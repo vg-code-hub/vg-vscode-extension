@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
+import { mkdirp } from "mkdirp";
 
 const os = require('os');
 const path = require('path');
@@ -259,3 +260,8 @@ const util = {
 };
 
 export default util;
+
+
+export function createDirectory(targetDirectory: string): Promise<string | void | undefined> {
+    return mkdirp(targetDirectory);
+}

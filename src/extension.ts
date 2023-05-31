@@ -2,21 +2,45 @@
  * @Author: zdd
  * @Date: 2023-05-30 17:42:04
  * @LastEditors: zdd
- * @LastEditTime: 2023-05-31 15:22:42
+ * @LastEditTime: 2023-05-31 16:52:13
  * @FilePath: /vg-vscode-extension/src/extension.ts
  * @Description: 
  */
 import * as vscode from 'vscode';
+import { imageGenerate } from './commands/image-generate';
+import { newGetxCommonDirectory } from './commands/new-getx-create-common-directory.command';
+import { newGetxGetBuilderPage } from './commands/new-getx-getbuilder-page.command';
+import { newGetxPage } from './commands/new-getx-page.command';
+import { newGetxStatefulWidgetGetBuilderPage } from './commands/new-getx-stateful-getbuilder-page.command';
+import { routersGenerate } from './commands/routers-generate';
 
 export function activate(context: vscode.ExtensionContext) {
 
 	console.log('恭喜，您的扩展“vg-vscode-extension”已被激活！');
 
-	let disposable = vscode.commands.registerCommand('extension.helloWorld', () => {
-		vscode.window.showInformationMessage('Hello World from vg-vscode-extension!');
-	});
-
-	context.subscriptions.push(disposable);
+	context.subscriptions.push(
+		vscode.commands.registerCommand(
+			"extension.new-getx-routers-generate",
+			routersGenerate
+		),
+		vscode.commands.registerCommand(
+			"extension.assets-generate",
+			imageGenerate
+		),
+		vscode.commands.registerCommand(
+			"extension.new-getx-create-directory",
+			newGetxCommonDirectory
+		),
+		vscode.commands.registerCommand("extension.new-getx-page", newGetxPage),
+		vscode.commands.registerCommand(
+			"extension.new-getx-getbuilder-page",
+			newGetxGetBuilderPage
+		),
+		vscode.commands.registerCommand(
+			"extension.new-getx-stateful-getbuilder-page",
+			newGetxStatefulWidgetGetBuilderPage
+		)
+	);
 }
 
 // This method is called when your extension is deactivated
