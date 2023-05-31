@@ -18,13 +18,13 @@
     "generator",
     "state-management"
   ],
+  "homepage": "https://github.com/JimmyZDD/vg-vscode-extension/blob/master/README.md",
   "repository": {
     "type": "git",
-    "url": "https://github.com/xxx/xxx"
+    "url": "https://github.com/JimmyZDD/vg-vscode-extension"
   },
   "bugs": {
-    "url": "https://github.com/xxx/xxx/issues",
-    "email": "xxx@gmail.com"
+    "url": "https://github.com/JimmyZDD/vg-vscode-extension/issues"
   },
   "README": "README.md",
   "publisher": "jimmy",
@@ -37,124 +37,13 @@
   "pricing": "Free",
   "main": "./dist/extension.js",
   "contributes": {
-    "configuration": {
-      "type": "object",
-      "title": "vg插件demo",
-      "properties": {
-        "vgVscodeExtension.yourName": {
-          "type": "string",
-          "default": "guest",
-          "description": "你的名字"
-        },
-        "vgVscodeExtension.showTip": {
-          "type": "boolean",
-          "default": true,
-          "description": "启动时显示自定义欢迎页"
-        },
-        "vgVscodeExtension.registryUrl": {
-          "type": "string",
-          "default": "https://www.npmjs.com/package/",
-          "description": "Registry URL to be used for package link."
-        },
-        "vgVscodeExtension.registryUrlPattern": {
-          "type": "string",
-          "default": "",
-          "markdownDescription": "Registry URL pattern to be used for package link.\n Example: `http://myCustomRegistry/{{pkg}}/package?queryparams`. \nTakes priority over `#npmDependencyLinks.registryUrl#` if set."
-        }
-      }
-    },
     "commands": [
       {
         "command": "extension.helloWorld",
         "category": "VG",
         "title": "Hello World"
-      },
-      {
-        "command": "extension.demo.getCurrentFilePath",
-        "category": "VG",
-        "title": "获取当前文件(夹)路径"
-      },
-      {
-        "command": "extension.demo.testMenuShow",
-        "category": "VG",
-        "title": "这个菜单仅在JS文件中出现",
-        "icon": {
-          "light": "./images/tool-light.svg",
-          "dark": "./images/tool-light.svg"
-        }
-      },
-      {
-        "command": "extension.demo.openWebview",
-        "category": "VG",
-        "title": "打开WebView"
-      },
-      {
-        "command": "extension.demo.showWelcome",
-        "category": "VG",
-        "title": "显示自定义欢迎页"
       }
     ],
-    "keybindings": [
-      {
-        "command": "extension.helloWorld",
-        "key": "ctrl+f10",
-        "mac": "cmd+f10",
-        "when": "editorTextFocus"
-      },
-      {
-        "command": "extension.demo.openWebview",
-        "key": "ctrl+f9",
-        "mac": "cmd+f9",
-        "when": "editorTextFocus"
-      }
-    ],
-    "menus": {
-      "editor/context": [
-        {
-          "when": "editorFocus",
-          "command": "extension.helloWorld",
-          "group": "navigation@6"
-        },
-        {
-          "when": "editorFocus",
-          "command": "extension.demo.getCurrentFilePath",
-          "group": "navigation@5"
-        },
-        {
-          "when": "editorFocus && resourceLangId == javascript",
-          "command": "extension.demo.testMenuShow",
-          "group": "z_commands"
-        },
-        {
-          "command": "extension.demo.openWebview",
-          "group": "navigation"
-        }
-      ],
-      "editor/title": [
-        {
-          "when": "editorFocus && resourceLangId == javascript",
-          "command": "extension.demo.testMenuShow",
-          "group": "navigation"
-        }
-      ],
-      "editor/title/context": [
-        {
-          "when": "resourceLangId == javascript",
-          "command": "extension.demo.testMenuShow",
-          "group": "navigation"
-        }
-      ],
-      "explorer/context": [
-        {
-          "command": "extension.demo.getCurrentFilePath",
-          "group": "navigation"
-        },
-        {
-          "command": "extension.demo.openWebview",
-          "group": "navigation"
-        }
-      ]
-    },
     "snippets": [
       {
         "language": "javascript",
@@ -163,38 +52,6 @@
       {
         "language": "html",
         "path": "./snippets/html.json"
-      }
-    ],
-    "viewsContainers": {
-      "activitybar": [
-        {
-          "id": "beautifulGirl",
-          "title": "美女",
-          "icon": "images/beautifulGirl.svg"
-        }
-      ]
-    },
-    "views": {
-      "beautifulGirl": [
-        {
-          "id": "beautifulGirl1",
-          "name": "国内美女"
-        },
-        {
-          "id": "beautifulGirl2",
-          "name": "国外美女"
-        },
-        {
-          "id": "beautifulGirl3",
-          "name": "人妖"
-        }
-      ]
-    },
-    "iconThemes": [
-      {
-        "id": "testIconTheme",
-        "label": "测试图标主题",
-        "path": "./theme/icon-theme.json"
       }
     ]
   },
