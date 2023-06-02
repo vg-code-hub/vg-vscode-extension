@@ -265,3 +265,27 @@ export default util;
 export function createDirectory(targetDirectory: string): Promise<string | void | undefined> {
     return mkdirp(targetDirectory);
 }
+
+/**
+ * @description: getRootPath(undefined) 获取根路径
+ * @param {vscode} resource
+ * @return {*}
+ */
+export function getRootPath(resource: vscode.Uri | undefined): string | undefined {
+    let path: string | undefined;
+    let workspace = vscode.workspace;
+    if (!workspace.workspaceFolders) {
+        path = workspace.rootPath;
+    } else {
+        let root: vscode.WorkspaceFolder | undefined;
+        if (workspace.workspaceFolders.length === 1)
+            root = workspace.workspaceFolders[0];
+        else
+            if (resource !== null)
+                root = workspace.getWorkspaceFolder(resource!);
+
+
+        path = root?.uri.fsPath;
+    }
+    return path;
+}

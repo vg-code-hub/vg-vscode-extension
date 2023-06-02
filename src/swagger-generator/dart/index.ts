@@ -2,38 +2,42 @@
  * @Author: zdd
  * @Date: 2023-06-01 15:12:03
  * @LastEditors: zdd
- * @LastEditTime: 2023-06-02 15:15:25
+ * @LastEditTime: 2023-06-02 23:47:30
  * @FilePath: /vg-vscode-extension/src/swagger-generator/dart/index.ts
  * @Description: 
  */
 
-import * as changeCase from "change-case";
-import { InputBoxOptions, OpenDialogOptions, Uri, window } from "vscode";
-import { existsSync, writeFile } from "fs";
-import { createDirectory } from "../../util";
-import { isEmpty, isNil } from "lodash";
+import { parse } from 'yaml';
+import { Uri, commands, window } from "vscode";
+import { existsSync, readFileSync, writeFile } from "fs";
+import { createDirectory, getRootPath } from "@root/util";
 import { getSimpleData } from "../http";
 import { collectChinese } from "../utils";
 import { getTranslateInfo } from "../translation";
 import ModelGenerate from "./generate/model";
 import RequestGenerate from "./generate/request";
+import { join } from "path";
 
 export const genWebapiForDart = async (uri: Uri) => {
+  let rootPath = getRootPath(undefined);
+  if (!rootPath) throw Error('no root path');
+  if (!existsSync(rootPath.concat(`/swagger.yaml`))) {
+    await new Promise<void>((resolve) => {
+      commands.executeCommand('extension.swagger-config-init').then(() => {
+        setTimeout(resolve, 100);
+      });
+    });
+    throw Error('config your swagger.yaml then  try again');
+  }
 
-  let jsonUrl = await promptForJsonUrl();
-  // if (isNil(jsonUrl) || jsonUrl.trim() === "") {
-  //   window.showErrorMessage("The name must not be empty");
-  //   return;
-  // }
+  // let targetDirectory = uri.fsPath;
 
-  let targetDirectory = uri.fsPath;
+  const file = readFileSync(rootPath.concat(`/swagger.yaml`), 'utf8');
+  const { jsonUrl, outputDir, language, requestClass } = parse(file);
+  if (!jsonUrl) throw Error('no swagger jsonUrl');
 
-  // jsonUrl = 'http://127.0.0.1:4523/export/openapi?projectId=2540665&version=2.0'; // done
-  jsonUrl = 'http://127.0.0.1:4523/export/openapi?projectId=2540665&version=3.1';
-
-  const pascalCasepageName = changeCase.pascalCase(jsonUrl.toLowerCase());
   try {
-    await generateCode(jsonUrl, targetDirectory);
+    await generateCode(jsonUrl, join(rootPath, 'lib', outputDir ?? 'api'));
     window.showInformationMessage(
       `Successfully Generated api directory`
     );
@@ -45,37 +49,14 @@ export const genWebapiForDart = async (uri: Uri) => {
   }
 };
 
-function promptForJsonUrl(): Thenable<string | undefined> {
-  const namePromptOptions: InputBoxOptions = {
-    prompt: "Input swagger json url",
-  };
-  return window.showInputBox(namePromptOptions);
-}
-
-async function promptForTargetDirectory(): Promise<string | undefined> {
-  const options: OpenDialogOptions = {
-    canSelectMany: false,
-    openLabel: "Select a folder to create the page in",
-    canSelectFolders: true,
-  };
-
-  return window.showOpenDialog(options).then((uri) => {
-    if (isNil(uri) || isEmpty(uri))
-      return undefined;
-
-    return uri[0].fsPath;
-  });
-}
-
-
 async function generateCode(jsonUrl: string, targetDirectory: string) {
-  const directoryPath = `${targetDirectory}/api`;
-  if (!existsSync(directoryPath)) await createDirectory(directoryPath);
+
+  if (!existsSync(targetDirectory)) await createDirectory(targetDirectory);
 
   const values = await getSimpleData(jsonUrl);
 
   writeFile(
-    directoryPath.concat(`/swagger.json`),
+    targetDirectory.concat(`/swagger.json`),
     JSON.stringify(values, null, 4),
     'utf-8',
     () => { }
@@ -84,7 +65,7 @@ async function generateCode(jsonUrl: string, targetDirectory: string) {
   //收集所有中文
   let chineseList = collectChinese(values);
 
-  const translationPath = directoryPath.concat(`/translation.json`);
+  const translationPath = targetDirectory.concat(`/translation.json`);
   // 拿到所有中英文映射对象
   let translateJson = await getTranslateInfo(chineseList, translationPath);
 
@@ -102,12 +83,6 @@ async function generateCode(jsonUrl: string, targetDirectory: string) {
   );
 
   // 生成 model
-  await new ModelGenerate(values.data, { translateJson, rootPath: directoryPath }).generateAllModel();
-  await new RequestGenerate(values.paths, { translateJson, rootPath: directoryPath, swaggerVersion: values.swagger }).generateAllRequest();
-
-  // await completePathAll(el.paths, {
-  //   name: el.serviceName,
-  //   rootPath: path.resolve(outputPath),
-  // });
-
+  await new ModelGenerate(values.data, { translateJson, rootPath: targetDirectory }).generateAllModel();
+  await new RequestGenerate(values.paths, { translateJson, rootPath: targetDirectory, swaggerVersion: values.swagger }).generateAllRequest();
 }

@@ -5,6 +5,14 @@
 		"lib": [
 			"ES2020"
 		],
+		"paths": {
+			"@root": [
+				"./src"
+			],
+			"@root/*": [
+				"./src/*"
+			], // 要使用别名下的模块的，配置这个。
+		},
 		"sourceMap": true,
 		"rootDir": "src",
 		"strict": true, /* enable all strict type-checking options */

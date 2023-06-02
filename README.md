@@ -69,3 +69,46 @@ You can author your README using Visual Studio Code. Here are some useful editor
 * [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
 
 **Enjoy!**
+
+
+Credits 
+Inspired by flutter_cache_manager, but make for support all platforms
+
+Uses:
+
+http - for file loading from internet
+path - for filename & location joint in InternetFileStorageIO
+universal_file - for work File in web
+Created for usage in:
+
+pdfx
+native_pdf_renderer
+native_pdf_view
+epub_view
+91
+LIKES
+130
+PUB POINTS
+97%
+POPULARITY
+Publisher
+verified publisher iconserge.software
+
+Metadata
+A internet file getter (also optional downloader) that works in all platforms
+
+Repository (GitHub)
+View/report issues
+
+Documentation
+API reference
+
+License
+Icon for licenses.MIT (LICENSE)
+
+Dependencies
+http, path, universal_file
+
+More
+Packages that depend on internet_file
+

@@ -1,3 +1,11 @@
+/*
+ * @Author: zdd
+ * @Date: 2023-05-30 17:42:04
+ * @LastEditors: zdd
+ * @LastEditTime: 2023-06-02 23:03:51
+ * @FilePath: /vg-vscode-extension/webpack.config.js
+ * @Description: 
+ */
 //@ts-check
 
 'use strict';
@@ -25,7 +33,11 @@ const extensionConfig = {
   },
   resolve: {
     // support reading TypeScript and JavaScript files, 📖 -> https://github.com/TypeStrong/ts-loader
-    extensions: ['.ts', '.js']
+    extensions: ['.ts', '.js'],
+    alias: {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        '@root': path.resolve(__dirname, 'src')
+    }
   },
   module: {
     rules: [

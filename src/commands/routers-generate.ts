@@ -9,6 +9,7 @@ import {
 } from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
+import { getRootPath } from "@root/util";
 
 export const routersGenerate = async (uri: Uri) => {
   console.log(uri);
@@ -30,24 +31,6 @@ export const routersGenerate = async (uri: Uri) => {
   }
 };
 
-function getRootPath(resource: Uri | undefined): string | undefined {
-  let path: string | undefined;
-  let workspace = vscode.workspace;
-  if (!workspace.workspaceFolders) {
-    path = workspace.rootPath;
-  } else {
-    let root: vscode.WorkspaceFolder | undefined;
-    if (workspace.workspaceFolders.length === 1)
-      root = workspace.workspaceFolders[0];
-    else
-      if (resource !== null)
-        root = workspace.getWorkspaceFolder(resource!);
-
-
-    path = root?.uri.fsPath;
-  }
-  return path;
-}
 
 // 生成 route names
 function routeNamesGenerate(targetDirectory: string) {
@@ -66,9 +49,6 @@ function routeNamesGenerate(targetDirectory: string) {
     // 排除 lib/pages/index.dart
     if (relativePath.indexOf("lib/pages/index.dart") !== -1 || relativePath.indexOf("bindings/") !== -1 || relativePath.indexOf("widgets/") !== -1 || relativePath.indexOf("controllers/") !== -1)
       return;
-
-    console.log(relativePath);
-
 
     // 名称
     let arrFilePath = relativePath
