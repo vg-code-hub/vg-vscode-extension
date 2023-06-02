@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-05-30 17:42:04
  * @LastEditors: zdd
- * @LastEditTime: 2023-05-31 16:52:13
+ * @LastEditTime: 2023-06-01 15:22:19
  * @FilePath: /vg-vscode-extension/src/extension.ts
  * @Description: 
  */
@@ -13,6 +13,7 @@ import { newGetxGetBuilderPage } from './commands/new-getx-getbuilder-page.comma
 import { newGetxPage } from './commands/new-getx-page.command';
 import { newGetxStatefulWidgetGetBuilderPage } from './commands/new-getx-stateful-getbuilder-page.command';
 import { routersGenerate } from './commands/routers-generate';
+import { genWebapiForDart, genWebapiForTypescript } from './swagger-generator';
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -39,6 +40,14 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(
 			"extension.new-getx-stateful-getbuilder-page",
 			newGetxStatefulWidgetGetBuilderPage
+		),
+		vscode.commands.registerCommand(
+			"extension.swagger-2-dart",
+			genWebapiForDart
+		),
+		vscode.commands.registerCommand(
+			"extension.swagger-2-ts",
+			genWebapiForTypescript
 		)
 	);
 }

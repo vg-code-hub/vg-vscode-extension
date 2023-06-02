@@ -40,32 +40,42 @@
     "commands": [
       {
         "command": "extension.assets-generate",
-        "title": "☆ VG: Images x1 x2 Generate",
+        "title": "☆ Images x1 x2 Generate",
         "category": "VG"
       },
       {
         "command": "extension.new-getx-routers-generate",
-        "title": "VG: Routers Generate",
+        "title": "Routers Generate",
         "category": "VG"
       },
       {
         "command": "extension.new-getx-create-directory",
-        "title": "VG: Create Common Directory",
+        "title": "Create Common Directory",
         "category": "VG"
       },
       {
         "command": "extension.new-getx-getbuilder-page",
-        "title": "★ VG: GetBuilder Page",
+        "title": "★ GetBuilder Page",
         "category": "VG"
       },
       {
         "command": "extension.new-getx-stateful-getbuilder-page",
-        "title": "VG: StatefulWidget + GetBuilder Page",
+        "title": "StatefulWidget + GetBuilder Page",
         "category": "VG"
       },
       {
         "command": "extension.new-getx-page",
-        "title": "VG: Full Page",
+        "title": "Full Page",
+        "category": "VG"
+      },
+      {
+        "command": "extension.swagger-2-dart",
+        "title": "swagger to dart",
+        "category": "VG"
+      },
+      {
+        "command": "extension.swagger-2-ts",
+        "title": "swagger to ts",
         "category": "VG"
       }
     ],
@@ -100,6 +110,16 @@
           "command": "extension.new-getx-page",
           "group": "blocGroup@1",
           "when": "explorerResourceIsFolder && resourcePath =~ /.?pages.?/i"
+        },
+        {
+          "command": "extension.swagger-2-dart",
+          "group": "blocGroup@1",
+          "when": "explorerResourceIsFolder && resourceFilename == 'lib'"
+        },
+        {
+          "command": "extension.swagger-2-ts",
+          "group": "blocGroup@1",
+          "when": "explorerResourceIsFolder && resourceFilename == 'lib'"
         }
       ]
     },
@@ -126,10 +146,12 @@
     "test": "node ./out/test/runTest.js"
   },
   "dependencies": {
+    "axios": "^1.4.0",
     "change-case": "^4.1.2",
     "jimp": "^0.22.8",
     "js-yaml": "^4.1.0",
     "lodash": "^4.17.21",
+    "md5": "^2.3.0",
     "mkdirp": "^3.0.1",
     "semver": "^7.5.1"
   },
