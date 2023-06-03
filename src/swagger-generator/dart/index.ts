@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-06-01 15:12:03
  * @LastEditors: zdd
- * @LastEditTime: 2023-06-02 23:47:30
+ * @LastEditTime: 2023-06-03 16:17:15
  * @FilePath: /vg-vscode-extension/src/swagger-generator/dart/index.ts
  * @Description: 
  */
@@ -42,6 +42,8 @@ export const genWebapiForDart = async (uri: Uri) => {
       `Successfully Generated api directory`
     );
   } catch (error) {
+    console.error(error);
+
     window.showErrorMessage(
       `Error:
         ${error instanceof Error ? error.message : JSON.stringify(error)}`
@@ -84,5 +86,5 @@ async function generateCode(jsonUrl: string, targetDirectory: string) {
 
   // 生成 model
   await new ModelGenerate(values.data, { translateJson, rootPath: targetDirectory }).generateAllModel();
-  await new RequestGenerate(values.paths, { translateJson, rootPath: targetDirectory, swaggerVersion: values.swagger }).generateAllRequest();
+  await new RequestGenerate(values.paths, { translateJson, rootPath: targetDirectory, swaggerVersion: Math.floor(values.swagger) }).generateAllRequest();
 }

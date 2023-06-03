@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-05-31 16:13:02
  * @LastEditors: zdd
- * @LastEditTime: 2023-05-31 18:39:40
+ * @LastEditTime: 2023-06-03 16:49:52
  * @FilePath: /vg-vscode-extension/src/commands/new-getx-getbuilder-page.command.ts
  * @Description: 
  */
@@ -19,7 +19,6 @@ import { createDirectory } from "../util";
 import { isEmpty, isNil } from "lodash";
 
 export const newGetxGetBuilderPage = async (uri: Uri) => {
-  console.log(uri);
   const pageName = await promptForPageName();
   if (isNil(pageName) || pageName.trim() === "") {
     window.showErrorMessage("The name must not be empty");
@@ -27,7 +26,6 @@ export const newGetxGetBuilderPage = async (uri: Uri) => {
   }
 
   let targetDirectory = uri.fsPath;
-  console.log(targetDirectory);
 
   const pascalCasepageName = changeCase.pascalCase(pageName.toLowerCase());
   try {

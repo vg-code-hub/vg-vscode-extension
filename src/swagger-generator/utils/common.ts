@@ -3,7 +3,7 @@
  * @Author: zdd
  * @Date: 2023-06-01 16:59:31
  * @LastEditors: zdd
- * @LastEditTime: 2023-06-02 15:43:26
+ * @LastEditTime: 2023-06-03 16:53:41
  * @FilePath: /vg-vscode-extension/src/swagger-generator/utils/common.ts
  * @Description: 
  */
@@ -17,7 +17,7 @@ const paths = require("path");
 /** tab 空格数 */
 export const INDENT = '  ';
 
-export const BASE_TYPE = ['int', 'double', 'String', 'DateTime', 'bool'];
+export const BASE_TYPE = ['int', 'double', 'string', 'String', 'DateTime', 'bool'];
 
 export function getDartType(key: string, property: SwaggerPropertyDefinition): string {
     const type = Array.isArray(property.type) ? first(property.type) : property.type;
@@ -50,7 +50,7 @@ export function getDartType(key: string, property: SwaggerPropertyDefinition): s
         case 'array':
             const items = property['items'];
             if (items) {
-                var itemType = getDartType(key + '_item', items);
+                var itemType = getDartType(key, items);
                 return `List<${itemType}>`;
             }
             break;
@@ -62,6 +62,8 @@ export function getDartType(key: string, property: SwaggerPropertyDefinition): s
                 return typeName;
             }
     }
+    console.error(key, property, 'getDartType');
+
     throw Error('Unsupported type: $type');
 }
 
@@ -105,14 +107,14 @@ export function getDartSchemaType(property: SwaggerPropertyDefinition): string |
                 return changeCase.pascalCase(typeName);
             }
     }
-    console.log(property, 'getDartSchemaType');
+    console.error(property, 'getDartSchemaType');
 
     throw Error('Unsupported type: $type');
 }
 
 export function getDartParamType(param: SwaggerHttpEndpoint['parameters'][0], swaggerVersion = 2): string | undefined {
     // TODO: fix swagger3 bug 
-    const type = swaggerVersion === 2 ? param.type : (param.schema ? (typeof param.schema === 'string' ? param.schema : param.schema.type) : 'object');
+    const type = swaggerVersion === 2 ? (param.type ?? param.schema?.type ?? param.schema?.$ref) : (param.schema ? (typeof param.schema === 'string' ? param.schema : param.schema.type) : 'object');
     const format = param.format;
 
     switch (type) {
@@ -136,10 +138,8 @@ export function getDartParamType(param: SwaggerHttpEndpoint['parameters'][0], sw
         case 'file':
             return 'File';
         case 'array':
-            const items = param['schema'];
+            const items = swaggerVersion === 2 ? (param.schema?.type ? param['schema']['items'] : param['items']) : param['schema'];
             if (items) {
-                console.log(items, param, 'items');
-
                 var itemType = getDartSchemaType(items);
                 return itemType ? `List<${changeCase.pascalCase(itemType)}>` : 'List';
             }
@@ -152,6 +152,8 @@ export function getDartParamType(param: SwaggerHttpEndpoint['parameters'][0], sw
                 return changeCase.pascalCase(typeName);
             }
     }
+    console.error(param, swaggerVersion, 'getDartParamType');
+
     throw Error('Unsupported type: $type');
 }
 

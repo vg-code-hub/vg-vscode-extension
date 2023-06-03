@@ -110,7 +110,9 @@ class RequestGenerate {
 
   generateRequest(key: string, method: Method, value: SwaggerHttpEndpoint) {
     let that = this;
-    const folder = value["x-apifox-folder"];
+    let folder = value["x-apifox-folder"];
+    if (!folder && value.tags && value.tags.length > 0) folder = value.tags[0];
+
     let dirPath: string, deeps = 1, className: string;
     if (folder) {
       const { str: path } = exchangeZhToEn(folder, this.options.translateJson);
@@ -130,11 +132,13 @@ class RequestGenerate {
       let resClass: string | undefined;
       if (!['post', 'put', 'delete'].includes(method) && value.responses && value.responses['200'] && value.responses['200'].schema) {
         const schema = value.responses['200'].schema;
-        if (schema.type === 'object' && Object.keys(schema.properties).includes('data')) {
+        if (schema.type === 'object' && schema.properties && Object.keys(schema.properties).includes('data')) {
           let rawData: SwaggerPropertyDefinition | undefined = schema.properties['data'];
           if (rawData['anyOf'])
             rawData = find(rawData['anyOf'], item => item.type !== 'null');
           resClass = rawData ? getDartSchemaType(rawData) : undefined;
+        } else if (schema.$ref || schema.type) {
+          resClass = getDartSchemaType(schema);
         }
       }
 
@@ -239,8 +243,8 @@ class RequestGenerate {
       const { pathParams, queryParams, formDataParams, bodyParams } = data;
       pathParams.forEach(p => {
         const name = changeCase.camelCase(p.name);
-        if (reqPath.includes('{$name}'))
-          reqPath = reqPath.replace(`{${name}}`, `\${${name}}`);
+        if (reqPath.includes(`{${p.name}}`))
+          reqPath = reqPath.replace(`{${p.name}}`, `\${${name}}`);
         else
           reqPath += reqPath.endsWith('/') ? `\${${name}}` : `/\${${name}}`;
       });
@@ -283,7 +287,7 @@ import '${join(...Array(deeps - 1).fill('..'), 'base_connect.dart')}';
 
 class ${className} extends BaseConnect {`;
     this.filesMap[dirPath] += `
-  /// ${value.summary}${value.description ? `\n/// ${value.description}` : ''}${value.operationId ? `\n/// Operation ID: ${value.operationId}` : ''}
+  /// ${value.summary}${value.description ? `\n${INDENT}/// ${value.description}` : ''}${value.operationId ? `\n${INDENT}/// Operation ID: ${value.operationId}` : ''}
   ${getParamsDescription()}
   ${getReturnType()} ${methodName}(${getParams()}) async {
     ${getReturnType() !== 'Future' ? 'final res = ' : ''}await ${method.toLowerCase()}(${getFunctionArgs()});${getReturnContent()}

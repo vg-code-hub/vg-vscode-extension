@@ -12,10 +12,7 @@ import * as vscode from "vscode";
 import { getRootPath } from "@root/util";
 
 export const routersGenerate = async (uri: Uri) => {
-  console.log(uri);
-
   let targetDirectory = uri.fsPath;
-  console.log(targetDirectory);
 
   try {
     routeNamesGenerate(targetDirectory);

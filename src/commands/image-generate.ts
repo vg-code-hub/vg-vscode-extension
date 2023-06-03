@@ -15,11 +15,7 @@ import {
 import { mkdirp } from "mkdirp";
 
 export const imageGenerate = async (uri: Uri) => {
-  console.log(uri);
-
   let targetDirectory = uri.fsPath;
-  console.log(targetDirectory);
-
   try {
     /**/
     imagesGen(targetDirectory);
@@ -55,7 +51,6 @@ function imagesGen(targetDirectory: string) {
 
 
     let workDir = path.resolve(imgPath.dir, ".."); // 上一级目录
-    console.log(filePath, workDir);
 
     // 创建 2.0x 1.0x
     if (!existsSync(`${workDir}/2.0x`))
@@ -132,7 +127,6 @@ function fileDisplay(filePath: string, fileList: string[]) {
             var isFile = stats.isFile(); //是文件
             var isDir = stats.isDirectory(); //是文件夹
             if (isFile)
-              // console.log(filedir);
               fileList.push(filedir);
 
             if (isDir)
@@ -170,7 +164,7 @@ const scaleImage = (
     Jimp.read(imagePath, (error, image) => {
       if (error) {
         reject(error);
-        console.log(error);
+        console.error(error);
         throw error;
       }
       let w = image.bitmap.width / scale;

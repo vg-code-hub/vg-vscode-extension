@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-05-31 16:13:02
  * @LastEditors: zdd
- * @LastEditTime: 2023-05-31 18:11:43
+ * @LastEditTime: 2023-06-03 16:49:41
  * @FilePath: /vg-vscode-extension/src/commands/new-getx-create-common-directory.command.ts
  * @Description: 
  */
@@ -18,10 +18,7 @@ import { createDirectory } from "../util";
 
 
 export const newGetxCommonDirectory = async (uri: Uri) => {
-  console.log(uri);
-
   let targetDirectory = uri.fsPath;
-  console.log(targetDirectory);
 
   // const pascalCasepageName = changeCase.pascalCase(pageName.toLowerCase());
   try {

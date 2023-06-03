@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-06-01 16:34:25
  * @LastEditors: zdd
- * @LastEditTime: 2023-06-02 15:53:10
+ * @LastEditTime: 2023-06-03 16:54:13
  * @FilePath: /vg-vscode-extension/src/swagger-generator/index.d.ts
  * @Description: 
  */
@@ -44,6 +44,7 @@ export interface SwaggerSchema extends Schema {
     required?: (keyof SwaggerSchemaProperties)[];
     allOf?: SwaggerSchema[];
     enum?: string[];
+    items: any
     "x-apifox-folder"?: string;
 }
 
@@ -82,6 +83,7 @@ export interface SwaggerHttpEndpoint {
         description?: string;
         type?: string;
         format?: string;
+        items?: SwaggerSchema;
         schema?: SwaggerSchema;
         maxLength?: number;
         minLength?: number;
