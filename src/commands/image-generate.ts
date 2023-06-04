@@ -4,15 +4,9 @@ import * as path from "path";
 import Jimp from "jimp";
 import { Uri, window } from "vscode";
 import {
-  readdirSync,
-  statSync,
-  existsSync,
-  readdir,
-  stat,
-  appendFileSync,
-  rmSync,
-} from "fs";
-import { mkdirp } from "mkdirp";
+  mkdirpSync, readdirSync, statSync, existsSync,
+  readdir, stat, appendFileSync, rmSync,
+} from "@root/util";
 
 export const imageGenerate = async (uri: Uri) => {
   let targetDirectory = uri.fsPath;
@@ -54,8 +48,7 @@ function imagesGen(targetDirectory: string) {
 
     // 创建 2.0x 1.0x
     if (!existsSync(`${workDir}/2.0x`))
-      createDirectory(`${workDir}/2.0x`);
-
+      mkdirpSync(`${workDir}/2.0x`);
 
     if (!existsSync(`${workDir}/${imgPath.base}`))
       await scaleImage(`${workDir}/${imgPath.base}`, filePath, 3);
@@ -151,9 +144,6 @@ function walkSync(currentDirPath: string, callback: Function) {
   });
 }
 
-function createDirectory(targetDirectory: string): Promise<string | void | undefined> {
-  return mkdirp(targetDirectory);
-}
 
 const scaleImage = (
   destinationImagePath: string,

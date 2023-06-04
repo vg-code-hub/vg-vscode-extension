@@ -1,15 +1,10 @@
 import * as changeCase from "change-case";
 import { Uri, window } from "vscode";
-import {
-  readdirSync,
-  statSync,
-  existsSync,
-  appendFileSync,
-  rmSync,
-} from "fs";
-import * as path from "path";
 import * as vscode from "vscode";
-import { getRootPath } from "@root/util";
+import {
+  join, getRootPath, readdirSync,
+  statSync, existsSync, appendFileSync, rmSync
+} from "@root/util";
 
 export const routersGenerate = async (uri: Uri) => {
   let targetDirectory = uri.fsPath;
@@ -101,7 +96,7 @@ function routeNamesGenerate(targetDirectory: string) {
 
 function walkSync(currentDirPath: string, callback: Function) {
   readdirSync(currentDirPath).forEach(function (name) {
-    var filePath = path.join(currentDirPath, name);
+    var filePath = join(currentDirPath, name);
     var stat = statSync(filePath);
     if (stat.isFile())
       callback(filePath, stat);

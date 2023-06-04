@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-06-01 16:34:25
  * @LastEditors: zdd
- * @LastEditTime: 2023-06-03 16:54:13
+ * @LastEditTime: 2023-06-04 19:05:31
  * @FilePath: /vg-vscode-extension/src/swagger-generator/index.d.ts
  * @Description: 
  */
@@ -105,3 +105,7 @@ type Consumers =
     | 'text/xml'
     | 'application/x-www-form-urlencoded';
 type Producers = 'application/json' | 'text/json' | 'application/xml' | 'text/xml';
+
+export type SwaggerPath = Swagger['paths'];
+export type Method = keyof SwaggerPath[''];
+export type Responses = SwaggerHttpEndpoint['responses'];

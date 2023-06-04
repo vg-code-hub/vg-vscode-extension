@@ -1,6 +1,5 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
-import { mkdirp } from "mkdirp";
 
 const os = require('os');
 const path = require('path');
@@ -262,10 +261,6 @@ const util = {
 export default util;
 
 
-export function createDirectory(targetDirectory: string): Promise<string | void | undefined> {
-    return mkdirp(targetDirectory);
-}
-
 /**
  * @description: getRootPath(undefined) 获取根路径
  * @param {vscode} resource
@@ -284,8 +279,26 @@ export function getRootPath(resource: vscode.Uri | undefined): string | undefine
             if (resource !== null)
                 root = workspace.getWorkspaceFolder(resource!);
 
-
         path = root?.uri.fsPath;
     }
     return path;
 }
+
+export function readFileToJson(uri: string) {
+    try {
+        let file = fs.readFileSync(uri);
+        return JSON.parse(file.toString());
+    } catch (error) {
+        return {};
+    }
+};
+export const writeFile = (file: fs.PathOrFileDescriptor, data: string | NodeJS.ArrayBufferView, options: fs.WriteFileOptions) => fs.writeFile(file, data, options, () => { });
+
+export { join } from "path";
+export { mkdirpSync, mkdirp } from "mkdirp";
+export {
+    existsSync, writeFileSync, readFileSync, readdirSync,
+    statSync, readFile, unlinkSync, readdir, stat,
+    appendFileSync, rmSync,
+} from "fs";
+export { find, first, isEmpty, isNil } from "lodash";

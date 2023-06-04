@@ -2,19 +2,14 @@
  * @Author: zdd
  * @Date: 2023-05-31 16:13:02
  * @LastEditors: zdd
- * @LastEditTime: 2023-06-03 16:49:41
+ * @LastEditTime: 2023-06-04 20:20:34
  * @FilePath: /vg-vscode-extension/src/commands/new-getx-create-common-directory.command.ts
  * @Description: 
  */
 
 import { Uri, window } from "vscode";
-import { existsSync } from "fs";
-import {
-  indexTemplate,
-  commonIndexTemplate,
-  viewIndexTemplate,
-} from "../templates/getx-create-common-directory.template";
-import { createDirectory } from "../util";
+import { indexTemplate, commonIndexTemplate, viewIndexTemplate } from "../templates/getx-create-common-directory.template";
+import { mkdirp, existsSync } from "../util";
 
 
 export const newGetxCommonDirectory = async (uri: Uri) => {
@@ -38,23 +33,23 @@ async function generateCode(pageName: string, targetDirectory: string) {
   if (!existsSync(commonDirectoryPath)) {
 
     ['pages', 'routers', 'middleware', 'domains'].forEach(async item => {
-      await createDirectory(`${targetDirectory}/${item}`);
+      await mkdirp(`${targetDirectory}/${item}`);
       indexTemplate(item, targetDirectory);
     });
 
     // fview
     const fviewPath = `${targetDirectory}/fview`;
-    await createDirectory(`${targetDirectory}/fview`);
+    await mkdirp(`${targetDirectory}/fview`);
     ['components', 'utils', 'vendors', 'widgets'].forEach(async item => {
-      await createDirectory(`${fviewPath}/${item}`);
+      await mkdirp(`${fviewPath}/${item}`);
       indexTemplate(item, fviewPath);
     });
     viewIndexTemplate(fviewPath);
 
     // common
-    await createDirectory(commonDirectoryPath);
+    await mkdirp(commonDirectoryPath);
     ['extension', 'l10n', 'models', 'network', 'services', 'style', 'theme', 'utils', 'values'].forEach(async item => {
-      await createDirectory(`${commonDirectoryPath}/${item}`);
+      await mkdirp(`${commonDirectoryPath}/${item}`);
       indexTemplate(item, commonDirectoryPath);
     });
     commonIndexTemplate(commonDirectoryPath);

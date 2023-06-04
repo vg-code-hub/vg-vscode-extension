@@ -3,13 +3,15 @@
  * @Author: zdd
  * @Date: 2023-06-01 16:59:31
  * @LastEditors: zdd
- * @LastEditTime: 2023-06-03 16:53:41
+ * @LastEditTime: 2023-06-04 20:09:55
  * @FilePath: /vg-vscode-extension/src/swagger-generator/utils/common.ts
  * @Description: 
  */
 import { first } from "lodash";
-import { Schema, SwaggerHttpEndpoint, SwaggerPropertyDefinition } from "../index.d";
+import { SwaggerHttpEndpoint, SwaggerPropertyDefinition } from "../index.d";
 import * as changeCase from "change-case";
+import { exchangeZhToEn } from "./helper";
+import { join } from "path";
 
 const fs = require("fs");
 const paths = require("path");
@@ -200,4 +202,22 @@ export const delDir = (
     }
 };
 
-export const translateToEn = () => { };
+export const getDirPath = (folder: string | undefined, type: 'entitys' | 'requests', { translateJson, rootPath }: any) => {
+    let dirPath: string, deeps = 1, className: string;
+    if (folder) {
+        const { str: path } = exchangeZhToEn(folder, translateJson);
+        dirPath = join(rootPath, type, path.split('/').map(e => changeCase.snakeCase(e)).join('/'));
+        deeps += path.split('/').length;
+        className = changeCase.pascalCase(path.split('/').map(e => changeCase.snakeCase(e)).join('_') + '_request');
+    } else {
+        dirPath = join(rootPath, type);
+        className = changeCase.pascalCase('request');
+    }
+    if (type === 'entitys') return dirPath;
+    else
+        return {
+            className,
+            dirPath,
+            deeps
+        };
+};

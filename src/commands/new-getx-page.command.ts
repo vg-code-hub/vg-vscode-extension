@@ -2,25 +2,16 @@
  * @Author: zdd
  * @Date: 2023-05-31 16:13:02
  * @LastEditors: zdd
- * @LastEditTime: 2023-06-03 16:50:01
+ * @LastEditTime: 2023-06-04 20:20:02
  * @FilePath: /vg-vscode-extension/src/commands/new-getx-page.command.ts
  * @Description: 
  */
 
 import * as changeCase from "change-case";
 import { InputBoxOptions, OpenDialogOptions, Uri, window } from "vscode";
-import { existsSync } from "fs";
-import {
-  bindingsTemplate,
-  controllerTemplate,
-  indexTemplate,
-  stateTemplate,
-  viewTemplate,
-  widgetsHelloTemplate,
-  widgetsTemplate,
-} from "../templates/getx-page.template";
-import { createDirectory } from "../util";
-import { isEmpty, isNil } from "lodash";
+import { bindingsTemplate, controllerTemplate, viewTemplate } from "../templates/getx-page.template";
+import { mkdirp, existsSync, isEmpty, isNil } from "../util";
+
 
 export const newGetxPage = async (uri: Uri) => {
   const pageName = await promptForPageName();
@@ -75,7 +66,7 @@ async function generateCode(pageName: string, targetDirectory: string) {
   if (!existsSync(pageFile)) {
     await Promise.all(['bindings', 'controllers', 'widgets'].map(async item => {
       const directoryPath = `${targetDirectory}/${item}`;
-      if (!existsSync(directoryPath)) await createDirectory(directoryPath);
+      if (!existsSync(directoryPath)) await mkdirp(directoryPath);
     }));
 
     await Promise.all([

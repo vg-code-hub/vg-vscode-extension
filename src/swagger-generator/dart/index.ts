@@ -2,21 +2,19 @@
  * @Author: zdd
  * @Date: 2023-06-01 15:12:03
  * @LastEditors: zdd
- * @LastEditTime: 2023-06-03 16:17:15
+ * @LastEditTime: 2023-06-04 20:13:30
  * @FilePath: /vg-vscode-extension/src/swagger-generator/dart/index.ts
  * @Description: 
  */
 
 import { parse } from 'yaml';
 import { Uri, commands, window } from "vscode";
-import { existsSync, readFileSync, writeFile } from "fs";
-import { createDirectory, getRootPath } from "@root/util";
+import { join, mkdirp, getRootPath, existsSync, readFileSync, writeFile } from "@root/util";
 import { getSimpleData } from "../http";
 import { collectChinese } from "../utils";
 import { getTranslateInfo } from "../translation";
 import ModelGenerate from "./generate/model";
 import RequestGenerate from "./generate/request";
-import { join } from "path";
 
 export const genWebapiForDart = async (uri: Uri) => {
   let rootPath = getRootPath(undefined);
@@ -29,8 +27,6 @@ export const genWebapiForDart = async (uri: Uri) => {
     });
     throw Error('config your swagger.yaml then  try again');
   }
-
-  // let targetDirectory = uri.fsPath;
 
   const file = readFileSync(rootPath.concat(`/swagger.yaml`), 'utf8');
   const { jsonUrl, outputDir, language, requestClass } = parse(file);
@@ -53,7 +49,7 @@ export const genWebapiForDart = async (uri: Uri) => {
 
 async function generateCode(jsonUrl: string, targetDirectory: string) {
 
-  if (!existsSync(targetDirectory)) await createDirectory(targetDirectory);
+  if (!existsSync(targetDirectory)) await mkdirp(targetDirectory);
 
   const values = await getSimpleData(jsonUrl);
 
@@ -61,7 +57,6 @@ async function generateCode(jsonUrl: string, targetDirectory: string) {
     targetDirectory.concat(`/swagger.json`),
     JSON.stringify(values, null, 4),
     'utf-8',
-    () => { }
   );
 
   //收集所有中文
@@ -76,12 +71,6 @@ async function generateCode(jsonUrl: string, targetDirectory: string) {
     translationPath,
     JSON.stringify(translateJson, null, 4),
     'utf-8',
-    (error: any) => {
-      // if (error)
-      //   reject(error);
-      // else
-      //   resolve("写入成功");
-    }
   );
 
   // 生成 model

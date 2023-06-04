@@ -3,386 +3,224 @@
  * @Author: zdd
  * @Date: 2023-05-31 22:05:06
  * @LastEditors: zdd
- * @LastEditTime: 2023-06-03 16:35:28
+ * @LastEditTime: 2023-06-04 18:58:10
  * @FilePath: /vg-vscode-extension/src/swagger-generator/dart/generate/model.ts
  * @Description: 
  */
-import { existsSync, writeFile } from "fs";
 import * as changeCase from "change-case";
-import { mkdirpSync } from "mkdirp";
-import { join } from "path";
-
-import type { SwaggerSchema, SwaggerSchemas } from "../../index.d";
-import { BASE_TYPE, INDENT, exchangeZhToEn, getDartType } from "../../utils";
-import { find } from "lodash";
+import { existsSync, writeFileSync, mkdirpSync, join, find } from "@root/util";
+import type { SwaggerSchema, SwaggerSchemaProperties, SwaggerSchemas } from "../../index.d";
+import { BASE_TYPE, INDENT, getDartType, getDirPath } from "../../utils";
 
 class ModelGenerate {
   data: SwaggerSchemas;
   options: { rootPath: string, translateJson: Record<string, string> };
   filesMap: Record<string, string>;
-  otherMap: Record<string, any>;
 
   constructor(data: SwaggerSchemas, options: { rootPath: string, translateJson: Record<string, string> }) {
     this.options = options;
     this.data = data;
     this.filesMap = {};
-    this.otherMap = {};
   }
 
   async generateAllModel() {
     for (let key in this.data)
       this.generateModel(key, this.data[key]);
 
-    for (const dirPath in this.otherMap) {
-      const element = this.otherMap[dirPath];
-      for (const className in element)
-        this.generateOtherModel(dirPath, className, element[className]);
-    }
     let str = 'library entitys;\n\n';
     const modelsDir = join(this.options.rootPath, 'entitys');
+
+    // model内容写入
     for (let key in this.filesMap) {
       str += `export '.${key.replace(modelsDir, '')}/model.g.dart';\n`;
       if (!existsSync(join(key, 'model.g.dart')))
-        // model内容写入
-        writeFile(
+        writeFileSync(
           join(key, 'model.g.dart'),
           this.filesMap[key],
           'utf-8',
-          (error: any) => {
-            // if (error)
-            //   reject(error);
-            // else
-            //   resolve("写入成功");
-          }
         );
       else
-        // model内容写入
-        writeFile(
+        writeFileSync(
           join(key, 'model.g.vg'),
           this.filesMap[key],
           'utf-8',
-          (error: any) => {
-            // if (error)
-            //   reject(error);
-            // else
-            //   resolve("写入成功");
-          }
         );
     }
-
+    // 内容写入 index.dart
     if (!existsSync(join(modelsDir, 'index.dart')))
-      writeFile(
+      writeFileSync(
         join(modelsDir, 'index.dart'),
         str,
         'utf-8',
-        (error: any) => {
-          // if (error)
-          //   reject(error);
-          // else
-          //   resolve("写入成功");
-        }
       );
-    writeFile(
+    writeFileSync(
       join(modelsDir, 'index.text'),
       str,
       'utf-8',
-      (error: any) => {
-        // if (error)
-        //   reject(error);
-        // else
-        //   resolve("写入成功");
-      }
     );
+  }
 
+  getConstructorContent(properties: SwaggerSchemaProperties, required: (string | number)[] | undefined) {
+    let str = '';
+    for (const propertyName in properties) {
+      const property = properties[propertyName];
+      const dartType = getDartType(propertyName, property);
+
+      let require = required?.includes(propertyName) ?? false;
+      // nullable swagger 3+
+      const nullable = Array.isArray(property.type) && find(property.type, e => e.toString().includes('null'));
+      if (nullable && require && !dartType.startsWith('List')) require = false;
+
+      const camelPropertyName = changeCase.camelCase(propertyName);
+      str += `${INDENT}${INDENT}${require ? 'required ' : ''}this.${camelPropertyName},\n`;
+    }
+    str = str.length > 0 ? str.substring(4, str.length - 1) : str;
+    return str;
+  }
+
+  getPropertiesContent(properties: SwaggerSchemaProperties, required: (string | number)[] | undefined) {
+    let str = '';
+    for (const propertyName in properties) {
+      const property = properties[propertyName];
+      const dartType = getDartType(propertyName, property);
+      const camelPropertyName = changeCase.camelCase(propertyName);
+
+      let require = required?.includes(propertyName) ?? false;
+      // nullable swagger 3+
+      const nullable = Array.isArray(property.type) && find(property.type, e => e.toString().includes('null'));
+      if (nullable && require && !dartType.startsWith('List')) require = false;
+
+      if (property.title || property.description) str += `${INDENT}/// ${property.title || property.description} \n`;
+      str += `${INDENT}${dartType}${require ? '' : '?'} ${camelPropertyName}; \n\n`;
+    }
+    str = str.length > 0 ? str.substring(2, str.length - 1) : str;
+    return str;
+  }
+
+  getFromJsonContent(properties: SwaggerSchemaProperties, required: (string | number)[] | undefined) {
+    let str = '';
+    for (const propertyName in properties) {
+      const property = properties[propertyName];
+      const dartType = getDartType(propertyName, property);
+      const camelPropertyName = changeCase.camelCase(propertyName);
+
+      let require = required?.includes(propertyName) ?? false;
+      // nullable swagger 3+
+      const nullable = Array.isArray(property.type) && find(property.type, e => e.toString().includes('null'));
+      if (nullable && require && !dartType.startsWith('List')) require = false;
+
+      str += `${INDENT}${INDENT}${camelPropertyName}: `;
+      if (dartType.startsWith('List')) {
+        var subType = dartType.substring(5, dartType.length - 1);
+        str += `json["${propertyName}"] != null ? List<${subType}>.from(json["${propertyName}"].map((x) => ${BASE_TYPE.includes(subType) ? 'x' : `${subType}.fromJson(x)`})) : [],\n`;
+      } else if (!BASE_TYPE.includes(dartType)) {
+        str += require ? `${dartType}.fromJson(json["${propertyName}"]),\n` : `json["${propertyName}"] != null ? ${dartType}.fromJson(json["${propertyName}"]) : null,\n`;
+      } else {
+        str += `json["${propertyName}"],\n`;
+      }
+    }
+    str = str.length > 0 ? str.substring(4, str.length - 1) : str;
+    return str;
+  }
+
+  getToJsonContent(properties: SwaggerSchemaProperties, required: (string | number)[] | undefined) {
+    let str = '';
+    for (const propertyName in properties) {
+
+      const camelPropertyName = changeCase.camelCase(propertyName);
+      const property = properties[propertyName];
+      const dartType = getDartType(propertyName, property);
+      let require = required?.includes(propertyName) ?? false;
+      // nullable swagger 3+
+      const nullable = Array.isArray(property.type) && find(property.type, e => e.toString().includes('null'));
+      if (nullable && require && !dartType.startsWith('List')) require = false;
+
+      str += `${INDENT}${INDENT}"${propertyName}": `;
+
+      if (dartType.startsWith('List')) {
+        var subType = dartType.substring(5, dartType.length - 1);
+        if (require)
+          str += `${camelPropertyName}.map((e) => ${BASE_TYPE.includes(subType) ? 'e' : 'e.toJson()'}).toList(),\n`;
+        else
+          str += `${camelPropertyName} != null ? ${camelPropertyName}!.map((e) => ${BASE_TYPE.includes(subType) ? 'e' : 'e.toJson()'}).toList() : null,\n`;
+      } else if (!BASE_TYPE.includes(dartType)) {
+        if (require)
+          str += `${camelPropertyName}.toJson(),\n`;
+        else
+          str += `${camelPropertyName} != null ? ${camelPropertyName}!.toJson() : null,\n`;
+
+      } else {
+        str += `${camelPropertyName},\n`;
+      }
+    }
+    str = str.length > 0 ? str.substring(4, str.length - 1) : str;
+    return str;
+  }
+
+  checkSubGen(properties: SwaggerSchemaProperties, dirPath: string) {
+    for (const propertyName in properties) {
+      const property = properties[propertyName];
+      const dartType = getDartType(propertyName, property);
+      if (dartType.startsWith('List')) {
+        var subType = dartType.substring(5, dartType.length - 1);
+        if (!BASE_TYPE.includes(subType)) this.generateOtherModel(dirPath, subType, property.items);
+      } else if (!BASE_TYPE.includes(dartType)) {
+        this.generateOtherModel(dirPath, dartType, property);
+      }
+    }
   }
 
   generateModel(key: string, value: SwaggerSchema) {
     let folder = value["x-apifox-folder"];
-    let dirPath: string;
-    let that = this;
-
-    if (folder) {
-      const { str: path } = exchangeZhToEn(folder, this.options.translateJson);
-      dirPath = join(this.options.rootPath, 'entitys', path.split('/').map(e => changeCase.snakeCase(e)).join('/'));
-    } else {
-      dirPath = join(this.options.rootPath, 'entitys');
-    }
+    let dirPath: string = getDirPath(folder, 'entitys', { ...this.options }) as string;
 
     if (!existsSync(dirPath)) mkdirpSync(dirPath);
     const className = changeCase.pascalCase(key);
     if (!this.filesMap[dirPath]) this.filesMap[dirPath] = '/// This file is generated by the VG SwaggerGenerator.\n/// You can modify it so that the next generation will not overwrite it, but instead generate a suffix file with the same name [.vg]\n';
 
-    function getConstructorContent() {
-      const properties = value['properties'];
-      let str = '';
-      for (const propertyName in properties) {
-        const property = properties[propertyName];
-        const dartType = getDartType(propertyName, property);
-        let require = value['required']?.includes(propertyName) ?? false;
-        // nullable swagger 3+
-        const nullable = Array.isArray(property.type) && find(property.type, e => e.toString().includes('null'));
-        if (nullable && require && !dartType.startsWith('List')) require = false;
-        const camelPropertyName = changeCase.camelCase(propertyName);
-        str += `${INDENT}${INDENT}${require ? 'required ' : ''}this.${camelPropertyName},\n`;
-      }
-      str = str.length > 0 ? str.substring(4, str.length - 1) : str;
-      return str;
-    }
-
-    function getPropertiesContent() {
-      const properties = value['properties'];
-      let str = '';
-      for (const propertyName in properties) {
-        const property = properties[propertyName];
-        const dartType = getDartType(propertyName, property);
-        const camelPropertyName = changeCase.camelCase(propertyName);
-
-        let require = value['required']?.includes(propertyName) ?? false;
-        // nullable swagger 3+
-        const nullable = Array.isArray(property.type) && find(property.type, e => e.toString().includes('null'));
-        if (nullable && require && !dartType.startsWith('List')) require = false;
-
-        if (property.title || property.description) str += `${INDENT}/// ${property.title || property.description} \n`;
-        str += `${INDENT}${dartType}${require ? '' : '?'} ${camelPropertyName}; \n\n`;
-      }
-      str = str.length > 0 ? str.substring(2, str.length - 1) : str;
-      return str;
-    }
-
-    function getFromJsonContent() {
-      const properties = value['properties'];
-      let str = '';
-      for (const propertyName in properties) {
-        const property = properties[propertyName];
-        const dartType = getDartType(propertyName, property);
-        const camelPropertyName = changeCase.camelCase(propertyName);
-
-        let require = value['required']?.includes(propertyName) ?? false;
-        // nullable swagger 3+
-        const nullable = Array.isArray(property.type) && find(property.type, e => e.toString().includes('null'));
-        if (nullable && require && !dartType.startsWith('List')) require = false;
-
-        str += `${INDENT}${INDENT}${camelPropertyName}: `;
-        if (dartType.startsWith('List')) {
-          var subType = dartType.substring(5, dartType.length - 1);
-          str += `json["${propertyName}"] != null ? List<${subType}>.from(json["${propertyName}"].map((x) => ${BASE_TYPE.includes(subType) ? 'x' : `${subType}.fromJson(x)`})) : [],\n`;
-        } else if (!BASE_TYPE.includes(dartType)) {
-          str += require ? `${dartType}.fromJson(json["${propertyName}"]),\n` : `json["${propertyName}"] != null ? ${dartType}.fromJson(json["${propertyName}"]) : null,\n`;
-        } else {
-          str += `json["${propertyName}"],\n`;
-        }
-      }
-      str = str.length > 0 ? str.substring(4, str.length - 1) : str;
-      return str;
-    }
-
-    function getToJsonContent() {
-      const properties = value['properties'];
-      let str = '';
-      for (const propertyName in properties) {
-
-        const camelPropertyName = changeCase.camelCase(propertyName);
-        const property = properties[propertyName];
-        const dartType = getDartType(propertyName, property);
-        let require = value['required']?.includes(propertyName) ?? false;
-        // nullable swagger 3+
-        const nullable = Array.isArray(property.type) && find(property.type, e => e.toString().includes('null'));
-        if (nullable && require && !dartType.startsWith('List')) require = false;
-
-        str += `${INDENT}${INDENT}"${propertyName}": `;
-
-        if (dartType.startsWith('List')) {
-          var subType = dartType.substring(5, dartType.length - 1);
-          if (require)
-            str += `${camelPropertyName}.map((e) => ${BASE_TYPE.includes(subType) ? 'e' : 'e.toJson()'}).toList(),\n`;
-          else
-            str += `${camelPropertyName} != null ? ${camelPropertyName}!.map((e) => ${BASE_TYPE.includes(subType) ? 'e' : 'e.toJson()'}).toList() : null,\n`;
-        } else if (!BASE_TYPE.includes(dartType)) {
-          if (require)
-            str += `${camelPropertyName}.toJson(),\n`;
-          else
-            str += `${camelPropertyName} != null ? ${camelPropertyName}!.toJson() : null,\n`;
-
-        } else {
-          str += `${camelPropertyName},\n`;
-        }
-      }
-      str = str.length > 0 ? str.substring(4, str.length - 1) : str;
-      return str;
-    }
+    if (this.filesMap[dirPath].includes(`class ${className} `)) return;
 
     this.filesMap[dirPath] += `
 class ${className} {
   ${className}({
-    ${getConstructorContent()}
+    ${this.getConstructorContent(value.properties, value.required)}
   });
 
-  ${getPropertiesContent()}
+  ${this.getPropertiesContent(value.properties, value.required)}
 
   factory ${className}.fromJson(Map<String, dynamic> json) => ${className}(
-    ${getFromJsonContent()}
+    ${this.getFromJsonContent(value.properties, value.required)}
   );
 
   Map<String, dynamic> toJson() => {
-    ${getToJsonContent()}
+    ${this.getToJsonContent(value.properties, value.required)}
   };
 }
 `;
-    function checkSubGen() {
-      const properties = value['properties'];
-      for (const propertyName in properties) {
-        const property = properties[propertyName];
-        const dartType = getDartType(propertyName, property);
-        if (dartType.startsWith('List')) {
-          var subType = dartType.substring(5, dartType.length - 1);
-          if (!BASE_TYPE.includes(subType)) {
-            if (!that.otherMap[dirPath]) that.otherMap[dirPath] = {};
-            that.otherMap[dirPath][subType] = property.items;
-          }
-        } else if (!BASE_TYPE.includes(dartType)) {
-          if (!that.otherMap[dirPath]) that.otherMap[dirPath] = {};
-          that.otherMap[dirPath][dartType] = property;
-        }
-      }
-    }
-    checkSubGen();
+    this.checkSubGen(value.properties, dirPath);
   }
 
   generateOtherModel(dirPath: string, className: string, value: any) {
     if (this.filesMap[dirPath].includes(`class ${className} `)) return;
 
-    let that = this;
-    function checkSubGen() {
-      const properties = value['properties'];
-      for (const propertyName in properties) {
-        const property = properties[propertyName];
-        const dartType = getDartType(propertyName, property);
-        if (dartType.startsWith('List')) {
-          var subType = dartType.substring(5, dartType.length - 1);
-          if (!BASE_TYPE.includes(subType)) that.generateOtherModel(dirPath, subType, property.items);
-        } else if (!BASE_TYPE.includes(dartType)) {
-          that.generateOtherModel(dirPath, dartType, property);
-        }
-      }
-    }
-
-    function getConstructorContent() {
-      const properties = value['properties'];
-      let str = '';
-      for (const propertyName in properties) {
-        const property = properties[propertyName];
-        const dartType = getDartType(propertyName, property);
-        let require = value['required']?.includes(propertyName) ?? false;
-        // nullable swagger 3+
-        const nullable = Array.isArray(property.type) && find(property.type, e => e.toString().includes('null'));
-        if (nullable && require && !dartType.startsWith('List')) require = false;
-        const camelPropertyName = changeCase.camelCase(propertyName);
-        str += `${INDENT}${INDENT}${require ? 'required ' : ''}this.${camelPropertyName},\n`;
-      }
-      str = str.length > 0 ? str.substring(4, str.length - 1) : str;
-      return str;
-    }
-
-    function getPropertiesContent() {
-      const properties = value['properties'];
-      let str = '';
-      for (const propertyName in properties) {
-        const property = properties[propertyName];
-        const dartType = getDartType(propertyName, property);
-        const camelPropertyName = changeCase.camelCase(propertyName);
-
-        let require = value['required']?.includes(propertyName) ?? false;
-        // nullable swagger 3+
-        const nullable = Array.isArray(property.type) && find(property.type, e => e.toString().includes('null'));
-        if (nullable && require && !dartType.startsWith('List')) require = false;
-
-        if (property.title || property.description) str += `${INDENT}/// ${property.title || property.description} \n`;
-        str += `${INDENT}${dartType}${require ? '' : '?'} ${camelPropertyName}; \n\n`;
-      }
-      str = str.length > 0 ? str.substring(2, str.length - 1) : str;
-      return str;
-    }
-
-    function getFromJsonContent() {
-      const properties = value['properties'];
-      let str = '';
-      for (const propertyName in properties) {
-        const property = properties[propertyName];
-        const dartType = getDartType(propertyName, property);
-        const camelPropertyName = changeCase.camelCase(propertyName);
-
-        let require = value['required']?.includes(propertyName) ?? false;
-        // nullable swagger 3+
-        const nullable = Array.isArray(property.type) && find(property.type, e => e.toString().includes('null'));
-        if (nullable && require && !dartType.startsWith('List')) require = false;
-
-        str += `${INDENT}${INDENT}${camelPropertyName}: `;
-        if (dartType.startsWith('List')) {
-          var subType = dartType.substring(5, dartType.length - 1);
-          str += `json["${propertyName}"] != null ? List<${subType}>.from(json["${propertyName}"].map((x) => ${BASE_TYPE.includes(subType) ? 'x' : `${subType}.fromJson(x)`})) : [],\n`;
-        } else if (!BASE_TYPE.includes(dartType)) {
-          str += require ? `${dartType}.fromJson(json["${propertyName}"]),\n` : `json["${propertyName}"] != null ? ${dartType}.fromJson(json["${propertyName}"]) : null,\n`;
-        } else {
-          str += `json["${propertyName}"],\n`;
-        }
-      }
-      str = str.length > 0 ? str.substring(4, str.length - 1) : str;
-      return str;
-    }
-
-    function getToJsonContent() {
-      const properties = value['properties'];
-      let str = '';
-      for (const propertyName in properties) {
-
-        const camelPropertyName = changeCase.camelCase(propertyName);
-        const property = properties[propertyName];
-        const dartType = getDartType(propertyName, property);
-        let require = value['required']?.includes(propertyName) ?? false;
-        // nullable swagger 3+
-        const nullable = Array.isArray(property.type) && find(property.type, e => e.toString().includes('null'));
-        if (nullable && require && !dartType.startsWith('List')) require = false;
-
-        str += `${INDENT}${INDENT}"${propertyName}": `;
-
-        if (dartType.startsWith('List')) {
-          var subType = dartType.substring(5, dartType.length - 1);
-          if (require)
-            str += `${camelPropertyName}.map((e) => ${BASE_TYPE.includes(subType) ? 'e' : 'e.toJson()'}).toList(),\n`;
-          else
-            str += `${camelPropertyName} != null ? ${camelPropertyName}!.map((e) => ${BASE_TYPE.includes(subType) ? 'e' : 'e.toJson()'}).toList() : null,\n`;
-        } else if (!BASE_TYPE.includes(dartType)) {
-          if (require)
-            str += `${camelPropertyName}.toJson(),\n`;
-          else
-            str += `${camelPropertyName} != null ? ${camelPropertyName}!.toJson() : null,\n`;
-
-        } else {
-          str += `${camelPropertyName},\n`;
-        }
-      }
-      str = str.length > 0 ? str.substring(4, str.length - 1) : str;
-      return str;
-    }
-
     this.filesMap[dirPath] += `
 class ${className} {
   ${className}({
-    ${getConstructorContent()}
+    ${this.getConstructorContent(value.properties, value.required)}
   });
 
-  ${getPropertiesContent()}
+  ${this.getPropertiesContent(value.properties, value.required)}
 
   factory ${className}.fromJson(Map<String, dynamic> json) => ${className}(
-    ${getFromJsonContent()}
+    ${this.getFromJsonContent(value.properties, value.required)}
   );
 
   Map<String, dynamic> toJson() => {
-    ${getToJsonContent()}
+    ${this.getToJsonContent(value.properties, value.required)}
   };
 }
 `;
-    checkSubGen();
+    this.checkSubGen(value.properties, dirPath);
   }
 }
 

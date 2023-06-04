@@ -1,22 +1,17 @@
 const https = require("https");
-const fs = require("fs");
 const md5 = require("md5");
-const paths = require("path");
 
-import { handleSpecialSymbol } from "../utils";
+import { readFileToJson } from "@root/util";
 import { ParamsBaidu, ParamsZhiyi } from "./index.d";
+import { handleSpecialSymbol } from "../utils";
 
-const options = {
-    outputPath: '',
-    fanyi: {
-        baidu: {
-            appid: "20210301000711374",
-            secretKey: "qyjxl2zU20BwQ8sfdyxt",
-            maxLimit: 2000,
-        },
-    }
+const fanyi = {
+    baidu: {
+        appid: "20210301000711374",
+        secretKey: "qyjxl2zU20BwQ8sfdyxt",
+        maxLimit: 2000,
+    },
 };
-
 
 /**
  * 获取中文转英文翻译
@@ -24,10 +19,7 @@ const options = {
  */
 
 export async function getTranslateInfo(values: Array<string>, translationPath: string) {
-
-    let translationObj: { [key: string]: string } = getTranslateJson(
-        translationPath
-    );
+    let translationObj: { [key: string]: string } = readFileToJson(translationPath);
     // 过滤掉已翻译的
     values = values.filter((el) => !translationObj.hasOwnProperty(el));
     try {
@@ -42,12 +34,11 @@ export async function getTranslateInfo(values: Array<string>, translationPath: s
 }
 
 // 百度翻译
-export const baiduTranslationHandle = async (
+const baiduTranslationHandle = async (
     values: Array<string>,
     translationObj: { [key: string]: any }
 ) => {
-
-    const { maxLimit, appid, secretKey } = options?.fanyi?.baidu;
+    const { maxLimit, appid, secretKey } = fanyi?.baidu;
     let qList = splitArray(values, maxLimit);
     let salt = Math.floor(Math.random() * 1e10);
 
@@ -56,7 +47,7 @@ export const baiduTranslationHandle = async (
         let q = qList[index];
         let sign = md5(appid + q + salt + secretKey);
         try {
-            let msg = await new Promise((resolve, reject) => {
+            await new Promise((resolve, reject) => {
                 https.get(
                     `https://fanyi-api.baidu.com/api/trans/vip/translate?q=${encodeURI(
                         q
@@ -102,11 +93,15 @@ export const baiduTranslationHandle = async (
         }
     }
     if (qList.length > 0)
-        await loop(0);
+        try {
+            await loop(0);
+        } catch (error) {
+            return Promise.reject();
+        }
 };
 
 // 知译翻译
-export const zhiyiTranslationHandle = async (
+const zhiyiTranslationHandle = async (
     values: Array<string>,
     translationObj: { [key: string]: any }
 ) => {
@@ -117,7 +112,7 @@ export const zhiyiTranslationHandle = async (
     async function loop(index: number) {
         let q = qList[index];
 
-        let msg = await new Promise((resolve, reject) => {
+        await new Promise((resolve, reject) => {
             const content = {
                 entityTag: "0",
                 field: "common",
@@ -179,44 +174,11 @@ export const zhiyiTranslationHandle = async (
     if (qList.length > 0)
         try {
             await loop(0);
-            // 判断文件夹是否存在，不存在则创建
-            if (!fs.existsSync(options.outputPath))
-                fs.mkdirSync(options.outputPath);
-
-            // 把翻译的内容写入
-            await new Promise((resolve, reject) => {
-                // 判断 'swagger2ts文件是否存在
-
-                fs.writeFile(
-                    paths.resolve(options.outputPath, "translation.json"),
-                    JSON.stringify(translationObj, null, 4),
-                    (error: any) => {
-                        if (error)
-                            reject(error);
-                        else
-                            resolve("写入成功");
-
-                    }
-                );
-            });
         } catch (error) {
             return Promise.reject();
         }
-
 };
 
-/**
- * 获取上次翻译的信息
- * @param uri 上一次缓存的翻译路径
- */
-export const getTranslateJson = (uri: string) => {
-    try {
-        let file = fs.readFileSync(uri);
-        return JSON.parse(file);
-    } catch (error) {
-        return {};
-    }
-};
 
 /**
  * 根据最大长度限制，拆分成多个query
@@ -225,7 +187,7 @@ export const getTranslateJson = (uri: string) => {
  * @example splitArray(['123','12','2'],4) // ['123','122']
  */
 
-export const splitArray = (list: Array<string>, maxLimit: number) => {
+const splitArray = (list: Array<string>, maxLimit: number) => {
     let splitList = [];
     // 临时字符串
     let arr = "";
@@ -244,7 +206,7 @@ export const splitArray = (list: Array<string>, maxLimit: number) => {
 };
 
 // 返回的英文处理
-export const handleEn = (str: string) => {
+const handleEn = (str: string) => {
     return str
         .split(/\s+/)
         .reduce(

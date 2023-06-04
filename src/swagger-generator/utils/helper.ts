@@ -28,7 +28,6 @@ export const defHandle = (str: string): string => {
 /**
  * 收集所有中文列表
  */
-
 export const collectChinese = (values: Swagger): Array<string> => {
   let chineseSet = new Set();
   for (let key in values.data) {
@@ -79,106 +78,6 @@ export const collectChinese = (values: Swagger): Array<string> => {
   return Array.from(chineseSet.values()) as Array<string>;
 };
 
-export const traverseOriginData = (item: any) => { };
-
-export const translateAndChangeChinese = (values: any) => {
-  // values.map((item: any) => {
-  //   for (let key in item?.data) {
-  //     let replaceStr = exchangeZhToEn(builtInDataHandle(key));
-  //     if (item.data[key].properties) {
-  //       for (let key2 in item.data[key].properties) {
-  //         //
-  //         let replaceStr2 = exchangeZhToEn(builtInDataHandle(key2));
-  //         let result = item.data[key].properties[key2];
-  //         if (result?.$ref)
-  //           result.$ref = defHandle(result.$ref);
-
-  //         if (result?.items) {
-  //           //     exchangeZhToEn(
-  //           //         builtInDataHandle(result.$ref)
-  //           //     ).str;
-  //           // }
-  //           if (result?.items?.$ref)
-  //             item.data[key].properties[key2].items.$ref = defHandle(
-  //               result.items.$ref
-  //             );
-
-  //           // exchangeZhToEn(
-  //           //     builtInDataHandle(result.items.$ref)
-  //           // ).str;
-
-  //           if (replaceStr2.hasZh) {
-  //             item.data[key].properties[replaceStr2.str] = result;
-  //             delete item.data[key].properties[key2];
-  //           } else {
-  //             item.data[key].properties[key2] = result;
-  //           }
-  //         }
-  //       }
-
-  //       if (replaceStr.hasZh) {
-  //         item.data[replaceStr.str] = item.data[key];
-  //         delete item.data[key];
-  //       }
-  //     }
-  //     for (let key in item?.paths) {
-  //       let val = item.paths[key];
-  //       // let method: Methods;
-  //       for (let method in val) {
-  //         let result = val[method];
-  //         if (
-  //           result &&
-  //           result.responses &&
-  //           result.responses[200] &&
-  //           result.responses[200].schema
-  //         ) {
-  //           if (result.responses[200].schema.$ref) {
-  //             // /受试者/.test(result.responses[200].schema.$ref) &&
-  //             //     console.log(
-  //             //         result.responses[200].schema.$ref,
-  //             //         exchangeZhToEn(
-  //             //             result.responses[200].schema.$ref
-  //             //         ).str
-  //             //     );
-  //             let value = defHandle(result.responses[200].schema.$ref);
-  //             if (
-  //               !/^Map«[^»]+»$/.test(
-  //                 result.responses[200].schema.$ref?.replace(
-  //                   "#/definitions/",
-  //                   ""
-  //                 )
-  //               )
-  //             )
-  //               result.responses[200].schema.$ref = value;
-
-  //           }
-  //           if (result.responses?.[200]?.schema?.items) {
-  //             let value = defHandle(result.responses[200].schema.items.$ref);
-  //             if (
-  //               !/^Map«[^»]+»$/.test(
-  //                 result.responses[200].schema.items.$ref?.replace(
-  //                   "#/definitions/",
-  //                   ""
-  //                 )
-  //               )
-  //             )
-  //               val[method].responses[200].schema.items.$ref = value;
-
-  //           }
-  //         }
-  //         val[method] = result;
-  //       }
-  //       item.paths[key] = val;
-  //     }
-  //   }
-  //   // console.log(JSON.stringify(item.data, null, 2), "paths");
-  // });
-  // fs.writeFile(
-  //     paths.resolve(__dirname, `./a.json`),
-  //     JSON.stringify(values, null, 4),
-  //     () => {}
-  // );
-};
 
 /**
  * 根据中英文映射对象，替换掉中文部分，返回新的字符串
@@ -196,10 +95,7 @@ export const exchangeZhToEn = (str: string, zhToEnMap: Record<string, string>) =
     let list = el.match(/[\u4e00-\u9fa5]+/g) || [];
     if (list.length > 0) hasZh = true;
     list.map((el) => {
-
       let val = zhToEnMap[el];
-      // console.log(el, val, 'zhToEnMap');
-
       if (val) str = str.replace(new RegExp(el), val);
     });
   });

@@ -2,16 +2,15 @@
  * @Author: zdd
  * @Date: 2023-05-31 16:35:05
  * @LastEditors: zdd
- * @LastEditTime: 2023-05-31 18:11:14
+ * @LastEditTime: 2023-06-04 20:25:10
  * @FilePath: /vg-vscode-extension/src/templates/getx-create-common-directory.template.ts
  * @Description: 
  */
 import * as changeCase from "change-case";
-import { existsSync, lstatSync, writeFile } from "fs";
+import { writeFileSync } from "../util";
 
 // index
 export function indexTemplate(pageName: string, targetDirectory: string) {
-  const pascalCaseName = changeCase.pascalCase(pageName.toLowerCase());
   const snakeCaseName = changeCase.snakeCase(pageName.toLowerCase());
   const targetPath = `${targetDirectory}/${pageName}/index.dart`;
   const template = `library ${snakeCaseName};
@@ -20,13 +19,12 @@ export function indexTemplate(pageName: string, targetDirectory: string) {
 `;
 
   return new Promise(async (resolve, reject) => {
-    writeFile(targetPath, template, "utf8", (error) => {
-      if (error) {
-        reject(error);
-        return;
-      }
-      resolve;
-    });
+    try {
+      writeFileSync(targetPath, template, "utf8");
+      resolve('success');
+    } catch (error) {
+      reject(error);
+    }
   });
 }
 
@@ -47,13 +45,12 @@ export 'values/index.dart';
 `;
 
   return new Promise(async (resolve, reject) => {
-    writeFile(targetPath, template, "utf8", (error) => {
-      if (error) {
-        reject(error);
-        return;
-      }
-      resolve;
-    });
+    try {
+      writeFileSync(targetPath, template, "utf8");
+      resolve('success');
+    } catch (error) {
+      reject(error);
+    }
   });
 }
 
@@ -69,12 +66,11 @@ export 'widgets/index.dart';
 `;
 
   return new Promise(async (resolve, reject) => {
-    writeFile(targetPath, template, "utf8", (error) => {
-      if (error) {
-        reject(error);
-        return;
-      }
-      resolve;
-    });
+    try {
+      writeFileSync(targetPath, template, "utf8");
+      resolve('success');
+    } catch (error) {
+      reject(error);
+    }
   });
 }
