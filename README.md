@@ -2,6 +2,8 @@
 
 你需要一个工具来自动生成规范的目录结构和常用页面文件。同时，还需要能够自动生成路由文件，将图片从3.0x转换为1x和2x，以及将Swagger转换为请求和模型格式。这些任务需要自动化完成，你是否已经在寻找现有的工具或库来帮助你完成这些任务呢？
 
+[下载: vg-vscode-extension](https://marketplace.visualstudio.com/items?itemName=jimmyzhao.vg-vscode-extension) - marketplace
+
 # 功能
 
 - [x] 1. 根据 `x3` 图片自动生成 `x1` `x2` 图片
