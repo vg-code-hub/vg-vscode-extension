@@ -3,18 +3,13 @@
  * @Author: zdd
  * @Date: 2023-06-01 16:59:31
  * @LastEditors: zdd
- * @LastEditTime: 2023-06-04 20:09:55
+ * @LastEditTime: 2023-06-05 17:20:56
  * @FilePath: /vg-vscode-extension/src/swagger-generator/utils/common.ts
  * @Description: 
  */
-import { first } from "lodash";
 import { SwaggerHttpEndpoint, SwaggerPropertyDefinition } from "../index.d";
-import * as changeCase from "change-case";
 import { exchangeZhToEn } from "./helper";
-import { join } from "path";
-
-const fs = require("fs");
-const paths = require("path");
+import { first, join, snakeCase, pascalCase } from "@root/util";
 
 /** tab 空格数 */
 export const INDENT = '  ';
@@ -24,7 +19,7 @@ export const BASE_TYPE = ['int', 'double', 'string', 'String', 'DateTime', 'bool
 export function getDartType(key: string, property: SwaggerPropertyDefinition): string {
     const type = Array.isArray(property.type) ? first(property.type) : property.type;
     const format = property.format;
-    const subClass = changeCase.pascalCase(key);
+    const subClass = pascalCase(key);
 
     switch (type) {
         case 'integer':
@@ -97,7 +92,7 @@ export function getDartSchemaType(property: SwaggerPropertyDefinition): string |
             const items = property['items'];
             if (items) {
                 var itemType = getDartSchemaType(items)!;
-                itemType = itemType === 'Map<String, dynamic>' ? itemType : changeCase.pascalCase(itemType);
+                itemType = itemType === 'Map<String, dynamic>' ? itemType : pascalCase(itemType);
                 return itemType ? `List<${itemType}>` : 'List';
             }
             break;
@@ -106,7 +101,7 @@ export function getDartSchemaType(property: SwaggerPropertyDefinition): string |
             if (ref) {
                 const parts = ref.split('/');
                 const typeName = parts[parts.length - 1];
-                return changeCase.pascalCase(typeName);
+                return pascalCase(typeName);
             }
     }
     console.error(property, 'getDartSchemaType');
@@ -143,7 +138,7 @@ export function getDartParamType(param: SwaggerHttpEndpoint['parameters'][0], sw
             const items = swaggerVersion === 2 ? (param.schema?.type ? param['schema']['items'] : param['items']) : param['schema'];
             if (items) {
                 var itemType = getDartSchemaType(items);
-                return itemType ? `List<${changeCase.pascalCase(itemType)}>` : 'List';
+                return itemType ? `List<${pascalCase(itemType)}>` : 'List';
             }
             break;
         default:
@@ -151,7 +146,7 @@ export function getDartParamType(param: SwaggerHttpEndpoint['parameters'][0], sw
             if (ref) {
                 const parts = ref.split('/');
                 const typeName = parts[parts.length - 1];
-                return changeCase.pascalCase(typeName);
+                return pascalCase(typeName);
             }
     }
     console.error(param, swaggerVersion, 'getDartParamType');
@@ -159,59 +154,17 @@ export function getDartParamType(param: SwaggerHttpEndpoint['parameters'][0], sw
     throw Error('Unsupported type: $type');
 }
 
-/**
- * @param key 含有处理特殊字符«» 【】 {} [] () （），如a«b«c»» 转换成a_b_c;
- */
-export const handleSpecialSymbol = (key: string | any) => {
-    return typeof key !== "string"
-        ? key
-        : key
-            .replace(/[\«|\(|\（|\【|\[|\{]/g, "_")
-            .replace(/[\»|\)|\）|\】|\]|\}]/g, "")
-            .replace(
-                /[\?|\？|\,|\，|\.|\。|\-|\/|\、|\=|\'|\"|\’|\‘|\“|\”|\s]/g,
-                ""
-            );
-};
 
-/**
- * 删除文件
- * @param path string;
- * @param options.deleteCurrPath 默认true 删除所有文件和文件夹，保存当前文件，false保留当前文件夹
- * @param options.ignore 不删除某些文件或者文件夹
- */
-
-export const delDir = (
-    path: string,
-    options?: { deleteCurrPath: boolean; ignore: Array<string> }
-) => {
-    let files = [];
-    if (fs.existsSync(path)) {
-        files = fs.readdirSync(path);
-        files.forEach((file: string) => {
-            let curPath = paths.resolve(path, file);
-            if (fs.statSync(curPath).isDirectory()) {
-                if (options && options?.ignore.includes(curPath)) return;
-                delDir(curPath); //递归删除文件夹
-            } else {
-                if (options && options?.ignore.includes(curPath)) return;
-                fs.unlinkSync(curPath); //删除文件
-            }
-        });
-        (!options || options.deleteCurrPath === true) && fs.rmdirSync(path); // 删除文件夹自身
-    }
-};
-
-export const getDirPath = (folder: string | undefined, type: 'entitys' | 'requests', { translateJson, rootPath }: any) => {
+export const getDirPath = (folder: string | undefined, type: 'entitys' | 'requests', { translationObj, rootPath }: any) => {
     let dirPath: string, deeps = 1, className: string;
     if (folder) {
-        const { str: path } = exchangeZhToEn(folder, translateJson);
-        dirPath = join(rootPath, type, path.split('/').map(e => changeCase.snakeCase(e)).join('/'));
+        const { str: path } = exchangeZhToEn(folder, translationObj);
+        dirPath = join(rootPath, type, path.split('/').map(e => snakeCase(e)).join('/'));
         deeps += path.split('/').length;
-        className = changeCase.pascalCase(path.split('/').map(e => changeCase.snakeCase(e)).join('_') + '_request');
+        className = pascalCase(path.split('/').map(e => snakeCase(e)).join('_') + '_request');
     } else {
         dirPath = join(rootPath, type);
-        className = changeCase.pascalCase('request');
+        className = pascalCase('request');
     }
     if (type === 'entitys') return dirPath;
     else

@@ -1,9 +1,23 @@
-# Change Log
+<!--
+ * @Author: zdd
+ * @Date: 2023-05-30 17:42:04
+ * @LastEditors: zdd
+ * @LastEditTime: 2023-06-05 17:34:16
+ * @FilePath: /vg-vscode-extension/CHANGELOG.md
+ * @Description: 
+-->
+# Release Notes
+### 0.2.0
 
-All notable changes to the "vg-vscode-extension" extension will be documented in this file.
+- New getx page add page_type pick    
+- Refactor code compressed file size
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+### 0.1.0
 
-## [Unreleased]
+Swagger config add `folderFilter` and `folderMap`, you have more control over your output.
+### 0.0.2
 
-- Initial release
+update readme
+### 0.0.1
+
+Initial release of ...

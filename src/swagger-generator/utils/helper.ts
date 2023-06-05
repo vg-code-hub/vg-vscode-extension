@@ -1,6 +1,50 @@
 //类型
-import { Swagger } from "../index.d";
-import { handleSpecialSymbol } from "./common";
+import type { Swagger } from "../index.d";
+import { resolve, existsSync, readdirSync, statSync, unlinkSync, rmdirSync } from "@root/util";
+
+
+/**
+ * 删除文件
+ * @param path string;
+ * @param options.deleteCurrPath 默认true 删除所有文件和文件夹，保存当前文件，false保留当前文件夹
+ * @param options.ignore 不删除某些文件或者文件夹
+ */
+
+export const delDir = (
+  path: string,
+  options?: { deleteCurrPath: boolean; ignore: Array<string> }
+) => {
+  let files = [];
+  if (existsSync(path)) {
+    files = readdirSync(path);
+    files.forEach((file: string) => {
+      let curPath = resolve(path, file);
+      if (statSync(curPath).isDirectory()) {
+        if (options && options?.ignore.includes(curPath)) return;
+        delDir(curPath); //递归删除文件夹
+      } else {
+        if (options && options?.ignore.includes(curPath)) return;
+        unlinkSync(curPath); //删除文件
+      }
+    });
+    (!options || options.deleteCurrPath === true) && rmdirSync(path); // 删除文件夹自身
+  }
+};
+
+/**
+ * @param key 含有处理特殊字符«» 【】 {} [] () （），如a«b«c»» 转换成a_b_c;
+ */
+export const handleSpecialSymbol = (key: string | any) => {
+  return typeof key !== "string"
+    ? key
+    : key
+      .replace(/[\«|\(|\（|\【|\[|\{]/g, "_")
+      .replace(/[\»|\)|\）|\】|\]|\}]/g, "")
+      .replace(
+        /[\?|\？|\,|\，|\.|\。|\-|\/|\、|\=|\'|\"|\’|\‘|\“|\”|\s]/g,
+        ""
+      );
+};
 
 // 处理后端内置得特殊情况
 export const builtInDataHandle = (str: string): string => {
@@ -42,30 +86,6 @@ export const collectChinese = (values: Swagger): Array<string> => {
     }
   }
 
-  for (let key in values.paths) {
-    let val = values.paths[key];
-
-    // for (let method in val) {
-    //   let dto = "";
-    //   if (val[method]?.responses?.[200]?.schema) {
-    //     val[method].responses[200].schema.$ref =
-    //       val[method]?.responses?.[200]?.schema.$ref ||
-    //       val[method]?.responses?.[200]?.schema.$$ref;
-    //     const { $ref, items } = val[method]?.responses?.[200]?.schema;
-    //     if ($ref)
-    //       dto = $ref.replace("#/definitions/", "");
-
-    //     if (items)
-    //       dto = items.$ref ? items.$ref.replace("#/definitions/", "") : "";
-
-    //   }
-
-    //   dto.replace(/[\u4e00-\u9fa5]+/g, (el) => {
-    //     chineseSet.add(el);
-    //     return el;
-    //   });
-    // }
-  }
   values.tags.forEach(({ name }: Swagger["tags"][0]) => {
     const paths = name.split('/');
     paths.forEach(path => {
@@ -104,3 +124,7 @@ export const exchangeZhToEn = (str: string, zhToEnMap: Record<string, string>) =
     str,
   };
 };
+
+export function isStringRegExp(str: string) {
+
+}

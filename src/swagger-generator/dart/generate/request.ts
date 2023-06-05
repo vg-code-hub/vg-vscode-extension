@@ -1,7 +1,6 @@
-import * as changeCase from "change-case";
-import { find, first, join, mkdirpSync, existsSync, writeFileSync, writeFile } from "@root/util";
+import { find, first, join, mkdirpSync, existsSync, writeFileSync, writeFile, snakeCase, camelCase } from "@root/util";
 import type { SwaggerPropertyDefinition, SwaggerPath, Method, SwaggerHttpEndpoint, Responses } from "../../index.d";
-import { BASE_TYPE, INDENT, getDartParamType, getDartSchemaType, getDirPath } from "../../utils";
+import { BASE_TYPE, INDENT, SwaggerConfig, getDartParamType, getDartSchemaType, getDirPath } from "../../utils";
 
 const METHOD_MAP = {
   get: 'get',
@@ -14,11 +13,9 @@ const rootName = 'requests';
 
 class RequestGenerate {
   paths: SwaggerPath;
-  options: { rootPath: string, translateJson: Record<string, string>, swaggerVersion: number };
   filesMap: Record<string, string>;
 
-  constructor(paths: SwaggerPath, options: { rootPath: string, translateJson: Record<string, string>, swaggerVersion: number }) {
-    this.options = options;
+  constructor(paths: SwaggerPath) {
     this.paths = paths;
     this.filesMap = {};
   }
@@ -29,7 +26,7 @@ class RequestGenerate {
         this.generateRequest(key, method as Method, this.paths[key][method as Method]) + "\n";
 
     let str = `library ${rootName};\n\n`;
-    const requestsDir = join(this.options.rootPath, rootName);
+    const requestsDir = join(SwaggerConfig.config.rootPath, rootName);
 
     // request内容写入
     for (let key in this.filesMap) {
@@ -66,12 +63,42 @@ class RequestGenerate {
       writeFileSync(
         join(requestsDir, 'base_connect.dart'),
         `abstract class BaseConnect {
-  get(path, {query}) {}
   onInit() {}
+  dispose() {}
+  get(path, {query}) {}
   post(path, body) {}
   put(path, body) {}
   delete(path, {query}) {}
 }
+/**
+ * GetConnect
+ * 
+import 'package:get/get.dart';
+class BaseConnect extends GetConnect {
+  @override
+  // ignore: overridden_fields
+  Duration timeout = const Duration(seconds: 30);
+
+  @override
+  void onInit() {
+    httpClient.baseUrl = 'xxx';
+
+    httpClient.addRequestModifier<void>((request) {
+      if (UserService.to.hasToken) {
+        request.headers['Authorization'] = xxx.token;
+      }
+      return request;
+    });
+
+    httpClient.addResponseModifier((request, response) {
+      if (response.body is Map && (response.body as Map)['success'] == false) {
+        // do some thing
+      }
+      return response;
+    });
+  }
+}
+ */ 
 `,
         'utf-8',
       );
@@ -80,16 +107,21 @@ class RequestGenerate {
   generateRequest(key: string, method: Method, value: SwaggerHttpEndpoint) {
     let folder = value["x-apifox-folder"];
     if (!folder && value.tags && value.tags.length > 0) folder = value.tags[0];
-    let { dirPath, deeps, className } = getDirPath(folder, rootName, { ...this.options }) as {
+    if (!SwaggerConfig.testFolder(folder ?? '')) return;
+    folder = SwaggerConfig.exchangeConfigMap(folder);
+
+    const { rootPath } = SwaggerConfig.config;
+    const translationObj = SwaggerConfig.translationObj;
+    let { dirPath, deeps, className } = getDirPath(folder, rootName, { translationObj, rootPath }) as {
       className: string,
       dirPath: string,
       deeps: number
     };
     if (!existsSync(dirPath)) mkdirpSync(dirPath);
-    const keyLast = key.split('/').map(e => changeCase.snakeCase(e)).filter(e => !['create', 'delete', 'update', 'v1'].includes(e)).join('_');
+    const keyLast = key.split('/').map(e => snakeCase(e)).filter(e => !['create', 'delete', 'update', 'v1'].includes(e)).join('_');
     if (!keyLast) return;
 
-    const methodName = changeCase.camelCase(METHOD_MAP[method] + '_' + keyLast);
+    const methodName = camelCase(METHOD_MAP[method] + '_' + keyLast);
 
     // 写入 class 头
     if (!this.filesMap[dirPath])
@@ -99,7 +131,19 @@ class RequestGenerate {
 import '${join(...Array(deeps).fill('..'), 'entitys', 'index.dart')}';
 import '${join(...Array(deeps - 1).fill('..'), 'base_connect.dart')}';
 
-class ${className} extends BaseConnect {`;
+class ${className} extends BaseConnect {
+  static ${className} get instance => _getInstance();
+  static ${className}? _instance;
+
+  static ${className} _getInstance() {
+    _instance ??= ${className}()..onInit();
+    return _instance!;
+  }
+
+  @override
+  dispose() {
+    ${className}._instance = null;
+  }\n`;
 
     const { params, desc } = this.getParams(value.parameters);
     const returnType = this.getReturnType(value.responses, method);
@@ -154,12 +198,12 @@ class ${className} extends BaseConnect {`;
     const data = this.getParamObj(parameters);
     if (!data) return { params: '', desc: '' };
     const { pathParams, queryParams, formDataParams, bodyParams } = data;
-    const swaggerVersion = this.options.swaggerVersion;
+    const swaggerVersion = SwaggerConfig.config.swaggerVersion;
     let str = '';
     let desc = `\n${INDENT}///\n${INDENT}/// parameters`;
 
     pathParams.forEach(p => {
-      const name = changeCase.camelCase(p.name);
+      const name = camelCase(p.name);
       const type = getDartParamType(p, swaggerVersion);
       str += `${type} ${name}, `;
 
@@ -169,7 +213,7 @@ class ${className} extends BaseConnect {`;
     if (queryParams.length > 0) str += '{\n';
 
     queryParams.forEach(p => {
-      const name = changeCase.camelCase(p.name);
+      const name = camelCase(p.name);
       const type = getDartParamType(p, swaggerVersion);
       const require = p['required'];
       str += `${INDENT}${INDENT}${require === true ? 'required ' : ''}${type}${require === true ? '' : '?'} ${name},\n`;
@@ -207,7 +251,7 @@ class ${className} extends BaseConnect {`;
     let str = '', reqPath = key, queryStr = '';
     const { pathParams, queryParams, formDataParams, bodyParams } = data;
     pathParams.forEach(p => {
-      const name = changeCase.camelCase(p.name);
+      const name = camelCase(p.name);
       if (reqPath.includes(`{${p.name}}`))
         reqPath = reqPath.replace(`{${p.name}}`, `\${${name}}`);
       else
@@ -220,7 +264,7 @@ class ${className} extends BaseConnect {`;
     if (queryParams.length > 0) {
       queryStr += '{';
       queryParams.forEach(p => {
-        const name = changeCase.camelCase(p.name);
+        const name = camelCase(p.name);
         queryStr += (`\'${name}\': ${name},`);
 
       });

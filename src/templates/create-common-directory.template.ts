@@ -2,16 +2,15 @@
  * @Author: zdd
  * @Date: 2023-05-31 16:35:05
  * @LastEditors: zdd
- * @LastEditTime: 2023-06-04 20:25:10
- * @FilePath: /vg-vscode-extension/src/templates/getx-create-common-directory.template.ts
+ * @LastEditTime: 2023-06-05 17:17:26
+ * @FilePath: /vg-vscode-extension/src/templates/create-common-directory.template.ts
  * @Description: 
  */
-import * as changeCase from "change-case";
-import { writeFileSync } from "../util";
+import { snakeCase, writeFileSync } from "../util";
 
 // index
 export function indexTemplate(pageName: string, targetDirectory: string) {
-  const snakeCaseName = changeCase.snakeCase(pageName.toLowerCase());
+  const snakeCaseName = snakeCase(pageName);
   const targetPath = `${targetDirectory}/${pageName}/index.dart`;
   const template = `library ${snakeCaseName};
 

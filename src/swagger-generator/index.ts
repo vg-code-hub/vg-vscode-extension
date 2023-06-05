@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-05-31 21:58:23
  * @LastEditors: zdd
- * @LastEditTime: 2023-06-04 20:11:05
+ * @LastEditTime: 2023-06-05 14:58:27
  * @FilePath: /vg-vscode-extension/src/swagger-generator/index.ts
  * @Description: 
  */
@@ -19,10 +19,17 @@ const values = `# swagger 配置文件
 # https://petstore.swagger.io/v2/swagger.json
 jsonUrl: http://127.0.0.1:4523/export/openapi?projectId=2540665&version=3.1
 outputDir: api
-# language: dart | typescript
+# language: dart (支持typescript开发中)
 language: dart
-# GetConnect | dio | axios
-requestClass: GetConnect
+folderFilter:
+  - app接口
+  # - /^app接口/
+  # - /^app接口模型/
+folderMap:
+  app接口: app
+  app接口模型: app
+  "驾驶员:driver": driver
+  "项目:project": project
 `;
 export const genSwaggerConfig = async (uri: Uri) => {
   try {

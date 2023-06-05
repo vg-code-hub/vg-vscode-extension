@@ -1,7 +1,33 @@
 import { pascalCase, snakeCase, writeFileSync } from "../util";
-import { PageType } from "@root/type.d";
+import type { PageType } from "@root/type";
 
-// controller
+
+export function bindingsTemplate(pageName: string, targetDirectory: string) {
+  const pascalCaseName = pascalCase(pageName);
+  const snakeCaseName = snakeCase(pageName);
+  const targetPath = `${targetDirectory}/bindings/${snakeCaseName}.dart`;
+  const template = `import 'package:get/get.dart';
+
+import '../controllers/${snakeCaseName}.dart';
+
+class ${pascalCaseName}Binding implements Bindings {
+  @override
+  void dependencies() {
+    Get.lazyPut<${pascalCaseName}Controller>(() => ${pascalCaseName}Controller());
+  }
+}
+`;
+
+  return new Promise(async (resolve, reject) => {
+    try {
+      writeFileSync(targetPath, template, "utf8");
+      resolve('success');
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
 export function controllerTemplate(pageName: string, targetDirectory: string, pageType: PageType) {
   const pascalCaseName = pascalCase(pageName);
   const snakeCaseName = snakeCase(pageName);
@@ -9,33 +35,52 @@ export function controllerTemplate(pageName: string, targetDirectory: string, pa
   let template = "";
 
   switch (pageType) {
-    case "normal":
+    case 'normal':
       template = `import 'package:get/get.dart';
+
+class ${pascalCaseName}State {
+  // title
+  final _title = "".obs;
+  set title(value) => _title.value = value;
+  get title => _title.value;
+}
 
 class ${pascalCaseName}Controller extends GetxController {
   ${pascalCaseName}Controller();
 
-  _initData() {
-    update(["${snakeCaseName}"]);
+  final state = ${pascalCaseName}State();
+
+  // tap
+  void handleTap(int index) {
+    Get.snackbar(
+      "标题",
+      "消息",
+    );
   }
 
-  void onTap() {}
+  /// 在 widget 内存中分配后立即调用。
+  @override
+  void onInit() {
+    super.onInit();
+  }
 
-  // @override
-  // void onInit() {
-  //   super.onInit();
-  // }
-
+  /// 在 onInit() 之后调用 1 帧。这是进入的理想场所
   @override
   void onReady() {
     super.onReady();
-    _initData();
   }
 
-  // @override
-  // void onClose() {
-  //   super.onClose();
-  // }
+  /// 在 [onDelete] 方法之前调用。
+  @override
+  void onClose() {
+    super.onClose();
+  }
+
+  /// dispose 释放内存
+  @override
+  void dispose() {
+    super.dispose();
+  }
 }
 `;
       break;
@@ -146,8 +191,6 @@ class ${pascalCaseName}Controller extends GetxController with StateMixin<List<An
       break;
   }
 
-
-
   return new Promise(async (resolve, reject) => {
     try {
       writeFileSync(targetPath, template, "utf8");
@@ -158,7 +201,7 @@ class ${pascalCaseName}Controller extends GetxController with StateMixin<List<An
   });
 }
 
-// view
+
 export function viewTemplate(pageName: string, targetDirectory: string, pageType: PageType) {
   const pascalCaseName = pascalCase(pageName);
   const snakeCaseName = snakeCase(pageName);
@@ -166,55 +209,40 @@ export function viewTemplate(pageName: string, targetDirectory: string, pageType
   let template = "";
 
   switch (pageType) {
-    case "normal":
+    case 'normal':
       template = `import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import './controllers/${snakeCaseName}.dart';
+import 'controllers/${snakeCaseName}.dart';
 
 
-class ${pascalCaseName}Page extends StatefulWidget {
-  const ${pascalCaseName}Page({Key? key}) : super(key: key);
-
-  @override
-  State<${pascalCaseName}Page> createState() => _${pascalCaseName}PageState();
-}
-
-class _${pascalCaseName}PageState extends State<${pascalCaseName}Page>
-    with AutomaticKeepAliveClientMixin {
-  @override
-  bool get wantKeepAlive => true;
+/// hello
+class HelloWidget extends GetView<${pascalCaseName}Controller> {
+  const HelloWidget({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
-    return const _${pascalCaseName}ViewGetX();
+    return Center(
+      child: Obx(() => Text(controller.state.title)),
+    );
   }
 }
 
-class _${pascalCaseName}ViewGetX extends GetView<${pascalCaseName}Controller> {
-  const _${pascalCaseName}ViewGetX({Key? key}) : super(key: key);
+class ${pascalCaseName}Page extends GetView<${pascalCaseName}Controller> {
+  const ${pascalCaseName}Page({Key? key}) : super(key: key);
 
   // 主视图
   Widget _buildView() {
-    return const Center(
-      child: Text("${pascalCaseName}Page"),
-    );
+    return const HelloWidget();
   }
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<${pascalCaseName}Controller>(
-      init: ${pascalCaseName}Controller(),
-      id: "${snakeCaseName}",
-      builder: (_) {
-        return Scaffold(
-          appBar: AppBar(title: const Text("${snakeCaseName}")),
-          body: SafeArea(
-            child: _buildView(),
-          ),
-        );
-      },
+    return Scaffold(
+      appBar: AppBar(title: const Text("${snakeCaseName}")),
+      body: SafeArea(
+        child: _buildView(),
+      ),
     );
   }
 }
@@ -225,30 +253,10 @@ class _${pascalCaseName}ViewGetX extends GetView<${pascalCaseName}Controller> {
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import './controllers/${snakeCaseName}.dart';
+import 'controllers/${snakeCaseName}.dart';
 
-
-class ${pascalCaseName}Page extends StatefulWidget {
+class ${pascalCaseName}Page extends GetView<${pascalCaseName}Controller> {
   const ${pascalCaseName}Page({Key? key}) : super(key: key);
-
-  @override
-  State<${pascalCaseName}Page> createState() => _${pascalCaseName}PageState();
-}
-
-class _${pascalCaseName}PageState extends State<${pascalCaseName}Page>
-    with AutomaticKeepAliveClientMixin {
-  @override
-  bool get wantKeepAlive => true;
-
-  @override
-  Widget build(BuildContext context) {
-    super.build(context);
-    return const _${pascalCaseName}ViewGetX();
-  }
-}
-
-class _${pascalCaseName}ViewGetX extends GetView<${pascalCaseName}Controller> {
-  const _${pascalCaseName}ViewGetX({Key? key}) : super(key: key);
 
   // ListView
   _buildListView(List<Animal> state) {
@@ -264,24 +272,18 @@ class _${pascalCaseName}ViewGetX extends GetView<${pascalCaseName}Controller> {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<${pascalCaseName}Controller>(
-      init: ${pascalCaseName}Controller(),
-      id: "${snakeCaseName}",
-      builder: (_) {
-        return Scaffold(
-          appBar: AppBar(title: const Text("${snakeCaseName}")),
-          body: SafeArea(
-            child: EasyRefresh(
-              controller: controller.refreshController,
-              onRefresh: controller.onRefresh,
-              onLoad: controller.onLoad,
-              child: controller.obx(
-                (state) => _buildListView(state!),
-              ),
-            ),
+    return Scaffold(
+      appBar: AppBar(title: const Text("${snakeCaseName}")),
+      body: SafeArea(
+        child: EasyRefresh(
+          controller: controller.refreshController,
+          onRefresh: controller.onRefresh,
+          onLoad: controller.onLoad,
+          child: controller.obx(
+            (state) => _buildListView(state!),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }

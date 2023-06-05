@@ -1,7 +1,6 @@
 const https = require("https");
 const md5 = require("md5");
 
-import { readFileToJson } from "@root/util";
 import { ParamsBaidu, ParamsZhiyi } from "./index.d";
 import { handleSpecialSymbol } from "../utils";
 
@@ -13,28 +12,8 @@ const fanyi = {
     },
 };
 
-/**
- * 获取中文转英文翻译
- * @param values
- */
-
-export async function getTranslateInfo(values: Array<string>, translationPath: string) {
-    let translationObj: { [key: string]: string } = readFileToJson(translationPath);
-    // 过滤掉已翻译的
-    values = values.filter((el) => !translationObj.hasOwnProperty(el));
-    try {
-        await zhiyiTranslationHandle(values, translationObj);
-    } catch (error) {
-        console.log("知译翻译失败,使用百度翻译");
-        // 百度翻译处理
-        await baiduTranslationHandle(values, translationObj);
-    }
-
-    return translationObj;
-}
-
 // 百度翻译
-const baiduTranslationHandle = async (
+export const baiduTranslationHandle = async (
     values: Array<string>,
     translationObj: { [key: string]: any }
 ) => {
@@ -101,7 +80,7 @@ const baiduTranslationHandle = async (
 };
 
 // 知译翻译
-const zhiyiTranslationHandle = async (
+export const zhiyiTranslationHandle = async (
     values: Array<string>,
     translationObj: { [key: string]: any }
 ) => {
@@ -186,7 +165,6 @@ const zhiyiTranslationHandle = async (
  * @param maxLimit
  * @example splitArray(['123','12','2'],4) // ['123','122']
  */
-
 const splitArray = (list: Array<string>, maxLimit: number) => {
     let splitList = [];
     // 临时字符串

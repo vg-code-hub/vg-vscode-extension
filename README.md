@@ -186,7 +186,14 @@ end
 大家可以自己动手体验下~
 
 # Release Notes
-### 1.0.0
+### 0.1.0
+
+Swagger config add `folderFilter` and `folderMap`,
+You have more control over your output.
+### 0.0.2
+
+update readme
+### 0.0.1
 
 Initial release of ...
 

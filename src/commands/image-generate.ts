@@ -1,11 +1,10 @@
 
-import * as changeCase from "change-case";
 import * as path from "path";
 import Jimp from "jimp";
 import { Uri, window } from "vscode";
 import {
   mkdirpSync, readdirSync, statSync, existsSync,
-  readdir, stat, appendFileSync, rmSync,
+  readdir, stat, appendFileSync, rmSync, camelCase,
 } from "@root/util";
 
 export const imageGenerate = async (uri: Uri) => {
@@ -67,7 +66,7 @@ function imagesGen(targetDirectory: string) {
     // 写入列表
     appendFileSync(
       `${workDir}/files.txt`,
-      `static const ${changeCase.camelCase(imgPath.base)} = 'assets/images/${imgPath.base
+      `static const ${camelCase(imgPath.base)} = 'assets/images/${imgPath.base
       }';\r\n`,
       "utf8"
     );
@@ -95,7 +94,7 @@ function svgsGen(targetDirectory: string) {
     // 写入列表
     appendFileSync(
       `${workDir}/files.txt`,
-      `static const ${changeCase.camelCase(imgPath.base)} = 'assets/svgs/${imgPath.base
+      `static const ${camelCase(imgPath.base)} = 'assets/svgs/${imgPath.base
       }';\r\n`,
       "utf8"
     );

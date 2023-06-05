@@ -1,9 +1,8 @@
-import * as changeCase from "change-case";
 import { Uri, window } from "vscode";
 import * as vscode from "vscode";
 import {
-  join, getRootPath, readdirSync,
-  statSync, existsSync, appendFileSync, rmSync
+  join, getRootPath, readdirSync, statSync, existsSync, appendFileSync,
+  rmSync, snakeCase, camelCase, pascalCase
 } from "@root/util";
 
 export const routersGenerate = async (uri: Uri) => {
@@ -49,14 +48,12 @@ function routeNamesGenerate(targetDirectory: string) {
       .split("/");
     const modalFileName = arrFilePath.join("_");
     const filePathName = arrFilePath.join("/");
-    // const pascalCaseName = changeCase.pascalCase(modalFileName);
-    const snakeCaseName = changeCase.snakeCase(modalFileName);
-    const camelCaseName = changeCase.camelCase(modalFileName);
+
+    const snakeCaseName = snakeCase(modalFileName);
+    const camelCaseName = camelCase(modalFileName);
 
     // 文件名
-    const pascalCaseName = changeCase.pascalCase(
-      arrFilePath[arrFilePath.length - 1]
-    );
+    const pascalCaseName = pascalCase(arrFilePath[arrFilePath.length - 1]);
 
     // 删除文件
     if (isFirst === true) {
@@ -69,7 +66,6 @@ function routeNamesGenerate(targetDirectory: string) {
 
       if (existsSync(`${rootPath}/lib/pages/index.txt`))
         rmSync(`${rootPath}/lib/pages/index.txt`);
-
     }
     // 写入列表
     appendFileSync(

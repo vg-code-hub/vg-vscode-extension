@@ -2,7 +2,7 @@
   "name": "vg-vscode-extension",
   "displayName": "Frontend Code Generator - VG",
   "description": "It supports the getx library and provides effective creation of business modules for Flutter applications.",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "engines": {
     "vscode": "^1.69.0"
   },
@@ -28,11 +28,12 @@
   },
   "README": "README.md",
   "publisher": "jimmyzhao",
+  "author": "jimmyzhao <zhaodongnn@gmail.com>",
+  "license": "ISC",
   "icon": "images/logo.png",
   "activationEvents": [
     "workspaceContains:**/pubspec.yaml",
-    "onLanguage:json",
-    "*"
+    "workspaceContains:**/package.json"
   ],
   "pricing": "Free",
   "main": "./dist/extension.js",
@@ -154,7 +155,6 @@
   },
   "dependencies": {
     "axios": "^1.4.0",
-    "change-case": "^4.1.2",
     "jimp": "^0.22.8",
     "lodash": "^4.17.21",
     "md5": "^2.3.0",
@@ -162,7 +162,6 @@
     "yaml": "^2.3.1"
   },
   "devDependencies": {
-    "@types/change-case": "^2.3.1",
     "@types/glob": "^8.1.0",
     "@types/lodash": "^4.14.195",
     "@types/mkdirp": "^0.5.2",

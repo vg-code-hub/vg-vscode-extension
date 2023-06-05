@@ -8,10 +8,10 @@
  */
 import * as vscode from 'vscode';
 import { imageGenerate } from './commands/image-generate';
-import { newGetxCommonDirectory } from './commands/new-getx-create-common-directory.command';
-import { newGetxGetBuilderPage } from './commands/new-getx-getbuilder-page.command';
-import { newGetxPage } from './commands/new-getx-page.command';
-import { newGetxStatefulWidgetGetBuilderPage } from './commands/new-getx-stateful-getbuilder-page.command';
+import { newGetxCommonDirectory } from './commands/create-common-directory';
+import { newGetxGetBuilderPage } from './commands/new-getx-getbuilder-page';
+import { newGetxFullPage } from './commands/new-getx-full-page';
+import { newGetxStatefulWidgetGetBuilderPage } from './commands/new-getx-stateful-getbuilder-page';
 import { routersGenerate } from './commands/routers-generate';
 import { genSwaggerConfig, genWebapiForDart, genWebapiForTypescript } from './swagger-generator';
 
@@ -32,7 +32,7 @@ export function activate(context: vscode.ExtensionContext) {
 			"extension.new-getx-create-directory",
 			newGetxCommonDirectory
 		),
-		vscode.commands.registerCommand("extension.new-getx-page", newGetxPage),
+		vscode.commands.registerCommand("extension.new-getx-page", newGetxFullPage),
 		vscode.commands.registerCommand(
 			"extension.new-getx-getbuilder-page",
 			newGetxGetBuilderPage
