@@ -2,11 +2,14 @@
  * @Author: zdd
  * @Date: 2023-05-30 17:42:04
  * @LastEditors: zdd
- * @LastEditTime: 2023-06-06 20:03:44
+ * @LastEditTime: 2023-06-06 21:58:01
  * @FilePath: /vg-vscode-extension/CHANGELOG.md
  * @Description: 
 -->
 # Release Notes
+### 0.3.1
+
+- feat: `swagger to ts` propertyName Case convert
 ### 0.3.0
 
 - feat: `swagger to ts`

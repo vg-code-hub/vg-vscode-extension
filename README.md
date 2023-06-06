@@ -194,22 +194,6 @@ end
 
 大家可以自己动手体验下~
 
-# Release Notes
-
-### 0.3.0
-
-- feat: `swagger to ts`
-### 0.1.0
-
-Swagger config add `folderFilter` and `folderMap`,
-You have more control over your output.
-### 0.0.2
-
-update readme
-### 0.0.1
-
-Initial release of ...
-
 # 更多
 
 受 `getx-template`、`swagger-ts-plugin` 的启发，做了些有趣的修改
