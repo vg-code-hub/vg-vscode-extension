@@ -18,7 +18,7 @@
       > pages/index.txt
 - [ ] 3. swagger gen
   - [x] 1. swagger to dart
-  - [ ] 2. swagger to ts
+  - [x] 2. swagger to ts
 - [ ] 4. snippets
 
 ---
@@ -172,6 +172,15 @@ assets/svgs/files.txt
 ```json
 // vscode command
 {
+  "title": "swagger to dart",
+  "category": "VG"
+}
+```
+
+### 3. swagger to ts
+```json
+// vscode command
+{
   "title": "swagger to ts",
   "category": "VG"
 }
@@ -186,6 +195,10 @@ end
 大家可以自己动手体验下~
 
 # Release Notes
+
+### 0.3.0
+
+- feat: `swagger to ts`
 ### 0.1.0
 
 Swagger config add `folderFilter` and `folderMap`,

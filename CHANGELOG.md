@@ -2,11 +2,14 @@
  * @Author: zdd
  * @Date: 2023-05-30 17:42:04
  * @LastEditors: zdd
- * @LastEditTime: 2023-06-05 17:34:16
+ * @LastEditTime: 2023-06-06 20:03:44
  * @FilePath: /vg-vscode-extension/CHANGELOG.md
  * @Description: 
 -->
 # Release Notes
+### 0.3.0
+
+- feat: `swagger to ts`
 ### 0.2.0
 
 - New getx page add page_type pick    

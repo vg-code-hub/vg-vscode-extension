@@ -1,8 +1,8 @@
 {
   "name": "vg-vscode-extension",
   "displayName": "Frontend Code Generator - VG",
-  "description": "It supports the getx library and provides effective creation of business modules for Flutter applications.",
-  "version": "0.1.0",
+  "description": "It supports effective creation of business modules for frontend applications.",
+  "version": "0.2.0",
   "engines": {
     "vscode": "^1.69.0"
   },
