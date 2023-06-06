@@ -261,7 +261,7 @@ export async function ${methodName}(${params}): Promise<${returnType}> {
   getFunctionArgs(key: string, method: Method, parameters: SwaggerHttpEndpoint['parameters']) {
     const data = this.getParamObj(parameters);
     if (!data) return `'${key}'`;
-    let str = '', reqPath = key, queryStr = '';
+    let str = '', reqPath = key;
     const { pathParams, queryParams, formDataParams, bodyParams } = data;
     pathParams.forEach(p => {
       const name = camelCase(p.name);
@@ -280,10 +280,14 @@ export async function ${methodName}(${params}): Promise<${returnType}> {
   getReturnContent(responses: SwaggerHttpEndpoint['responses'], method: Method) {
     const returnType = this.getReturnType(responses, method);
     if (returnType === 'void') return '';
-    if (returnType.endsWith('[]'))
-      return `\n${INDENT}return res.data ?? [];`;
-    else
+    if (returnType.endsWith('[]')) {
+      var subType = returnType.substring(0, returnType.length - 2);
+      return `\n${INDENT}return res.data ? ${BASE_TYPE.includes(subType) ? 'res.data' : `(res.data as any[]).map<${subType}>((v: any) => ${subType}.fromJson(v))`} : [];`;
+    } else if (!BASE_TYPE.includes(returnType)) {
+      return `\n${INDENT}return ${returnType}.fromJson(res.data);`;
+    } else {
       return `\n${INDENT}return res.data;`;
+    }
   }
 }
 

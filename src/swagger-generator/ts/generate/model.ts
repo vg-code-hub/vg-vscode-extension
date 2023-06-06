@@ -3,7 +3,7 @@
  * @Author: zdd
  * @Date: 2023-05-31 22:05:06
  * @LastEditors: zdd
- * @LastEditTime: 2023-06-06 10:55:09
+ * @LastEditTime: 2023-06-06 21:43:23
  * @FilePath: /vg-vscode-extension/src/swagger-generator/ts/generate/model.ts
  * @Description: 
  */
@@ -74,18 +74,38 @@ class ModelGenerate {
     if (this.filesMap[dirPath].includes(`class ${className} `)) return;
 
     this.filesMap[dirPath] += `
-export interface ${className} {
-  ${this.getPropertiesContent(value.properties, value.required)}}
+export class ${className} {
+  ${this.getPropertiesContent(value.properties, value.required)}
+  static fromJson(json: any): ${className} {
+    let instance = new ${className}()
+${this.getFromJsonContent(value.properties, value.required)}
+    return instance;
+  }
+
+  toJson(): any {
+    return ${this.getToJsonContent(value.properties, value.required)};
+  }
+}
 `;
     this.checkSubGen(value.properties, dirPath);
   }
 
   generateOtherModel(dirPath: string, className: string, value: any) {
-    if (this.filesMap[dirPath].includes(`interface ${className} `)) return;
+    if (this.filesMap[dirPath].includes(`class ${className} `)) return;
 
     this.filesMap[dirPath] += `
-export interface ${className} {
-  ${this.getPropertiesContent(value.properties, value.required)}}
+export class ${className} {
+  ${this.getPropertiesContent(value.properties, value.required)}
+  static fromJson(json: any): ${className} {
+    let instance = new ${className}()
+${this.getFromJsonContent(value.properties, value.required)}
+    return instance;
+  }
+
+  toJson(): any {
+    return ${this.getToJsonContent(value.properties, value.required)};
+  }
+}
 `;
     this.checkSubGen(value.properties, dirPath);
   }
@@ -106,6 +126,65 @@ export interface ${className} {
       str += `${INDENT}${camelPropertyName}${require ? '' : '?'}: ${propType}; \n\n`;
     }
     str = str.length > 0 ? str.substring(2, str.length - 1) : str;
+    return str;
+  }
+
+  getFromJsonContent(properties: SwaggerSchemaProperties, required: (string | number)[] | undefined) {
+    let str = ``;
+    for (const propertyName in properties) {
+      const property = properties[propertyName];
+      const propType = getTsType(propertyName, property);
+      const camelPropertyName = camelCase(propertyName);
+
+      let require = required?.includes(propertyName) ?? false;
+      // nullable swagger 3+
+      const nullable = Array.isArray(property.type) && find(property.type, e => e.toString().includes('null'));
+      if (nullable && require && !propType.endsWith('[]')) require = false;
+
+      str += `${INDENT}${INDENT}instance.${camelPropertyName} = `;
+      if (propType.endsWith('[]')) {
+        const subType = propType.substring(0, propType.length - 2);
+        str += `json["${propertyName}"] != null ? ${BASE_TYPE.includes(subType) ? `json["${propertyName}"]` : `(json["${propertyName}"] as any[]).map<${subType}>((v: any) => ${subType}.fromJson(v))`} : [];\n`;
+      } else if (!BASE_TYPE.includes(propType)) {
+        str += require ? `${propType}.fromJson(json["${propertyName}"]);\n` : `json["${propertyName}"] != null ? ${propType}.fromJson(json["${propertyName}"]) : null;\n`;
+      } else {
+        str += `json["${propertyName}"];\n`;
+      }
+    }
+    str = str.length > 0 ? str.substring(0, str.length - 1) : str;
+    return str;
+  }
+
+  getToJsonContent(properties: SwaggerSchemaProperties, required: (string | number)[] | undefined) {
+    let str = '{\n';
+    for (const propertyName in properties) {
+      const camelPropertyName = camelCase(propertyName);
+      const property = properties[propertyName];
+      const propType = getTsType(propertyName, property);
+      let require = required?.includes(propertyName) ?? false;
+      // nullable swagger 3+
+      const nullable = Array.isArray(property.type) && find(property.type, e => e.toString().includes('null'));
+      if (nullable && require && !propType.endsWith('[]')) require = false;
+
+      str += `${INDENT}${INDENT}${INDENT}"${propertyName}": `;
+
+      if (propType.endsWith('[]')) {
+        const subType = propType.substring(0, propType.length - 2);
+        if (require)
+          str += `this.${BASE_TYPE.includes(subType) ? camelPropertyName : `${camelPropertyName}.map((e: ${subType}) => e.toJson())`},\n`;
+        else
+          str += `${camelPropertyName} != null ? ${BASE_TYPE.includes(subType) ? `this.${camelPropertyName}` : `this.${camelPropertyName}.map((e: ${subType}) => e.toJson())`} : null,\n`;
+      } else if (!BASE_TYPE.includes(propType)) {
+        if (require)
+          str += `this.${camelPropertyName}.toJson(),\n`;
+        else
+          str += `${camelPropertyName} != null ? this.${camelPropertyName}!.toJson() : null,\n`;
+
+      } else {
+        str += `this.${camelPropertyName},\n`;
+      }
+    }
+    str += `${INDENT}${INDENT}}`;
     return str;
   }
 
