@@ -1,4 +1,4 @@
-import { find, first, join, mkdirpSync, existsSync, writeFileSync, writeFile, snakeCase, camelCase } from "@root/util";
+import { isRegExp, find, first, join, mkdirpSync, existsSync, writeFileSync, writeFile, snakeCase, camelCase } from "@root/util";
 import type { SwaggerPropertyDefinition, SwaggerPath, Method, SwaggerHttpEndpoint, Responses } from "../../index.d";
 import { BASE_TYPE, INDENT, SwaggerConfig, getTsParamType, getTsSchemaType, getDirPath } from "../../utils";
 
@@ -30,7 +30,7 @@ class RequestGenerate {
 
     // request内容写入
     for (let key in this.filesMap) {
-      str += `export * from '.${key.replace(requestsDir, '')}/request.g.ts';\n`;
+      str += `export * from '.${key.replace(requestsDir, '')}/request.g';\n`;
       if (!existsSync(join(key, 'request.g.ts')))
         writeFile(
           join(key, 'request.g.ts'),
@@ -105,15 +105,27 @@ export const http = {
   }
 
   generateRequest(key: string, method: Method, value: SwaggerHttpEndpoint) {
-    let folder = value["x-apifox-folder"];
-    if (!folder && value.tags && value.tags.length > 0) folder = value.tags[0];
-    if (!SwaggerConfig.testFolder(folder ?? '')) return;
-    folder = SwaggerConfig.exchangeConfigMap(folder);
+    const { rootPath, customPathFolder } = SwaggerConfig.config;
+    let folder;
+    if (customPathFolder)
+      for (const customKey of customPathFolder.keys())
+        if (isRegExp(customKey) && customKey.test(key)) {
+          folder = customPathFolder.get(customKey);
+          break;
+        } else if (!isRegExp(customKey) && key.startsWith(customKey)) {
+          folder = customPathFolder.get(customKey);
+          break;
+        }
 
-    const { rootPath } = SwaggerConfig.config;
+    if (!folder) {
+      folder = value["x-apifox-folder"];
+      if (!folder && value.tags && value.tags.length > 0) folder = value.tags[0];
+      if (!SwaggerConfig.testFolder(folder ?? '')) return;
+      folder = SwaggerConfig.exchangeConfigMap(folder);
+    }
+
     const translationObj = SwaggerConfig.translationObj;
-    let { dirPath, deeps, className } = getDirPath(folder, rootName, { translationObj, rootPath }) as {
-      className: string,
+    let { dirPath, deeps } = getDirPath(folder, rootName, { translationObj, rootPath }) as {
       dirPath: string,
       deeps: number
     };
@@ -182,7 +194,7 @@ export async function ${methodName}(${params}): Promise<${returnType}> {
     }
     if (resClass?.endsWith('[]')) {
       const subType = resClass.substring(0, resClass.length - 2);
-      resClass = BASE_TYPE.includes(resClass!) ? resClass : `models.${subType}[]`;
+      resClass = BASE_TYPE.includes(subType) ? resClass : `models.${subType}[]`;
     } else if (resClass) {
       resClass = BASE_TYPE.includes(resClass) ? resClass : `models.${resClass}`;
     }
@@ -203,7 +215,7 @@ export async function ${methodName}(${params}): Promise<${returnType}> {
       let type = getTsParamType(p, swaggerVersion);
       if (type?.endsWith('[]')) {
         const subType = type.substring(0, type.length - 2);
-        type = BASE_TYPE.includes(type!) ? type : `models.${subType}[]`;
+        type = BASE_TYPE.includes(subType) ? type : `models.${subType}[]`;
       } else {
         type = BASE_TYPE.includes(type!) ? type : `models.${type}`;
       }
@@ -214,19 +226,18 @@ export async function ${methodName}(${params}): Promise<${returnType}> {
 
     let queryType = queryParams.length > 0 ? '{\n' : '';
     queryParams.forEach(p => {
-      const name = camelCase(p.name);
       let type = getTsParamType(p, swaggerVersion);
       const require = p['required'];
       if (type?.endsWith('[]')) {
         const subType = type.substring(0, type.length - 2);
-        type = BASE_TYPE.includes(type!) ? type : `models.${subType}[]`;
+        type = BASE_TYPE.includes(subType) ? type : `models.${subType}[]`;
       } else {
         type = BASE_TYPE.includes(type!) ? type : `models.${type}`;
       }
-      queryType += `${INDENT}${name}${require === true ? '' : '?'}: ${type},\n`;
+      queryType += `${INDENT}${p.name}${require === true ? '' : '?'}: ${type},\n`;
 
       const description = p?.description;
-      desc += `\n * @queryParam {${type}${require === true ? '' : '?'}} ${name}: ${description ?? ''}`;
+      desc += `\n * @queryParam {${type}${require === true ? '' : '?'}} ${p.name}: ${description ?? ''}`;
     });
 
     if (queryParams.length > 0) queryType += '}';
@@ -245,7 +256,7 @@ export async function ${methodName}(${params}): Promise<${returnType}> {
       const require = p['required'];
       if (type?.endsWith('[]')) {
         const subType = type.substring(0, type.length - 2);
-        type = BASE_TYPE.includes(type!) ? type : `models.${subType}[]`;
+        type = BASE_TYPE.includes(subType) ? type : `models.${subType}[]`;
       } else {
         type = BASE_TYPE.includes(type!) ? type : `models.${type}`;
       }
@@ -260,6 +271,7 @@ export async function ${methodName}(${params}): Promise<${returnType}> {
 
   getFunctionArgs(key: string, method: Method, parameters: SwaggerHttpEndpoint['parameters']) {
     const data = this.getParamObj(parameters);
+    const swaggerVersion = SwaggerConfig.config.swaggerVersion;
     if (!data) return `'${key}'`;
     let str = '', reqPath = key;
     const { pathParams, queryParams, formDataParams, bodyParams } = data;
@@ -271,7 +283,17 @@ export async function ${methodName}(${params}): Promise<${returnType}> {
         reqPath += reqPath.endsWith('/') ? `\${${name}}` : `/\${${name}}`;
     });
     str += `'${reqPath}'`;
-    if (bodyParams.length > 0 && ['put', 'post'].includes(method)) str += ', body';
+    // TODO: body 对象类型 case 转换
+    if (bodyParams.length > 0 && ['put', 'post'].includes(method)) {
+      const p = first(bodyParams)!;
+      let type = getTsParamType(p, swaggerVersion);
+      if (type?.endsWith('[]')) {
+        const subType = type.substring(0, type.length - 2);
+        str += BASE_TYPE.includes(subType) ? ', body' : `, body.map((e) => e.toJson())`;
+      } else {
+        str += BASE_TYPE.includes(type!) ? ', body' : ', body.toJson()';
+      }
+    }
     if (formDataParams.length > 0 && !str.includes(', body') && ['put', 'post'].includes(method)) str += ', body';
     if (queryParams.length > 0) str += `, query`;
     return str;

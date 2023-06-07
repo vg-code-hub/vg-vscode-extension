@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-05-31 21:58:23
  * @LastEditors: zdd
- * @LastEditTime: 2023-06-05 14:58:27
+ * @LastEditTime: 2023-06-07 19:19:35
  * @FilePath: /vg-vscode-extension/src/swagger-generator/index.ts
  * @Description: 
  */
@@ -19,15 +19,25 @@ const values = `# swagger 配置文件
 # https://petstore.swagger.io/v2/swagger.json
 jsonUrl: http://127.0.0.1:4523/export/openapi?projectId=2540665&version=3.1
 outputDir: api
-# language: dart (支持typescript开发中)
-language: dart
+# 1、首先过滤需要的文件夹[folderFilter]， 2、然后根据 customPathFolder ｜ customModelFolder 自定义 Folder
+# 3、最后如果没有第二步，folderMap 转换 folder path
 folderFilter:
   - app接口
   # - /^app接口/
   # - /^app接口模型/
+customPathFolder:
+  /v1/app/login: test/login
+  # string startsWith
+  /v1/common/upload: test/upload
+  # reg match
+  /v1/driver.*/: test/driver
+customModelFolder:
+  DeviceListResp: test
+  DeviceHistoryNewResp: test/history
 folderMap:
   app接口: app
   app接口模型: app
+  app模型: app
   "驾驶员:driver": driver
   "项目:project": project
 `;

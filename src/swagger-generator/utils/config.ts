@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-06-05 11:28:07
  * @LastEditors: zdd
- * @LastEditTime: 2023-06-05 17:21:03
+ * @LastEditTime: 2023-06-07 14:57:42
  * @FilePath: /vg-vscode-extension/src/swagger-generator/utils/config.ts
  * @Description: 
  */
@@ -10,12 +10,15 @@ import { parse } from 'yaml';
 import { commands } from "vscode";
 import { existsSync, isRegExp, readFileSync, readFileSyncToObj } from "@root/util";
 import { baiduTranslationHandle, zhiyiTranslationHandle } from '../translation';
+import { getRegExp } from "./helper";
 
 interface Config {
   jsonUrl: string,
   outputDir: string,
   folderFilter?: (string | RegExp)[],
   folderMap?: Record<string, string>
+  customPathFolder?: Map<string | RegExp, string>
+  customModelFolder?: Record<string, string>
   translationObj?: Record<string, string>
   rootPath: string
   swaggerVersion: 2 | 3
@@ -65,14 +68,19 @@ class SwaggerConfig {
     let folderFilter = data.folderFilter;
     if (folderFilter) {
       if (!Array.isArray(folderFilter)) throw Error('folderFilter must be array');
-      folderFilter = folderFilter.map((item) => {
-        if (/^\/.*\/[g]?[ism]?$/.test(item)) {
-          var parts = /^\/(.*)\/([g]?[ism]?)$/.exec(item);
-          return new RegExp(parts![1], parts![2]);
-        }
-        return item;
-      });
+      folderFilter = folderFilter.map(getRegExp);
     }
+    let customPathFolder = data.customPathFolder;
+    if (customPathFolder) {
+      let mapCustomPathFolder = new Map();
+      for (const key in customPathFolder) {
+        const element = customPathFolder[key];
+        let _key = getRegExp(key);
+        mapCustomPathFolder.set(_key, element);
+      }
+      data.customPathFolder = mapCustomPathFolder;
+    }
+
     this._config = { ...data, outputDir: data.outputDir ?? 'api', folderFilter };
     return this.config;
   }

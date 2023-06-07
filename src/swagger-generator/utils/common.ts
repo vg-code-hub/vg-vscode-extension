@@ -3,7 +3,7 @@
  * @Author: zdd
  * @Date: 2023-06-01 16:59:31
  * @LastEditors: zdd
- * @LastEditTime: 2023-06-06 10:47:26
+ * @LastEditTime: 2023-06-07 14:34:11
  * @FilePath: /vg-vscode-extension/src/swagger-generator/utils/common.ts
  * @Description: 
  */
@@ -73,7 +73,7 @@ export function getTsSchemaType(property: SwaggerPropertyDefinition): string | u
         case 'array':
             const items = property['items'];
             if (items) {
-                var itemType = getDartSchemaType(items)!;
+                var itemType = getTsSchemaType(items)!;
                 itemType = itemType === 'Record<string, any>' ? itemType : pascalCase(itemType);
                 return itemType ? `${itemType}[]` : 'any[]';
             }

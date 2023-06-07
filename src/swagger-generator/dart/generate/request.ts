@@ -1,4 +1,4 @@
-import { find, first, join, mkdirpSync, existsSync, writeFileSync, writeFile, snakeCase, camelCase } from "@root/util";
+import { find, first, join, mkdirpSync, existsSync, writeFileSync, writeFile, snakeCase, camelCase, isRegExp } from "@root/util";
 import type { SwaggerPropertyDefinition, SwaggerPath, Method, SwaggerHttpEndpoint, Responses } from "../../index.d";
 import { BASE_TYPE, INDENT, SwaggerConfig, getDartParamType, getDartSchemaType, getDirPath } from "../../utils";
 
@@ -105,12 +105,25 @@ class BaseConnect extends GetConnect {
   }
 
   generateRequest(key: string, method: Method, value: SwaggerHttpEndpoint) {
-    let folder = value["x-apifox-folder"];
-    if (!folder && value.tags && value.tags.length > 0) folder = value.tags[0];
-    if (!SwaggerConfig.testFolder(folder ?? '')) return;
-    folder = SwaggerConfig.exchangeConfigMap(folder);
+    const { rootPath, customPathFolder } = SwaggerConfig.config;
+    let folder;
+    if (customPathFolder)
+      for (const customKey of customPathFolder.keys())
+        if (isRegExp(customKey) && customKey.test(key)) {
+          folder = customPathFolder.get(customKey);
+          break;
+        } else if (!isRegExp(customKey) && key.startsWith(customKey)) {
+          folder = customPathFolder.get(customKey);
+          break;
+        }
 
-    const { rootPath } = SwaggerConfig.config;
+    if (!folder) {
+      folder = value["x-apifox-folder"];
+      if (!folder && value.tags && value.tags.length > 0) folder = value.tags[0];
+      if (!SwaggerConfig.testFolder(folder ?? '')) return;
+      folder = SwaggerConfig.exchangeConfigMap(folder);
+    }
+
     const translationObj = SwaggerConfig.translationObj;
     let { dirPath, deeps, className } = getDirPath(folder, rootName, { translationObj, rootPath }) as {
       className: string,

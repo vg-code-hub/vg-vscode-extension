@@ -125,6 +125,10 @@ export const exchangeZhToEn = (str: string, zhToEnMap: Record<string, string>) =
   };
 };
 
-export function isStringRegExp(str: string) {
-
+export function getRegExp(path: string) {
+  if (/^\/.*\/[g]?[ism]?$/.test(path)) {
+    var parts = /^\/(.*)\/([g]?[ism]?)$/.exec(path);
+    return new RegExp(parts![1], parts![2]);
+  }
+  return path;
 }

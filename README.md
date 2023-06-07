@@ -186,9 +186,24 @@ assets/svgs/files.txt
 }
 ```
 
+#### swagger.yaml 配置
+- jsonUrl
+- outputDir?
+- folderFilter? {string|reg[]} 文件夹过滤配置（不配置取所有）
+- customPathFolder
+- customModelFolder
+- folderMap
+
+文件夹规则
+> 1、首先过滤需要的文件夹[folderFilter]   
+> 2、然后根据 customPathFolder ｜ customModelFolder 自定义 Folder     
+> 3、最后如果没有第二步，folderMap 转换 folder path
+
+说明
+
 > 简单做了 swagger2、swagger3 适配 ，主要测试 apifox 导出的 swagger.json   
 > 目前根据 `tags` 和 `x-apifox-folder` 生成目录，其他一律放在 api/entitys 或  api/requests 目录下 
-> 首次会生成 xxx.g.dart 文件，你也可以做修改。再次生成不会覆盖已有文件，生成一个同名的 xxx.g.vg 文件    
+> 首次会生成 xxx.g.dart 文件，你也可以做修改。再次生成不会覆盖已有文件，生成一个同名的 xxx.g.vg 文件      
 
 end
 
@@ -196,7 +211,7 @@ end
 
 # 更多
 
-受 `getx-template`、`swagger-ts-plugin` 的启发，做了些有趣的修改
+受 `getx-template`、`swagger-ts-plugin` 的启发
 
 Dependencies:
 - axios    

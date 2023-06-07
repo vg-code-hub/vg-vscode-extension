@@ -337,10 +337,6 @@ async function promptForTargetDirectory(): Promise<string | undefined> {
     });
 }
 
-export const isRegExp = (v: any) => {
-    return Object.prototype.toString.call(v) === '[object RegExp]';
-};
-
 export { join, resolve } from "path";
 export { mkdirpSync, mkdirp } from "mkdirp";
 export {
@@ -348,6 +344,6 @@ export {
     statSync, readFile, unlinkSync, readdir, stat,
     appendFileSync, rmSync, rmdirSync
 } from "fs";
-export { find, first, isEmpty, isNil, camelCase, kebabCase, snakeCase, upperFirst, upperCase, lowerCase, lowerFirst } from "lodash";
+export { find, first, isEmpty, isNil, isRegExp, camelCase, kebabCase, snakeCase, upperFirst, upperCase, lowerCase, lowerFirst } from "lodash";
 
 export const pascalCase = (str: string) => upperFirst(camelCase(str));
