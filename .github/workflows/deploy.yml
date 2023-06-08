@@ -20,7 +20,7 @@ jobs:
       #   uses: DerYeger/yarn-setup-action@v1.0.1
       #   with:
       #     node-version: 16
-      - run: pnpm i
+      - run: pnpm install --frozen-lockfile
       - name: Publish to Open VSX Registry
         uses: HaaLeo/publish-vscode-extension@v1
         with:
