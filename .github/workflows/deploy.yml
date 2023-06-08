@@ -12,10 +12,11 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-      - name: Setup pnpm yarn
+      - name: Setup pnpm
         uses: pnpm/action-setup@v2.2.4
         with:
           version: 8
+      - name: Setup yarn
         uses: DerYeger/yarn-setup-action@v1.0.1
         with:
           node-version: 16
