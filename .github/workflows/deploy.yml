@@ -14,6 +14,7 @@ jobs:
           node-version: 16
       - name: Setup pnpm
         uses: pnpm/action-setup@v2.2.4
+        with:
           version: 7
       - run: pnpm ci
       - name: Publish to Open VSX Registry
