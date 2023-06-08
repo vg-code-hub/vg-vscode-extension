@@ -16,19 +16,19 @@ jobs:
         uses: pnpm/action-setup@v2.2.4
         with:
           version: 8
-      - name: Setup yarn
-        uses: DerYeger/yarn-setup-action@v1.0.1
-        with:
-          node-version: 16
-      - run: yarn
+      # - name: Setup yarn
+      #   uses: DerYeger/yarn-setup-action@v1.0.1
+      #   with:
+      #     node-version: 16
+      - run: pnpm i
       - name: Publish to Open VSX Registry
         uses: HaaLeo/publish-vscode-extension@v1
         with:
           pat: ${{ secrets.OPEN_VSX_TOKEN }}
-          yarn: true
+          dependencies: false
       - name: Publish to Visual Studio Marketplace
         uses: HaaLeo/publish-vscode-extension@v1
         with:
           pat: ${{ secrets.VS_MARKETPLACE_TOKEN }}
-          yarn: true
+          dependencies: false
           registryUrl: https://marketplace.visualstudio.com
