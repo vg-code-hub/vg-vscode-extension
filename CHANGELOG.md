@@ -2,11 +2,15 @@
  * @Author: zdd
  * @Date: 2023-05-30 17:42:04
  * @LastEditors: zdd
- * @LastEditTime: 2023-06-07 19:20:23
+ * @LastEditTime: 2023-06-09 16:15:49
  * @FilePath: /vg-vscode-extension/CHANGELOG.md
  * @Description: 
 -->
 # Release Notes
+
+### 0.3.3
+
+- perf: `swagger ts` better use
 ### 0.3.2
 
 - feat: `swagger gen` customPathFolder、customModelFolder
