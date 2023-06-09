@@ -2,13 +2,13 @@
  * @Author: zdd
  * @Date: 2023-06-05 11:28:07
  * @LastEditors: zdd
- * @LastEditTime: 2023-06-07 14:57:42
+ * @LastEditTime: 2023-06-08 15:55:41
  * @FilePath: /vg-vscode-extension/src/swagger-generator/utils/config.ts
  * @Description: 
  */
 import { parse } from 'yaml';
 import { commands } from "vscode";
-import { existsSync, isRegExp, readFileSync, readFileSyncToObj } from "@root/util";
+import { existsSync, isRegExp, join, readFileSync, readFileSyncToObj, rmSync, writeFileSync } from "@root/util";
 import { baiduTranslationHandle, zhiyiTranslationHandle } from '../translation';
 import { getRegExp } from "./helper";
 
@@ -118,6 +118,24 @@ class SwaggerConfig {
       folder = folder.split(key).join(element);
     }
     return folder;
+  }
+
+  private static exceptionString?: string;
+  static addException(e: string) {
+    if (!this.exceptionString) this.exceptionString = '';
+    this.exceptionString += `${e}\n`;
+  }
+
+  static writeExceptionToFile(modelsDir: string) {
+    if (this.exceptionString)
+      writeFileSync(
+        join(modelsDir, 'exception.text'),
+        this.exceptionString,
+        'utf-8',
+      );
+    else
+      rmSync(join(modelsDir, 'exception.text'));
+    this.exceptionString = '';
   }
 }
 

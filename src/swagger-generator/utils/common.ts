@@ -3,10 +3,11 @@
  * @Author: zdd
  * @Date: 2023-06-01 16:59:31
  * @LastEditors: zdd
- * @LastEditTime: 2023-06-07 14:34:11
+ * @LastEditTime: 2023-06-08 15:58:54
  * @FilePath: /vg-vscode-extension/src/swagger-generator/utils/common.ts
  * @Description: 
  */
+import { SwaggerConfig } from ".";
 import { SwaggerHttpEndpoint, SwaggerPropertyDefinition } from "../index.d";
 import { exchangeZhToEn } from "./helper";
 import { first, join, snakeCase, pascalCase } from "@root/util";
@@ -17,7 +18,7 @@ export const INDENT = '  ';
 export const BASE_TYPE = ['int', 'double', 'number', 'boolean', 'File', 'string', 'String', 'DateTime', 'bool', 'Record<string, any>', 'Map<String, dynamic>'];
 
 
-export function getTsType(key: string, property: SwaggerPropertyDefinition): string {
+export function getTsType(key: string, property: SwaggerPropertyDefinition, addException = false): string {
     const type = Array.isArray(property.type) ? first(property.type) : property.type;
     const format = property.format;
     const subClass = pascalCase(key);
@@ -33,11 +34,12 @@ export function getTsType(key: string, property: SwaggerPropertyDefinition): str
         case 'file':
             return 'File';
         case 'object':
+            if (addException) SwaggerConfig.addException(`info: auto create [class ${subClass}] in some object propertys`);
             return subClass;
         case 'array':
             const items = property['items'];
             if (items) {
-                var itemType = getTsType(key, items);
+                var itemType = getTsType(key, items, addException);
                 return `${itemType}[]`;
             }
             break;

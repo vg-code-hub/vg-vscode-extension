@@ -74,7 +74,7 @@ export let http: Http;
 /**
  * umi
  * 
-import { request } from 'umi';
+import { request } from '@umijs/max';
 
 function download(url: string, params?: Record<string, any>) {
   return request(url, {
@@ -284,17 +284,17 @@ export async function ${methodName}(${params}): Promise<${returnType}> {
     });
     str += `'${reqPath}'`;
     // TODO: body 对象类型 case 转换
-    if (bodyParams.length > 0 && ['put', 'post'].includes(method)) {
+    if (bodyParams.length > 0 && ['put', 'post', 'delete'].includes(method)) {
       const p = first(bodyParams)!;
       let type = getTsParamType(p, swaggerVersion);
       if (type?.endsWith('[]')) {
         const subType = type.substring(0, type.length - 2);
-        str += BASE_TYPE.includes(subType) ? ', body' : `, body.map((e) => e.toJson())`;
+        str += BASE_TYPE.includes(subType) ? ', body' : `, body.map((e) => (new models.${subType}(e)).toJson())`;
       } else {
-        str += BASE_TYPE.includes(type!) ? ', body' : ', body.toJson()';
+        str += BASE_TYPE.includes(type!) ? ', body' : `, (new models.${type}(body)).toJson()`;
       }
     }
-    if (formDataParams.length > 0 && !str.includes(', body') && ['put', 'post'].includes(method)) str += ', body';
+    if (formDataParams.length > 0 && !str.includes(', body') && ['put', 'post', 'delete'].includes(method)) str += ', body';
     if (queryParams.length > 0) str += `, query`;
     return str;
   }
