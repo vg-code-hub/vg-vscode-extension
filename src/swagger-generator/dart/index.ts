@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-06-01 15:12:03
  * @LastEditors: zdd
- * @LastEditTime: 2023-06-05 14:53:22
+ * @LastEditTime: 2023-06-09 16:58:35
  * @FilePath: /vg-vscode-extension/src/swagger-generator/dart/index.ts
  * @Description: 
  */
@@ -24,7 +24,9 @@ export const genWebapiForDart = async (uri: Uri) => {
     const { jsonUrl, outputDir } = await SwaggerConfig.instance.getConfig(rootPath);
     if (!jsonUrl) throw Error('no swagger jsonUrl');
 
-    await generateCode(jsonUrl, join(rootPath, 'lib', outputDir));
+    const absPath = outputDir.startsWith('/') ? join(rootPath, outputDir) : join(rootPath, 'lib', outputDir);
+
+    await generateCode(jsonUrl, absPath);
     window.showInformationMessage(
       `Successfully Generated api directory`
     );

@@ -263,6 +263,8 @@ class ${className} extends BaseConnect {
     if (!data) return `'${key}'`;
     let str = '', reqPath = key, queryStr = '';
     const { pathParams, queryParams, formDataParams, bodyParams } = data;
+    const swaggerVersion = SwaggerConfig.config.swaggerVersion;
+
     pathParams.forEach(p => {
       const name = camelCase(p.name);
       if (reqPath.includes(`{${p.name}}`))
@@ -271,15 +273,25 @@ class ${className} extends BaseConnect {
         reqPath += reqPath.endsWith('/') ? `\${${name}}` : `/\${${name}}`;
     });
     str += `'${reqPath}'`;
-    if (bodyParams.length > 0 && ['put', 'post'].includes(method)) str += ', body';
-    if (formDataParams.length > 0 && !str.includes(', body') && ['put', 'post'].includes(method)) str += ', body';
+    if (bodyParams.length > 0 && ['put', 'post', 'delete'].includes(method)) {
+      const p = first(bodyParams)!;
+      const type = getDartParamType(p, swaggerVersion);
+      var suffix = '';
+      if (type && !BASE_TYPE.includes(type)) suffix = `.toJson()`;
+      else if (type && ['int', 'double'].includes(type)) suffix = `.toString()`;
+      str += `, body${suffix}`;
+    }
+    if (formDataParams.length > 0 && !str.includes(', body') && ['put', 'post', 'delete'].includes(method)) str += ', body';
 
     if (queryParams.length > 0) {
       queryStr += '{';
       queryParams.forEach(p => {
+        const type = getDartParamType(p, swaggerVersion);
         const name = camelCase(p.name);
-        queryStr += (`\'${name}\': ${name},`);
-
+        var suffix = '';
+        if (type && !BASE_TYPE.includes(type)) suffix = `.toJson()`;
+        else if (type && ['int', 'double'].includes(type)) suffix = `.toString()`;
+        queryStr += (`\'${p.name}\': ${name}${suffix}, `);
       });
       queryStr += '}';
     }
@@ -295,7 +307,7 @@ class ${className} extends BaseConnect {
       return `\n${INDENT}${INDENT}return res.body['data'];`;
     } else if (type.startsWith('List')) {
       const subType = type.substring(5, type.length - 1);
-      return `\n${INDENT}${INDENT}return res.body['data'].map((e) => ${subType}.fromJson(e)).toList() as ${type};`;
+      return `\n${INDENT}${INDENT}return res.body['data'].map<${subType}>((e) => ${subType}.fromJson(e)).toList() as ${type};`;
     } else {
       return `\n${INDENT}${INDENT}return ${type}.fromJson(res.body['data']);`;
     }

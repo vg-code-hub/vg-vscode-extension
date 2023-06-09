@@ -3,7 +3,7 @@
  * @Author: zdd
  * @Date: 2023-06-01 16:59:31
  * @LastEditors: zdd
- * @LastEditTime: 2023-06-08 15:58:54
+ * @LastEditTime: 2023-06-09 17:04:31
  * @FilePath: /vg-vscode-extension/src/swagger-generator/utils/common.ts
  * @Description: 
  */
@@ -130,7 +130,7 @@ export function getTsParamType(param: SwaggerHttpEndpoint['parameters'][0], swag
     throw Error('Unsupported type: $type');
 }
 
-export function getDartType(key: string, property: SwaggerPropertyDefinition): string {
+export function getDartType(key: string, property: SwaggerPropertyDefinition, addException = false): string {
     const type = Array.isArray(property.type) ? first(property.type) : property.type;
     const format = property.format;
     const subClass = pascalCase(key);
@@ -157,11 +157,12 @@ export function getDartType(key: string, property: SwaggerPropertyDefinition): s
         case 'file':
             return 'File';
         case 'object':
+            if (addException) SwaggerConfig.addException(`info: auto create [class ${subClass}] in some object propertys`);
             return subClass;
         case 'array':
             const items = property['items'];
             if (items) {
-                var itemType = getDartType(key, items);
+                var itemType = getDartType(key, items, addException);
                 return `List<${itemType}>`;
             }
             break;

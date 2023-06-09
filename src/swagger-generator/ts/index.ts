@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-06-01 15:12:03
  * @LastEditors: zdd
- * @LastEditTime: 2023-06-06 09:33:15
+ * @LastEditTime: 2023-06-09 16:59:04
  * @FilePath: /vg-vscode-extension/src/swagger-generator/ts/index.ts
  * @Description: 
  */
@@ -23,8 +23,9 @@ export const genWebapiForTypescript = async (uri: Uri) => {
 
     const { jsonUrl, outputDir } = await SwaggerConfig.instance.getConfig(rootPath);
     if (!jsonUrl) throw Error('no swagger jsonUrl');
+    const absPath = outputDir.startsWith('/') ? join(rootPath, outputDir) : join(rootPath, 'src', outputDir);
 
-    await generateCode(jsonUrl, join(rootPath, 'src', outputDir));
+    await generateCode(jsonUrl, absPath);
     window.showInformationMessage(
       `Successfully Generated api directory`
     );
