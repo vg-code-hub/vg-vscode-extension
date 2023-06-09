@@ -23,6 +23,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Publish to Open VSX Registry
         uses: HaaLeo/publish-vscode-extension@v1
+        id: publishToOpenVSX
         with:
           pat: ${{ secrets.OPEN_VSX_TOKEN }}
           dependencies: false
@@ -30,5 +31,6 @@ jobs:
         uses: HaaLeo/publish-vscode-extension@v1
         with:
           pat: ${{ secrets.VS_MARKETPLACE_TOKEN }}
+          extensionFile: ${{ steps.publishToOpenVSX.outputs.vsixPath }}
           dependencies: false
           registryUrl: https://marketplace.visualstudio.com
