@@ -2,12 +2,15 @@
  * @Author: zdd
  * @Date: 2023-05-30 17:42:04
  * @LastEditors: zdd
- * @LastEditTime: 2023-06-09 21:59:32
+ * @LastEditTime: 2023-06-12 21:35:11
  * @FilePath: /vg-vscode-extension/CHANGELOG.md
  * @Description: 
 -->
 # Release Notes
 
+### 0.4.1
+
+- fix: `swagger to request` bug
 ### 0.4.0
 
 - fix: `swagger dart` some bug
