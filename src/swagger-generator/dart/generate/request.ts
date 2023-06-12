@@ -166,7 +166,7 @@ class ${className} extends BaseConnect {
     // 写入请求
     this.filesMap[dirPath] += `${functionDesc}
   ${returnType} ${methodName}(${params}) async {
-    ${returnType !== 'Future' ? 'final res = ' : ''}await ${method.toLowerCase()}(${functionArgs});${this.getReturnContent(value.responses, method)}
+    ${returnType !== 'Future<void>' ? 'final res = ' : ''}await ${method.toLowerCase()}(${functionArgs});${this.getReturnContent(value.responses, method)}
   }
 `;
   }
@@ -178,9 +178,9 @@ class ${className} extends BaseConnect {
     const queryParams =
       parameters.filter((p) => p['in'] === 'query');
     const formDataParams =
-      parameters.filter((p) => p['in'] === 'formData');
+      parameters.filter((p) => p['in'] === 'body' && p['contentType'] === 'multipart/form-data');
     const bodyParams =
-      parameters.filter((p) => p['in'] === 'body');
+      parameters.filter((p) => p['in'] === 'body' && p['contentType'] !== 'multipart/form-data');
 
     return {
       pathParams,
@@ -192,7 +192,7 @@ class ${className} extends BaseConnect {
 
   getReturnType(responses: Responses, method: Method) {
     let resClass: string | undefined;
-    if (!['post', 'put', 'delete'].includes(method) && responses && responses['200'] && responses['200'].schema) {
+    if (responses && responses['200'] && responses['200'].schema) {
       const schema = responses['200'].schema;
       if (schema.type === 'object' && schema.properties && Object.keys(schema.properties).includes('data')) {
         let rawData: SwaggerPropertyDefinition | undefined = schema.properties['data'];
@@ -204,7 +204,7 @@ class ${className} extends BaseConnect {
       }
     }
 
-    return resClass !== undefined ? `Future<${resClass}>` : 'Future';
+    return resClass !== undefined ? `Future<${resClass}>` : 'Future<void>';
   }
 
   getParams(parameters: SwaggerHttpEndpoint['parameters']) {
@@ -229,28 +229,28 @@ class ${className} extends BaseConnect {
       const name = camelCase(p.name);
       const type = getDartParamType(p, swaggerVersion);
       const require = p['required'];
-      str += `${INDENT}${INDENT}${require === true ? 'required ' : ''}${type}${require === true ? '' : '?'} ${name},\n`;
+      str += `${INDENT}${INDENT}${require ? 'required ' : ''}${type}${require ? '' : '?'} ${name},\n`;
 
       const description = p?.description;
-      desc += `\n${INDENT}/// [queryParam] ${type}${require === true ? '' : '?'} ${name}: ${description ?? ''}`;
+      desc += `\n${INDENT}/// [queryParam] ${type}${require ? '' : '?'} ${name}: ${description ?? ''}`;
     });
 
     if (formDataParams.length > 0) {
       if (!str.includes('{')) str += '{\n';
-      str += `${INDENT}${INDENT}required Map<String, dynamic> body,\n`;
+      str += `${INDENT}${INDENT}required dynamic body,\n`;
 
       const description = formDataParams[0]?.description;
-      desc += `\n${INDENT}/// [formDataParam] Map<String, dynamic> body: ${description ?? ''}`;
+      desc += `\n${INDENT}/// [formDataParam] FormData body: ${description ?? ''}`;
     }
     if (bodyParams.length > 0) {
       if (!str.includes('{\n')) str += '{\n';
       const p = first(bodyParams)!;
       const type = getDartParamType(p, swaggerVersion);
       const require = p['required'];
-      str += `${INDENT}${INDENT}${require === true ? 'required ' : ''}${type}${require === true ? '' : '?'} body,\n`;
+      str += `${INDENT}${INDENT}${require ? 'required ' : ''}${type}${require ? '' : '?'} body,\n`;
 
       const description = formDataParams[0]?.description;
-      desc += `\n${INDENT}/// [formDataParam] ${type}${require === true ? '' : '?'} body: ${description ?? ''}`;
+      desc += `\n${INDENT}/// [bodyParam] ${type}${require ? '' : '?'} body: ${description ?? ''}`;
     }
 
     if (str.includes('{')) str += `${INDENT}}`;
@@ -276,10 +276,13 @@ class ${className} extends BaseConnect {
     if (bodyParams.length > 0 && ['put', 'post', 'delete'].includes(method)) {
       const p = first(bodyParams)!;
       const type = getDartParamType(p, swaggerVersion);
+      const require = p['required'];
+
       var suffix = '';
       if (type && !BASE_TYPE.includes(type)) suffix = `.toJson()`;
       else if (type && ['int', 'double'].includes(type)) suffix = `.toString()`;
-      str += `, body${suffix}`;
+
+      str += `, body${require || !suffix ? '' : '?'}${suffix}`;
     }
     if (formDataParams.length > 0 && !str.includes(', body') && ['put', 'post', 'delete'].includes(method)) str += ', body';
 
@@ -288,10 +291,11 @@ class ${className} extends BaseConnect {
       queryParams.forEach(p => {
         const type = getDartParamType(p, swaggerVersion);
         const name = camelCase(p.name);
+        const require = p['required'];
         var suffix = '';
         if (type && !BASE_TYPE.includes(type)) suffix = `.toJson()`;
         else if (type && ['int', 'double'].includes(type)) suffix = `.toString()`;
-        queryStr += (`\'${p.name}\': ${name}${suffix}, `);
+        queryStr += `\'${p.name}\': ${name}${require || !suffix ? '' : '?'}${suffix}, `;
       });
       queryStr += '}';
     }
@@ -301,13 +305,13 @@ class ${className} extends BaseConnect {
 
   getReturnContent(responses: SwaggerHttpEndpoint['responses'], method: Method) {
     const returnType = this.getReturnType(responses, method);
-    if (returnType === 'Future') return '';
+    if (returnType === 'Future<void>') return '';
     let type = returnType.substring(7, returnType.length - 1);
     if (BASE_TYPE.includes(type) || type === 'List<Map<String, dynamic>>' || type === 'Map<String, dynamic>') {
       return `\n${INDENT}${INDENT}return res.body['data'];`;
     } else if (type.startsWith('List')) {
       const subType = type.substring(5, type.length - 1);
-      return `\n${INDENT}${INDENT}return res.body['data'].map<${subType}>((e) => ${subType}.fromJson(e)).toList() as ${type};`;
+      return `\n${INDENT}${INDENT}return res.body['data'] == null ? [] : ${type}.from(res.body['data'].map((e) => ${subType}.fromJson(e)));`;
     } else {
       return `\n${INDENT}${INDENT}return ${type}.fromJson(res.body['data']);`;
     }

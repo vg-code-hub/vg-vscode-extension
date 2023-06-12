@@ -2,7 +2,7 @@ import { Uri, window } from "vscode";
 import * as vscode from "vscode";
 import {
   join, getRootPath, readdirSync, statSync, existsSync, appendFileSync,
-  rmSync, snakeCase, camelCase, pascalCase
+  rmSync, snakeCase, camelCase, pascalCase, mkdirp
 } from "@root/util";
 
 export const routersGenerate = async (uri: Uri) => {
@@ -48,6 +48,7 @@ function routeNamesGenerate(targetDirectory: string) {
       .split("/");
     const modalFileName = arrFilePath.join("_");
     const filePathName = arrFilePath.join("/");
+    if (filePathName.startsWith('.')) return;
 
     const snakeCaseName = snakeCase(modalFileName);
     const camelCaseName = camelCase(modalFileName);
@@ -66,7 +67,11 @@ function routeNamesGenerate(targetDirectory: string) {
 
       if (existsSync(`${rootPath}/lib/pages/index.txt`))
         rmSync(`${rootPath}/lib/pages/index.txt`);
+
+      if (!existsSync(`${rootPath}/lib/routers`))
+        mkdirp(`${rootPath}/lib/routers`);
     }
+
     // 写入列表
     appendFileSync(
       `${rootPath}/lib/routers/names.txt`,

@@ -181,7 +181,7 @@ export async function ${methodName}(${params}): Promise<${returnType}> {
 
   getReturnType(responses: Responses, method: Method) {
     let resClass: string | undefined;
-    if (!['post', 'put', 'delete'].includes(method) && responses && responses['200'] && responses['200'].schema) {
+    if (responses && responses['200'] && responses['200'].schema) {
       const schema = responses['200'].schema;
       if (schema.type === 'object' && schema.properties && Object.keys(schema.properties).includes('data')) {
         let rawData: SwaggerPropertyDefinition | undefined = schema.properties['data'];
@@ -245,10 +245,10 @@ export async function ${methodName}(${params}): Promise<${returnType}> {
     if (queryType.length > 0) str += `${str.length > 0 ? ', ' : ''}query: ${queryType}`;
 
     if (formDataParams.length > 0) {
-      str += `${str.length > 0 ? ', ' : ''}body: Record<string, any>`;
+      str += `${str.length > 0 ? ', ' : ''}body: any`;
 
       const description = formDataParams[0]?.description;
-      desc += `\n * @formDataParam {Record<string, any>} body: ${description ?? ''}`;
+      desc += `\n * @formDataParam {any} body: ${description ?? ''}`;
     }
     if (bodyParams.length > 0) {
       const p = first(bodyParams)!;
@@ -263,7 +263,7 @@ export async function ${methodName}(${params}): Promise<${returnType}> {
       str += `${str.length > 0 ? ', ' : ''}body${require === true ? '' : '?'}: ${type}`;
 
       const description = formDataParams[0]?.description;
-      desc += `\n * @formDataParam {${type}${require === true ? '' : '?'}} body: ${description ?? ''}`;
+      desc += `\n * @bodyParam {${type}${require === true ? '' : '?'}} body: ${description ?? ''}`;
     }
 
     return { params: str, desc };
