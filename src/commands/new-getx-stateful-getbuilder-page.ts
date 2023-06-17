@@ -2,14 +2,14 @@
  * @Author: zdd
  * @Date: 2023-05-31 16:13:02
  * @LastEditors: zdd
- * @LastEditTime: 2023-06-05 16:57:15
+ * @LastEditTime: 2023-06-17 09:42:18
  * @FilePath: /vg-vscode-extension/src/commands/new-getx-stateful-getbuilder-page.ts
  * @Description: 
  */
 
 import { Uri, window } from "vscode";
 import { controllerTemplate, viewTemplate } from "../templates/getx-stateful-getbuilder-page.template";
-import { mkdirp, existsSync, isNil, promptForPageTypePick, promptForPageName, pascalCase, snakeCase } from "../util";
+import { mkdirp, existsSync, isNil, promptForPageTypePick, promptForPageName, pascalCase, snakeCase } from "../utils";
 import type { PageType } from "@root/type.d";
 
 export const newGetxStatefulWidgetGetBuilderPage = async (uri: Uri) => {

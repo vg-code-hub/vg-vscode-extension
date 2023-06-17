@@ -6,7 +6,7 @@
  * @FilePath: /vg-vscode-extension/src/templates/create-common-directory.template.ts
  * @Description: 
  */
-import { snakeCase, writeFileSync } from "../util";
+import { snakeCase, writeFileSync } from "../utils";
 
 // index
 export function indexTemplate(pageName: string, targetDirectory: string) {

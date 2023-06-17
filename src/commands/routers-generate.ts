@@ -3,7 +3,7 @@ import * as vscode from "vscode";
 import {
   join, getRootPath, readdirSync, statSync, existsSync, appendFileSync,
   rmSync, snakeCase, camelCase, pascalCase, mkdirp
-} from "@root/util";
+} from "@root/utils";
 
 export const routersGenerate = async (uri: Uri) => {
   let targetDirectory = uri.fsPath;

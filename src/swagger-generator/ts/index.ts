@@ -8,7 +8,7 @@
  */
 
 import { Uri, window } from "vscode";
-import { join, mkdirp, getRootPath, existsSync, writeFile } from "@root/util";
+import { join, mkdirp, getRootPath, existsSync, writeFile } from "@root/utils";
 import { getSimpleData } from "../http";
 import { SwaggerConfig, collectChinese } from "../utils";
 import ModelGenerate from "./generate/model";

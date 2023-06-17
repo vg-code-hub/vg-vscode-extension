@@ -10,7 +10,7 @@
 import { SwaggerConfig } from ".";
 import { SwaggerHttpEndpoint, SwaggerPropertyDefinition } from "../index.d";
 import { exchangeZhToEn } from "./helper";
-import { first, join, snakeCase, pascalCase } from "@root/util";
+import { first, join, snakeCase, pascalCase } from "@root/utils";
 
 /** tab 空格数 */
 export const INDENT = '  ';

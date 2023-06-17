@@ -9,7 +9,7 @@
 
 import { Uri, window } from "vscode";
 import { controllerTemplate, viewTemplate } from "../templates/getx-getbuilder-page.template";
-import { mkdirp, existsSync, isNil, pascalCase, promptForPageName, promptForPageTypePick, snakeCase } from "../util";
+import { mkdirp, existsSync, isNil, pascalCase, promptForPageName, promptForPageTypePick, snakeCase } from "../utils";
 import type { PageType } from "@root/type.d";
 
 export const newGetxGetBuilderPage = async (uri: Uri) => {

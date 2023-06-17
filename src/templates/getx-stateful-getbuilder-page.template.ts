@@ -1,4 +1,4 @@
-import { pascalCase, snakeCase, writeFileSync } from "../util";
+import { pascalCase, snakeCase, writeFileSync } from "../utils";
 import { PageType } from "@root/type.d";
 
 // controller

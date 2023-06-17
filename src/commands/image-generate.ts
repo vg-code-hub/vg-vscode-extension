@@ -5,7 +5,7 @@ import { Uri, window } from "vscode";
 import {
   mkdirpSync, readdirSync, statSync, existsSync,
   readdir, stat, appendFileSync, rmSync, camelCase,
-} from "@root/util";
+} from "@root/utils";
 
 export const imageGenerate = async (uri: Uri) => {
   let targetDirectory = uri.fsPath;

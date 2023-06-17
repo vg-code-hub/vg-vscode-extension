@@ -7,7 +7,7 @@
  * @FilePath: /vg-vscode-extension/src/swagger-generator/dart/generate/model.ts
  * @Description: 
  */
-import { existsSync, writeFileSync, mkdirpSync, join, find, camelCase, pascalCase } from "@root/util";
+import { existsSync, writeFileSync, mkdirpSync, join, find, camelCase, pascalCase } from "@root/utils";
 import type { SwaggerSchema, SwaggerSchemaProperties, SwaggerSchemas } from "../../index.d";
 import { BASE_TYPE, INDENT, SwaggerConfig, getDartType, getDirPath } from "../../utils";
 

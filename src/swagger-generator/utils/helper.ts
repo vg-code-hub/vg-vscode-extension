@@ -1,6 +1,6 @@
 //类型
 import type { Swagger } from "../index.d";
-import { resolve, existsSync, readdirSync, statSync, unlinkSync, rmdirSync } from "@root/util";
+import { resolve, existsSync, readdirSync, statSync, unlinkSync, rmdirSync } from "@root/utils";
 
 
 /**

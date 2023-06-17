@@ -40,6 +40,11 @@
   "contributes": {
     "commands": [
       {
+        "command": "extension.generateCodeByWebview",
+        "title": "可视化生成代码",
+        "category": "VG"
+      },
+      {
         "command": "extension.assets-generate",
         "title": "☆ Images x1 x2 Generate",
         "category": "VG"
@@ -138,7 +143,16 @@
         "language": "html",
         "path": "./snippets/html.json"
       }
-    ]
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "VGApp",
+          "title": "v gen",
+          "icon": "image/activitybar.svg"
+        }
+      ]
+    }
   },
   "scripts": {
     "vsce-package": "vsce package --no-dependencies",
@@ -148,6 +162,8 @@
     "watch": "webpack --watch",
     "package": "webpack --mode production --devtool hidden-source-map",
     "compile-tests": "tsc -p . --outDir out",
+    "webview:dev": "pnpm --dir \"webview-react\" dev",
+    "webview:build": "pnpm --dir \"webview-react\" build",
     "watch-tests": "tsc -p . -w --outDir out",
     "pretest": "pnpm run compile-tests && pnpm run compile && pnpm run lint",
     "lint": "eslint src --ext ts",
@@ -155,18 +171,33 @@
   },
   "dependencies": {
     "axios": "^1.4.0",
+    "copy-paste": "^1.5.3",
+    "directory-tree": "^3.5.1",
+    "ejs": "^3.1.9",
+    "execa": "^7.1.1",
+    "fs-extra": "^11.1.1",
+    "generate-schema": "^2.6.0",
     "jimp": "^0.22.8",
+    "json-schema-to-typescript": "^13.0.2",
     "lodash": "^4.17.21",
     "md5": "^2.3.0",
     "mkdirp": "^3.0.1",
+    "prettier": "^2.8.8",
+    "strip-comments": "^2.0.1",
+    "tar": "^6.1.15",
+    "typescript-json-schema": "^0.57.0",
     "yaml": "^2.3.1"
   },
   "devDependencies": {
+    "@types/copy-paste": "^1.1.30",
+    "@types/ejs": "^3.1.2",
+    "@types/fs-extra": "^11.0.1",
     "@types/glob": "^8.1.0",
     "@types/lodash": "^4.14.195",
     "@types/mkdirp": "^0.5.2",
     "@types/mocha": "^10.0.1",
     "@types/node": "~16.18.34",
+    "@types/prettier": "^2.7.3",
     "@types/vscode": "^1.69.10",
     "@typescript-eslint/eslint-plugin": "^5.59.8",
     "@typescript-eslint/parser": "^5.59.8",

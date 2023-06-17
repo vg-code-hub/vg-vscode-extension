@@ -2,14 +2,14 @@
  * @Author: zdd
  * @Date: 2023-05-31 16:13:02
  * @LastEditors: zdd
- * @LastEditTime: 2023-06-05 17:15:48
+ * @LastEditTime: 2023-06-17 17:52:17
  * @FilePath: /vg-vscode-extension/src/commands/create-common-directory.ts
  * @Description: 
  */
 
 import { Uri, window } from "vscode";
 import { indexTemplate, commonIndexTemplate, viewIndexTemplate } from "../templates/create-common-directory.template";
-import { mkdirp, existsSync } from "../util";
+import { mkdirp, existsSync } from "../utils";
 
 
 export const newGetxCommonDirectory = async (uri: Uri) => {

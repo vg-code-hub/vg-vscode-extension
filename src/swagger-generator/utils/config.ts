@@ -8,7 +8,7 @@
  */
 import { parse } from 'yaml';
 import { commands } from "vscode";
-import { existsSync, isRegExp, join, readFileSync, readFileSyncToObj, rmSync, writeFileSync } from "@root/util";
+import { existsSync, isRegExp, join, readFileSync, readFileSyncToObj, rmSync, writeFileSync } from "@root/utils";
 import { baiduTranslationHandle, zhiyiTranslationHandle } from '../translation';
 import { getRegExp } from "./helper";
 

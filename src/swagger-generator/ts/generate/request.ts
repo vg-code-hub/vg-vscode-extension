@@ -1,4 +1,4 @@
-import { isRegExp, find, first, join, mkdirpSync, existsSync, writeFileSync, writeFile, snakeCase, camelCase } from "@root/util";
+import { isRegExp, find, first, join, mkdirpSync, existsSync, writeFileSync, writeFile, snakeCase, camelCase } from "@root/utils";
 import type { SwaggerPropertyDefinition, SwaggerPath, Method, SwaggerHttpEndpoint, Responses } from "../../index.d";
 import { BASE_TYPE, INDENT, SwaggerConfig, getTsParamType, getTsSchemaType, getDirPath } from "../../utils";
 

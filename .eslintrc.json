@@ -21,6 +21,7 @@
         "semi": "off"
     },
     "ignorePatterns": [
+        "webview-react",
         "out",
         "dist",
         "**/*.d.ts"
