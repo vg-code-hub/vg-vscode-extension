@@ -2,12 +2,16 @@
  * @Author: zdd
  * @Date: 2023-05-30 17:42:04
  * @LastEditors: zdd
- * @LastEditTime: 2023-06-12 21:35:11
+ * @LastEditTime: 2023-06-19 18:47:44
  * @FilePath: /vg-vscode-extension/CHANGELOG.md
  * @Description: 
 -->
 # Release Notes
 
+### 1.0.0
+
+- feat: add `swagger config` overwrite
+- chore: Successful application in typescript and flutter production projects
 ### 0.4.1
 
 - fix: `swagger to request` bug
