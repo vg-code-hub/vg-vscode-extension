@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-06-01 15:12:03
  * @LastEditors: zdd
- * @LastEditTime: 2023-06-09 16:59:04
+ * @LastEditTime: 2023-06-19 18:39:21
  * @FilePath: /vg-vscode-extension/src/swagger-generator/ts/index.ts
  * @Description: 
  */
@@ -15,8 +15,6 @@ import ModelGenerate from "./generate/model";
 import RequestGenerate from "./generate/request";
 
 export const genWebapiForTypescript = async (uri: Uri) => {
-
-
   try {
     let rootPath = getRootPath(undefined);
     if (!rootPath) throw Error('no root path');
