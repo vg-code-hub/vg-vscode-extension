@@ -147,7 +147,7 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "VGApp",
+          "id": "VgCode",
           "title": "v gen",
           "icon": "image/activitybar.svg"
         }

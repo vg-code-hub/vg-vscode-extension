@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-06-17 09:58:32
  * @LastEditors: zdd
- * @LastEditTime: 2023-06-18 00:25:00
+ * @LastEditTime: 2023-06-29 17:58:52
  * @FilePath: /vg-vscode-extension/webview-react/.umirc.ts
  * @Description: 
  */
@@ -10,33 +10,56 @@ import { defineConfig } from '@umijs/max';
 
 export default defineConfig({
   antd: {},
+  theme: { '@primary-color': '#1DA57A' },
   access: {},
   model: {},
   initialState: {},
   styleLoader: {},
   request: {},
   layout: {
-    title: '@umijs/max',
+    title: 'Vg Code',
   },
   routes: [
     {
       path: '/',
-      redirect: '/home',
+      redirect: '/snippets',
     },
     {
-      name: '首页',
-      path: '/home',
-      component: './Home',
+      name: '代码片段',
+      path: '/snippets',
+      component: './snippets',
     },
     {
-      name: '权限演示',
-      path: '/access',
-      component: './Access',
+      hideInMenu: true,
+      name: '代码片段详情',
+      path: '/snippet-detail',
+      component: './snippets/detail',
     },
     {
-      name: ' CRUD 示例',
-      path: '/table',
-      component: './Table',
+      hideInMenu: true,
+      name: '创建代码片段',
+      path: '/snippet-create',
+      component: './snippets/create',
+    },
+    {
+      name: '区块',
+      path: '/blocks',
+      component: './blocks',
+    },
+    {
+      name: '脚手架',
+      path: '/scaffold',
+      component: './scaffold',
+    },
+    {
+      name: '物料中心',
+      path: '/materials',
+      component: './materials',
+    },
+    {
+      name: '更多',
+      path: '/more',
+      component: './more',
     },
   ],
   npmClient: 'pnpm',
@@ -94,7 +117,9 @@ export default defineConfig({
         // },
       },
     });
-    return memo;
   },
+  cssLoaderModules: {
+    exportLocalsConvention: 'camelCase'
+  }
 });
 

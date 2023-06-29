@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-05-30 17:42:04
  * @LastEditors: zdd
- * @LastEditTime: 2023-06-17 19:36:59
+ * @LastEditTime: 2023-06-29 18:50:34
  * @FilePath: /vg-vscode-extension/src/extension.ts
  * @Description: 
  */
@@ -76,10 +76,9 @@ export function activate(context: vscode.ExtensionContext) {
 		-1,
 	);
 	statusBarItem.command = 'extension.generateCodeByWebview';
-	statusBarItem.text = '$(octoface) VGApp';
+	statusBarItem.text = '$(octoface) Vg Code';
 	statusBarItem.tooltip = '可视化生成代码';
 	statusBarItem.show();
-
 }
 
 // This method is called when your extension is deactivated

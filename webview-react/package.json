@@ -5,7 +5,6 @@
     "dev": "max dev",
     "build": "max build",
     "format": "prettier --cache --write .",
-    "prepare": "husky install",
     "postinstall": "max setup",
     "setup": "max setup",
     "start": "npm run dev"
@@ -14,17 +13,28 @@
     "@ant-design/icons": "^5.1.4",
     "@ant-design/pro-components": "^2.5.11",
     "@umijs/max": "^4.0.71",
-    "antd": "^5.6.1"
+    "ahooks": "^3.7.8",
+    "amis": "^2.9.0",
+    "antd": "^5.6.1",
+    "codemirror": "^5.58.1",
+    "form-render": "^2.2.9",
+    "jsonlint": "^1.6.3",
+    "mitt": "^3.0.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-simple-image-viewer": "^1.2.2",
+    "use-immer": "^0.9.0"
   },
   "devDependencies": {
+    "@types/codemirror": "^0.0.98",
     "@types/react": "^18.2.12",
     "@types/react-dom": "^18.2.5",
     "babel-plugin-dynamic-import-node": "^2.3.3",
-    "husky": "^8.0.3",
     "lint-staged": "^13.2.2",
     "prettier": "^2.8.8",
     "prettier-plugin-organize-imports": "^3.2.2",
     "prettier-plugin-packagejson": "^2.4.3",
+    "script-loader": "^0.7.2",
     "typescript": "^5.1.3"
   }
 }
