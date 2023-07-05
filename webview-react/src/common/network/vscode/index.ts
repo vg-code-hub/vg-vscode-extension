@@ -1,5 +1,14 @@
+/*
+ * @Author: zdd
+ * @Date: 2023-06-28 18:00:11
+ * @LastEditors: zdd
+ * @LastEditTime: 2023-07-05 17:52:59
+ * @FilePath: /vg-vscode-extension/webview-react/src/common/network/vscode/index.ts
+ * @Description: 
+ */
 import { AxiosRequestConfig } from 'axios';
 import { request } from './vscode';
+export * from './vscode';
 
 export interface IGetLocalMaterialsResult {
   path: string;
@@ -12,7 +21,6 @@ export interface IGetLocalMaterialsResult {
     img?: string | string[];
     category?: string[];
     schema?: 'form-render' | 'formily' | 'amis';
-    chatGPT?: { viewPrompt?: string };
     scripts?: [{ method: string; remark: string; }];
   };
   template: string;
@@ -21,13 +29,11 @@ export interface IGetLocalMaterialsResult {
  * 获取本地物料列表
  *
  * @export
- * @param {('snippets' | 'blocks')} type
  * @returns
  */
-export function getLocalMaterials(type: 'snippets' | 'blocks') {
-  return request<IGetLocalMaterialsResult[]>({
-    cmd: 'getLocalMaterials',
-    data: type,
+export function getLocalMaterials() {
+  return request<{ blocks: IGetLocalMaterialsResult[], snippets: IGetLocalMaterialsResult[] }>({
+    cmd: 'getLocalMaterials'
   });
 }
 /**
@@ -327,8 +333,7 @@ export function getPluginConfig() {
     cmd: 'getPluginConfig',
   });
 }
-
-export function savePluginConfig(data: {
+export interface IConfigResult {
   yapi: {
     domain: string;
     projects: {
@@ -350,7 +355,9 @@ export function savePluginConfig(data: {
       value: string;
     }[];
   };
-}) {
+}
+
+export function savePluginConfig(data: IConfigResult) {
   return request({
     cmd: 'savePluginConfig',
     data,
@@ -480,27 +487,6 @@ export function nodeRequest<IResult = unknown>(config: AxiosRequestConfig) {
   });
 }
 
-export function askChatGPT(data: {
-  sessionId: number;
-  messageId: number;
-  messages: { role: 'system' | 'user' | 'assistant'; content: string }[];
-}) {
-  return request<{ sessionId: number; messageId: number; content: string }>({
-    cmd: 'askChatGPT',
-    data,
-  });
-}
-
-export function askChatGPTWithEjsTemplate(data: {
-  template: string;
-  model: object;
-}) {
-  return request<boolean>({
-    cmd: 'askChatGPTWithEjsTemplate',
-    data,
-  });
-}
-
 export function getTask() {
   return request<{
     task: 'addSnippets' | 'openSnippet' | 'route' | 'updateSelectedFolder';
@@ -514,13 +500,6 @@ export function insertCode(code: string) {
   return request<boolean>({
     cmd: 'insertCode',
     data: code,
-  });
-}
-
-export function exportChatGPTContent(content: string) {
-  return request<boolean>({
-    cmd: 'exportChatGPTContent',
-    data: content,
   });
 }
 

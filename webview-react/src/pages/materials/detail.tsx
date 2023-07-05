@@ -2,14 +2,14 @@
  * @Author: zdd
  * @Date: 2023-06-29 15:19:34
  * @LastEditors: zdd
- * @LastEditTime: 2023-06-29 18:46:09
- * @FilePath: /vg-vscode-extension/webview-react/src/pages/snippets/detail.tsx
+ * @LastEditTime: 2023-07-04 17:54:02
+ * @FilePath: /vg-vscode-extension/webview-react/src/pages/materials/detail.tsx
  * @Description: 
  */
 import { useEffect } from 'react';
 import { useMount } from 'ahooks';
 import { DownOutlined } from '@ant-design/icons';
-import { Form, Space, Button, Dropdown, message, MenuProps } from 'antd';
+import { Form, Space, Button, Dropdown, message, MenuProps, Modal } from 'antd';
 import { useImmer } from 'use-immer';
 import FormRender, { useForm } from 'form-render';
 import { useLocation } from '@umijs/max';
@@ -17,36 +17,44 @@ import { useLocation } from '@umijs/max';
 import { IGetLocalMaterialsResult, genCodeBySnippetMaterial } from '@/common';
 import CodeMirror from '@/components/CodeMirror';
 import AmisComponent from '@/components/AmisComponent';
+import JsonToTs from '@/components/JsonToTs';
+import YapiModal from '@/components/YapiModal';
+import RunScript from '@/components/RunScript';
+
 import './index.less';
 
-const SnippetDetailPage: React.FC = () => {
+const MaterialDetailPage: React.FC = () => {
   const { state }: { state: any } = useLocation();
   const items: MenuProps['items'] = [
     {
       key: '1',
       label: 'JSON TO TS',
       onClick: () => {
-
+        setJsonToTsModalVisble(true)
       }
     },
     {
       key: '2',
       label: '根据 YAPI 接口追加模板数据',
       onClick: () => {
-
+        setYapiModalVsible(true)
       }
     },
     {
       key: '3',
       label: '编辑模板',
       onClick: () => {
-
+        setTemplateModalVisble(true);
       }
     },
   ]
   const [formData, setFormData] = useImmer({});
   const form = useForm();
   const [selectedMaterial, setSelectedMaterial] = useImmer<IGetLocalMaterialsResult>({ schema: {}, model: {} } as any);
+  const [templateModalVisble, setTemplateModalVisble] = useImmer(false);
+  const [jsonToTsModalVisble, setJsonToTsModalVisble] = useImmer(false);
+  const [yapiModalVsible, setYapiModalVsible] = useImmer(false);
+  const [scriptModalVisible, setScriptModalVisible] = useImmer(false);
 
   useEffect(() => {
 
@@ -78,10 +86,10 @@ const SnippetDetailPage: React.FC = () => {
             lint={false}
             value={selectedMaterial.template}
             onChange={(value) => {
-              // model.setSelectedMaterial((s) => ({
-              //   ...s,
-              //   template: value,
-              // }));
+              setSelectedMaterial((s) => ({
+                ...s,
+                template: value,
+              }));
             }}
           />
         </Form.Item>
@@ -103,7 +111,7 @@ const SnippetDetailPage: React.FC = () => {
                     type="primary"
                     size="small"
                     onClick={() => {
-                      // model.setScriptModalVisible(true);
+                      setScriptModalVisible(true);
                     }}
                   >
                     执行脚本设置模板数据
@@ -112,10 +120,10 @@ const SnippetDetailPage: React.FC = () => {
                     type="primary"
                     size="small"
                     onClick={() => {
-                      // model.setSelectedMaterial((s) => ({
-                      //   ...s,
-                      //   model: model.formData,
-                      // }));
+                      setSelectedMaterial((s) => ({
+                        ...s,
+                        model: formData,
+                      }));
                     }}
                   >
                     重新生成模板数据
@@ -147,10 +155,10 @@ const SnippetDetailPage: React.FC = () => {
             lint
             value={JSON.stringify(selectedMaterial.model, null, 2)}
             onChange={(value) => {
-              // model.setSelectedMaterial((s) => ({
-              //   ...s,
-              //   model: JSON.parse(value),
-              // }));
+              setSelectedMaterial((s) => ({
+                ...s,
+                model: JSON.parse(value),
+              }));
             }}
           />
           <br></br>
@@ -192,8 +200,77 @@ const SnippetDetailPage: React.FC = () => {
           返回
         </Button>
       </div>
+      <YapiModal
+        visible={yapiModalVsible}
+        onOk={(m) => {
+          setSelectedMaterial((s) => ({
+            ...s,
+            model: { ...selectedMaterial.model, ...m },
+          }));
+          setYapiModalVsible(false);
+        }}
+        onCancel={() => {
+          setYapiModalVsible(false);
+        }}
+      />
+      <JsonToTs
+        visible={jsonToTsModalVisble}
+        json={selectedMaterial.model}
+        onCancel={() => {
+          setJsonToTsModalVisble(false);
+        }}
+        onOk={(type) => {
+          setSelectedMaterial((s) => ({
+            ...s,
+            model: { ...selectedMaterial.model, type },
+          }));
+          setJsonToTsModalVisble(false);
+        }}
+      />
+      <Modal
+        open={templateModalVisble}
+        title="编辑模板"
+        okText="确定"
+        cancelText="取消"
+        onCancel={() => {
+          setTemplateModalVisble(false);
+        }}
+        onOk={() => {
+          setTemplateModalVisble(false);
+        }}
+      >
+        <CodeMirror
+          domId="templateCodeMirrorDialog"
+          lint={false}
+          value={selectedMaterial.template}
+          onChange={(value) => {
+            setSelectedMaterial((s) => ({
+              ...s,
+              template: value,
+            }));
+          }}
+        />
+      </Modal>
+      <RunScript
+        visible={scriptModalVisible}
+        materialPath={selectedMaterial.path}
+        model={selectedMaterial.model}
+        scripts={selectedMaterial.preview?.scripts}
+        onCancel={() => {
+          setScriptModalVisible(false);
+        }}
+        onOk={(result) => {
+          setSelectedMaterial((s) => ({
+            ...s,
+            model: result,
+          }));
+          setFormData(result);
+          form.setValues(result);
+          setScriptModalVisible(false);
+        }}
+      />
     </>
   )
 }
 
-export default SnippetDetailPage;
+export default MaterialDetailPage;

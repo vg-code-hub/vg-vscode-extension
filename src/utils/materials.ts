@@ -27,10 +27,6 @@ export const getLocalMaterials = (
       notShowInSnippetsList?: boolean;
       notShowInintellisense?: boolean;
       schema?: string;
-      chatGPT?: {
-        commandPrompt?: string;
-        viewPrompt?: string;
-      };
     };
     template: string;
   }[] = [];
@@ -108,6 +104,8 @@ export const getLocalMaterials = (
 export const getCodeTemplateListFromFiles = () => {
   const list: { name: string; template: string; type: 'ejs' }[] = [];
   const templateFullPath = path.join(rootPath, getTemplateFilePath());
+  console.log({ templateFullPath });
+
   try {
     const templateFiles = fs
       .readdirSync(templateFullPath)
@@ -146,10 +144,6 @@ export function getSnippets() {
       notShowInSnippetsList?: boolean;
       notShowInintellisense?: boolean;
       schema?: string;
-      chatGPT?: {
-        commandPrompt?: string;
-        viewPrompt?: string;
-      };
     };
     template: string;
   }[] = getCodeTemplateListFromFiles().map((s) => ({

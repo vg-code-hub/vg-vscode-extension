@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-06-17 09:43:56
  * @LastEditors: zdd
- * @LastEditTime: 2023-06-17 18:06:37
+ * @LastEditTime: 2023-07-05 18:12:33
  * @FilePath: /vg-vscode-extension/src/webview/controllers/material.ts
  * @Description: 
  */
@@ -11,34 +11,37 @@ import {
   downloadMaterialsFromGit,
   downloadMaterialsFromNpm,
 } from '../../utils/download';
-import { tempDir } from '../../utils/env';
-import { getLocalMaterials, getSnippets } from '../../utils/materials';
-import { blockMaterialsPath, materialsPath } from '../../utils/vscodeEnv';
+import { tempGlobalDir } from '../../utils/env';
+import { getLocalMaterials } from '../../utils/materials';
+import { materialsPath } from '../../utils/vscodeEnv';
 import { IMessage } from '../type';
 
 const material = {
-  getLocalMaterials: (message: IMessage<'blocks' | 'snippets'>) => {
-    if (message.data === 'blocks') {
-      const materials = getLocalMaterials('blocks', blockMaterialsPath);
-      return materials;
-    }
-    const materials = getSnippets().filter(
-      (s) => !s.preview.notShowInSnippetsList,
+  getLocalMaterials: () => {
+    console.log(
+      {
+        blocks: getLocalMaterials('blocks', tempGlobalDir.blockMaterials),
+        snippets: getLocalMaterials('snippets', tempGlobalDir.snippetMaterials),
+      }
     );
-    return materials;
+
+    return {
+      blocks: getLocalMaterials('blocks', tempGlobalDir.blockMaterials),
+      snippets: getLocalMaterials('snippets', tempGlobalDir.snippetMaterials),
+    };
   },
 
   downloadMaterials: async (
     message: IMessage<{ type: 'git' | 'npm'; url: string }>,
   ) => {
-    if (message.data.type === 'npm') {
+    if (message.data.type === 'npm')
       await downloadMaterialsFromNpm(message.data.url);
-    } else {
+    else
       downloadMaterialsFromGit(message.data.url);
-    }
+
     const materials = {
-      blocks: getLocalMaterials('blocks', tempDir.blockMaterials),
-      snippets: getLocalMaterials('snippets', tempDir.snippetMaterials),
+      blocks: getLocalMaterials('blocks', tempGlobalDir.blockMaterials),
+      snippets: getLocalMaterials('snippets', tempGlobalDir.snippetMaterials),
     };
     return materials;
   },

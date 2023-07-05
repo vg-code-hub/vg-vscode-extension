@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-06-17 18:03:33
  * @LastEditors: zdd
- * @LastEditTime: 2023-06-17 18:06:12
+ * @LastEditTime: 2023-07-05 11:33:36
  * @FilePath: /vg-vscode-extension/src/utils/download.ts
  * @Description: 
  */
@@ -10,7 +10,7 @@ import axios from 'axios';
 import * as path from 'path';
 import * as execa from 'execa';
 import * as fs from 'fs-extra';
-import { tempDir } from './env';
+import { tempGlobalDir } from './env';
 
 const tar = require('tar');
 
@@ -43,21 +43,22 @@ export const download = (url: string, filePath: string, fileName: string) =>
 export const downloadMaterialsFromNpm = async (packageName: string) => {
   const result = execa.execaSync('npm', ['view', packageName, 'dist.tarball']);
   const tarball = result.stdout;
-  fs.removeSync(tempDir.materials);
-  await download(tarball, tempDir.temp, `temp.tgz`);
-  if (!fs.existsSync(tempDir.materials))
-    fs.mkdirSync(tempDir.materials);
+  fs.removeSync(tempGlobalDir.materials);
+  await download(tarball, tempGlobalDir.temp, `temp.tgz`);
+  if (!fs.existsSync(tempGlobalDir.materials))
+    fs.mkdirSync(tempGlobalDir.materials);
 
   await tar.x({
-    file: path.join(tempDir.temp, `temp.tgz`),
-    C: tempDir.materials,
+    file: path.join(tempGlobalDir.temp, `temp.tgz`),
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    C: tempGlobalDir.materials,
     strip: 1,
   });
 };
 
 export const downloadMaterialsFromGit = (remote: string) => {
-  fs.removeSync(tempDir.materials);
-  execa.execaSync('git', ['clone', ...remote.split(' '), tempDir.materials]);
+  fs.removeSync(tempGlobalDir.materials);
+  execa.execaSync('git', ['clone', ...remote.split(' '), tempGlobalDir.materials]);
 };
 
 export const copyMaterialsFromTemp = (
@@ -66,7 +67,7 @@ export const copyMaterialsFromTemp = (
 ) => {
   from.blocks.map((s) => {
     fs.copySync(
-      path.join(tempDir.blockMaterials, s),
+      path.join(tempGlobalDir.blockMaterials, s),
       fs.existsSync(path.join(to, 'blocks', s))
         ? path.join(to, 'blocks', `${s} copy`)
         : path.join(to, 'blocks', s),
@@ -74,12 +75,12 @@ export const copyMaterialsFromTemp = (
   });
   from.snippets.map((s) => {
     fs.copySync(
-      path.join(tempDir.snippetMaterials, s),
+      path.join(tempGlobalDir.snippetMaterials, s),
       fs.existsSync(path.join(to, 'snippets', s))
         ? path.join(to, 'snippets', `${s} copy`)
         : path.join(to, 'snippets', s),
     );
   });
 
-  fs.removeSync(tempDir.materials);
+  fs.removeSync(tempGlobalDir.materials);
 };

@@ -19,7 +19,7 @@ export const getSchemaWebUrl = (
 
 export const defaultSchema = {
   formRender: {
-    model: JSON.stringify({ name: 'lowcode' }, null, 2),
+    model: JSON.stringify({ name: 'vgcode' }, null, 2),
     schema: JSON.stringify(
       {
         formSchema: {
@@ -42,7 +42,7 @@ export const defaultSchema = {
     ),
   },
   amis: {
-    model: JSON.stringify({ name: 'lowcode' }, null, 2),
+    model: JSON.stringify({ name: 'vgcode' }, null, 2),
     schema: JSON.stringify(
       {
         formSchema: {
@@ -83,7 +83,7 @@ export const defaultSchema = {
     ),
   },
   formily: {
-    model: JSON.stringify({ name: 'lowcode' }, null, 2),
+    model: JSON.stringify({ name: 'vgcode' }, null, 2),
     schema: JSON.stringify(
       {
         formSchema: {
@@ -123,7 +123,7 @@ export const defaultSchema = {
   },
 };
 
-const SnippetCreatePage: React.FC = () => {
+const MaterialCreatePage: React.FC = () => {
   const [formData, setFormData] = useImmer<{
     name: string;
     template: string;
@@ -293,4 +293,4 @@ const SnippetCreatePage: React.FC = () => {
   );
 }
 
-export default SnippetCreatePage;
+export default MaterialCreatePage;

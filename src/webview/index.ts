@@ -6,7 +6,7 @@ import { getExtensionPath, setLastActiveTextEditorId } from '../context';
 import { routes } from './routes';
 import { invokeCallback, invokeErrorCallback } from './callback';
 import util from "../util";
-import { readFileSync } from "../utils";
+
 const fs = require('fs');
 
 type WebViewKeys = 'main' | 'createApp' | 'downloadMaterials';
@@ -92,8 +92,8 @@ export const showWebView = (context: vscode.ExtensionContext, options: {
       setLastActiveTextEditorId((vscode.window.activeTextEditor as any).id);
 
     const panel = vscode.window.createWebviewPanel(
-      'lowcode',
-      options.title || 'LOW-CODE可视化',
+      'vgcode',
+      options.title || 'VG-CODE',
       {
         viewColumn: options.viewColumn || vscode.ViewColumn.Two,
         preserveFocus: true,
@@ -170,6 +170,5 @@ export const showWebView = (context: vscode.ExtensionContext, options: {
         task: options.task.task,
         data: options.task.data,
       });
-
   }
 };

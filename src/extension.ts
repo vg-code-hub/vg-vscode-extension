@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-05-30 17:42:04
  * @LastEditors: zdd
- * @LastEditTime: 2023-06-29 18:50:34
+ * @LastEditTime: 2023-07-05 17:13:58
  * @FilePath: /vg-vscode-extension/src/extension.ts
  * @Description: 
  */
@@ -15,7 +15,8 @@ import { newGetxFullPage } from './commands/new-getx-full-page';
 import { newGetxStatefulWidgetGetBuilderPage } from './commands/new-getx-stateful-getbuilder-page';
 import { routersGenerate } from './commands/routers-generate';
 import { genSwaggerConfig, genWebapiForDart, genWebapiForTypescript } from './swagger-generator';
-import { createOrShowWebview } from './commands/createOrShowWebview';
+import { commonCommands } from './commands/common';
+
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -33,10 +34,6 @@ export function activate(context: vscode.ExtensionContext) {
 	init({ extensionContext: context, extensionPath: context.extensionPath });
 
 	context.subscriptions.push(
-		vscode.commands.registerCommand(
-			"extension.generateCodeByWebview",
-			(args) => createOrShowWebview(context, args)
-		),
 		vscode.commands.registerCommand(
 			"extension.new-getx-routers-generate",
 			routersGenerate
@@ -79,6 +76,8 @@ export function activate(context: vscode.ExtensionContext) {
 	statusBarItem.text = '$(octoface) Vg Code';
 	statusBarItem.tooltip = '可视化生成代码';
 	statusBarItem.show();
+
+	commonCommands(context);
 }
 
 // This method is called when your extension is deactivated

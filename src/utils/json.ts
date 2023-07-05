@@ -5,6 +5,7 @@ import * as TJS from 'typescript-json-schema';
 import { compile } from 'json-schema-to-typescript';
 import { getConfig } from './config';
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 const GenerateSchema = require('generate-schema');
 const strip = require('strip-comments');
 
@@ -173,7 +174,7 @@ export const mockFromSchema = (schema: any) => {
 
 export const typescriptToJson = (oriType: string) => {
   let type = oriType;
-  const tempDir = path.join(os.homedir(), '.lowcode/temp');
+  const tempDir = path.join(os.homedir(), '.vgcode/temp');
   const filePath = path.join(tempDir, 'ts.ts');
   if (!fs.existsSync(filePath))
     fs.createFileSync(filePath);

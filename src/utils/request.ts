@@ -1,6 +1,12 @@
-import axios, { AxiosRequestConfig } from 'axios';
-import common from 'mocha/lib/interfaces/common';
-
+/*
+ * @Author: zdd
+ * @Date: 2023-06-27 22:01:26
+ * @LastEditors: zdd
+ * @LastEditTime: 2023-07-05 16:09:39
+ * @FilePath: /vg-vscode-extension/src/utils/request.ts
+ * @Description: 
+ */
+import axios from 'axios';
 const https = require('https');
 
 const agent = new https.Agent({
@@ -41,9 +47,3 @@ export const fetchApiDetailInfo = (
 };
 
 export const fetchScaffolds = (url: string) => axios.get(url);
-
-export const checkVankeInternal = () =>
-  axios
-    .get('https://npm.bu6.io')
-    .then((res) => true)
-    .catch(() => false);

@@ -1,405 +1,589 @@
-export default [
-  {
-    path: '1',
-    name: 'amis schema',
-    model: {
-      string: '',
-      select: 'a',
-    },
-    schema: {
-      "type": "page",
-      "title": "Hello world",
-      "body": [
-        {
-          "type": "tpl",
-          "tpl": "初始页面",
-          "wrapperComponent": "",
-          "inline": false,
-          "id": "u:cbaa951a27fd"
-        },
-        {
-          "type": "matrix-checkboxes",
-          "name": "matrix",
-          "label": "矩阵开关",
-          "rowLabel": "行标题说明",
-          "columns": [
-            {
-              "label": "列1"
-            },
-            {
-              "label": "列2"
-            }
-          ],
-          "rows": [
-            {
-              "label": "行1"
-            },
-            {
-              "label": "行2"
-            }
-          ],
-          "id": "u:148e89421e85"
-        }
-      ],
-      "id": "u:1028c37d971d"
-    },
-    preview: {
-      title: 'amis schema',
-      description: 'amis schema',
-      img: [
-        'https://fastly.jsdelivr.net/gh/migrate-gitee/img-host/2020/11/05/1604587962875.jpg',
-        'https://s1.ax1x.com/2023/04/16/p9CenKS.jpg',
-      ],
-      schema: 'amis',
-    },
-    template: '1212121',
-  },
-  {
-    path: '2',
-    name: '2',
-    model: {
-      select: 'c',
-      includeContext: false,
-      includeStyle: true,
-      form: [],
-    },
-    schema: {
-      "type": "object",
-      coloumn: 3,
-      "properties": {
-        "inputDemo": {
-          "title": "长度",
-          "type": "string",
-          "default": "750",
-          "rules": [
-            {
-              "pattern": "^[A-Za-z0-9]+$",
-              "message": "请输入正确格式"
-            }
-          ],
-          "className": "input-with-px",
-          "props": {
-            "addonAfter": "px"
+export default {
+  "blocks": [
+    {
+      "path": "~/.vgcode/materials/materials/blocks/amis",
+      "name": "amis",
+      "model": {
+        "name": "lowcode"
+      },
+      "schema": {
+        "type": "page",
+        "body": [
+          {
+            "type": "form",
+            "title": "",
+            "body": [
+              {
+                "type": "input-text",
+                "name": "name",
+                "label": "测试表单",
+                "id": "u:4886baa626cf",
+                "value": ""
+              }
+            ],
+            "id": "u:67967afb0e69",
+            "submitText": "",
+            "name": "form",
+            "data": "[Circular]"
           }
+        ],
+        "id": "u:d87dbf6bf8df",
+        "asideResizor": false,
+        "style": {
+          "boxShadow": " 0px 0px 0px 0px transparent"
         },
-        "numberDemo": {
-          "title": "数字",
-          "description": "数字输入框",
-          "type": "number",
-          "min": 10,
-          "max": 100,
-          "step": 10
-        },
-        "textareaDemo": {
-          "title": "输入框",
-          "type": "string",
-          "widget": "textarea",
-          "default": "FormRender\nHello World!",
-          "required": true
-        },
-        "imgDemo": {
-          "title": "图片",
-          "type": "string",
-          "format": "image",
-          "default": "https://img.alicdn.com/tfs/TB1P8p2uQyWBuNjy0FpXXassXXa-750-1334.png"
-        },
-        "uploadDemo": {
-          "title": "文件上传",
-          "type": "string",
-          "default": "https://img.alicdn.com/tfs/TB1P8p2uQyWBuNjy0FpXXassXXa-750-1334.png",
-          "widget": "upload",
-          "props": {
-            "action": "https://www.mocky.io/v2/5cc8019d300000980a055e76"
-          }
-        },
-        "disabledDemo": {
-          "title": "不可用",
-          "type": "string",
-          "default": "我是一个被 disabled 的值",
+        "pullRefresh": {
           "disabled": true
         },
-        "enumDemo": {
-          "title": "枚举",
-          "type": "string",
-          "enum": [
-            "A",
-            "B"
-          ],
-          "enumNames": [
-            "养成",
-            "<span style='background-color: black;display: inline-block;vertical-align: text-top;width: 48px;height: 24px;margin-top:-2px;color:white; border: 1px solid #ddd;'>试试</span>"
-          ],
-          "width": "50%"
-        },
-        "dateDemo": {
-          "title": "时间",
-          "format": "dateTime",
-          "type": "string",
-          "widget": "date",
-          "width": "50%",
-          "default": "2018-11-22",
-          "required": true
-        },
-        "objDemo": {
-          "title": "单个对象",
-          "description": "这是一个对象类型",
-          "type": "object",
-          "properties": {
-            "isLike": {
-              "title": "是否显示颜色选择",
-              "type": "boolean",
-              "default": true
-            },
-            "background": {
-              "title": "颜色选择",
-              "description": "特殊面板",
-              "format": "color",
-              "type": "string",
-              "hidden": "{{rootValue.isLike === false}}",
-              "default": "#ffff00"
-            },
-            "wayToTravel": {
-              "title": "旅行方式",
-              "type": "string",
-              "enum": [
-                "self",
-                "group"
-              ],
-              "enumNames": [
-                "自驾",
-                "跟团"
-              ],
-              "widget": "radio"
-            },
-            "canDrive": {
-              "title": "是否拥有驾照",
-              "type": "boolean",
-              "default": false,
-              "hidden": "{{rootValue.wayToTravel !== 'self'}}"
-            }
-          },
-          "required": [
-            "background"
-          ]
-        },
-        "multiSelectDemo": {
-          "title": "多选组件",
-          "tooltip": "多选功能",
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "enum": [
-            "A",
-            "B",
-            "C",
-            "D"
-          ],
-          "enumNames": [
-            "杭州",
-            "武汉",
-            "湖州",
-            "贵阳"
-          ],
-          "widget": "multiSelect",
-          "required": true
-        },
-        "custom": {
-          "properties": {
-            "payType": {
-              "title": "支付方式",
-              "type": "array",
-              "items": {
-                "type": "string"
-              },
-              "enum": [
-                "1",
-                "5",
-                "6"
-              ],
-              "enumNames": [
-                "预付",
-                "面付",
-                "信用住"
-              ]
-            }
-          },
-          "type": "object",
-          "required": [
-            "payType"
-          ],
-          "title": "酒店行业限制",
-          "name": "custom"
-        },
-        "arrDemo": {
-          "title": "对象数组",
-          "description": "对象数组嵌套功能",
-          "type": "array",
-          "min": 1,
-          "max": 3,
-          "items": {
-            "type": "object",
-            "properties": {
-              "num": {
-                "title": "数字参数",
-                "description": "number类型",
-                "type": "number"
-              },
-              "name": {
-                "title": "字符名称",
-                "description": "string类型",
-                "type": "string",
-                "rules": [
-                  {
-                    "pattern": "^[A-Za-z0-9]+$"
-                  }
-                ],
-                "disabled": "{{rootValue.num === 3}}"
-              }
-            }
-          },
-          "props": {
-            "foldable": true,
-            "hideDelete": "{{rootValue.arrDemo.length === 1}}",
-            "buttons": [
-              {
-                "text": "复制",
-                "icon": "CopyOutlined",
-                "callback": "copyLast"
-              }
-            ]
+        "regions": [
+          "body"
+        ],
+        "name": "page"
+      },
+      "preview": {
+        "title": "amis",
+        "description": "amis",
+        "img": [
+          "https://gitee.com/img-host/img-host/raw/master/2020/11/05/1604587962875.jpg"
+        ],
+        "category": [],
+        "schema": "amis",
+        "scripts": [
+          {
+            "method": "intFromOcrText",
+            "remark": "使用 ocr 结果初始化表单"
+          }
+        ]
+      },
+      "template": ""
+    },
+    {
+      "path": "~/.vgcode/materials/materials/blocks/form-render",
+      "name": "form-render",
+      "model": {
+        "name": "lowcode"
+      },
+      "schema": {
+        "type": "object",
+        "column": 1,
+        "displayType": "column",
+        "properties": {
+          "name": {
+            "title": "测试表单",
+            "type": "string",
+            "props": {}
           }
         }
-      }
+      },
+      "preview": {
+        "title": "form-render",
+        "description": "form-render",
+        "img": [
+          "https://gitee.com/img-host/img-host/raw/master/2020/11/05/1604587962875.jpg"
+        ],
+        "category": [],
+        "schema": "form-render",
+        "scripts": [
+          {
+            "method": "test",
+            "remark": "测试一下"
+          }
+        ]
+      },
+      "template": ""
     },
-    preview: {
-      title: '哈哈哈',
-      description: 'ksjfdfhdfhdkfjd',
-      img: [
-        'https://fastly.jsdelivr.net/gh/migrate-gitee/img-host/2020/11/05/1604587962875.jpg',
-        'https://s1.ax1x.com/2023/04/16/p9CenKS.jpg',
-      ],
-    },
-    template: '',
-  },
-  {
-    path: '3',
-    name: '3',
-    model: {
-      schema: {
-        type: 'object',
-        properties: {
-          string: { title: '字符串', type: 'string' },
-          select: {
-            title: '单选',
-            type: 'string',
-            enum: ['a', 'b', 'c'],
-            enumNames: ['选项1', '选项2', '选项3'],
+    {
+      "path": "~/.vgcode/materials/materials/blocks/formily",
+      "name": "formily",
+      "model": {
+        "name": "lowcode"
+      },
+      "schema": {
+        "form": {
+          "labelCol": 6,
+          "wrapperCol": 12,
+          "layout": "vertical",
+          "labelAlign": "left",
+          "fullness": false,
+          "inset": false
+        },
+        "schema": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "title": "测试表单",
+              "x-decorator": "FormItem",
+              "x-component": "Input",
+              "x-validator": [],
+              "x-component-props": {},
+              "x-decorator-props": {},
+              "x-designable-id": "v3zwx2xtcfx",
+              "x-index": 0,
+              "name": "name"
+            }
           },
-        },
+          "x-designable-id": "d4ogui2afmr"
+        }
       },
-      formData: { string: '', select: 'a' },
-    },
-    schema: {
-      type: 'object',
-      properties: {
-        string: { title: '字符串', type: 'string' },
-        select: {
-          title: '单选',
-          type: 'string',
-          enum: ['a', 'b', 'c'],
-          enumNames: ['选项1', '选项2', '选项3'],
-        },
+      "preview": {
+        "title": "formily",
+        "description": "formily",
+        "img": [
+          "https://gitee.com/img-host/img-host/raw/master/2020/11/05/1604587962875.jpg"
+        ],
+        "category": [],
+        "schema": "formily",
+        "scripts": [
+          {
+            "method": "test",
+            "remark": "测试一下"
+          }
+        ]
       },
+      "template": ""
     },
-    preview: {
-      title: '哈哈哈',
-      description: 'ksjfdfhdfhdkfjd',
-      img: [
-        'https://fastly.jsdelivr.net/gh/migrate-gitee/img-host/2020/11/05/1604587962875.jpg',
-        'https://s1.ax1x.com/2023/04/16/p9CenKS.jpg',
-      ],
+    {
+      "path": "~/.vgcode/materials/materials/blocks/react-mvp 模块",
+      "name": "react-mvp 模块",
+      "model": {},
+      "schema": {},
+      "preview": {
+        "title": "react-mvp 模块",
+        "description": "react-mvp 模块",
+        "img": "https://gitee.com/img-host/img-host/raw/master/2020/11/05/1604587962875.jpg",
+        "category": [
+          "react",
+          "mvp"
+        ],
+        "schema": "form-render"
+      },
+      "template": ""
     },
-    template: '',
-  },
-  {
-    path: '4',
-    name: '4',
-    model: {
-      schema: {
-        type: 'object',
-        properties: {
-          string: { title: '字符串', type: 'string' },
-          select: {
-            title: '单选',
-            type: 'string',
-            enum: ['a', 'b', 'c'],
-            enumNames: ['选项1', '选项2', '选项3'],
+    {
+      "path": "~/.vgcode/materials/materials/blocks/taro-request",
+      "name": "taro-request",
+      "model": {},
+      "schema": {},
+      "preview": {
+        "title": "taro-request",
+        "description": "taro-request通用封装",
+        "img": "https://gitee.com/img-host/img-host/raw/master/2020/11/05/1604587962875.jpg",
+        "category": [
+          "taro",
+          "request"
+        ],
+        "schema": "form-render"
+      },
+      "template": ""
+    },
+    {
+      "path": "~/.vgcode/materials/materials/blocks/vue-mvp 模块",
+      "name": "vue-mvp 模块",
+      "model": {},
+      "schema": {},
+      "preview": {
+        "title": "vue-mvp 模块",
+        "description": "vue-mvp 模块",
+        "img": "https://gitee.com/img-host/img-host/raw/master/2020/11/05/1604587962875.jpg",
+        "category": [
+          "vue",
+          "vue3",
+          "mvp"
+        ],
+        "schema": "form-render"
+      },
+      "template": ""
+    },
+    {
+      "path": "~/.vgcode/materials/materials/blocks/vue2-mvp 模块",
+      "name": "vue2-mvp 模块",
+      "model": {},
+      "schema": {},
+      "preview": {
+        "title": "vue2-mvp 模块",
+        "description": "vue2-mvp 模块",
+        "img": "https://gitee.com/img-host/img-host/raw/master/2020/11/05/1604587962875.jpg",
+        "category": [
+          "vue",
+          "vue2",
+          "mvp"
+        ],
+        "schema": "form-render"
+      },
+      "template": ""
+    }
+  ],
+  "snippets": [
+    {
+      "path": "~/.vgcode/materials/materials/snippets/amis",
+      "name": "amis",
+      "model": {
+        "name": "lowcode"
+      },
+      "schema": {
+        "type": "page",
+        "body": [
+          {
+            "type": "form",
+            "title": "",
+            "body": [
+              {
+                "type": "input-text",
+                "name": "name",
+                "label": "测试表单",
+                "id": "u:4886baa626cf",
+                "value": ""
+              }
+            ],
+            "id": "u:67967afb0e69",
+            "submitText": "",
+            "name": "form",
+            "data": "[Circular]"
+          }
+        ],
+        "id": "u:d87dbf6bf8df",
+        "asideResizor": false,
+        "style": {
+          "boxShadow": " 0px 0px 0px 0px transparent"
+        },
+        "pullRefresh": {
+          "disabled": true
+        },
+        "regions": [
+          "body"
+        ],
+        "name": "page"
+      },
+      "preview": {
+        "title": "",
+        "description": "",
+        "img": [
+          "https://gitee.com/img-host/img-host/raw/master/2020/11/05/1604587962875.jpg"
+        ],
+        "category": [],
+        "notShowInCommand": false,
+        "notShowInSnippetsList": false,
+        "notShowInintellisense": false,
+        "schema": "amis",
+        "scripts": [
+          {
+            "method": "test",
+            "remark": "测试一下"
+          }
+        ]
+      },
+      "template": "<%= name %>"
+    },
+    {
+      "path": "~/.vgcode/materials/materials/snippets/axios-request",
+      "name": "axios-request",
+      "model": {},
+      "schema": {},
+      "preview": {
+        "title": "axios-request",
+        "description": "axios 通用封装",
+        "img": "https://gitee.com/img-host/img-host/raw/master/2020/11/05/1604587962875.jpg",
+        "category": [
+          "请求"
+        ],
+        "schema": "form-render"
+      },
+      "template": "import axios, { AxiosRequestConfig } from \"axios\";\n\nconst instance = axios.create({\n  timeout: 30 * 1000,\n});\n\n// 请求拦截\ninstance.interceptors.request.use(\n  (config) => {\n    return config;\n  },\n  (error) => {\n    return Promise.reject(error);\n  },\n);\n\n// 响应拦截\ninstance.interceptors.response.use(\n  (res) => {\n    return Promise.resolve(res.data);\n  },\n  (error) => {\n    return Promise.reject(error);\n  },\n);\n\ntype Request = <T = unknown>(config: AxiosRequestConfig) => Promise<T>;\n\nexport const request = instance.request as Request;\n"
+    },
+    {
+      "path": "~/.vgcode/materials/materials/snippets/axios-request-api",
+      "name": "axios-request-api",
+      "model": {},
+      "schema": {},
+      "preview": {
+        "title": "axios-request-api",
+        "description": "通过 yapi 接口信息生成接口请求方法",
+        "img": "https://gitee.com/img-host/img-host/raw/master/2020/11/05/1604587962875.jpg",
+        "schema": "form-render"
+      },
+      "template": "<%= type %>  \n<% if (api.req_query.length > 0 || api.req_params.length > 0 || api.query_path.params.length > 0) { %>\nexport interface I<%= rawSelectedText.slice(0, 1).toUpperCase() + rawSelectedText.slice(1) %>Params {\n<% api.req_query.map(query => { %><%= query.name %>: string;<% }) %>\n<% api.req_params.map(query => { %><%= query.name %>: string;<% }) %>\n<% api.query_path.params.map(query => { %><%= query.name %>: string;<% }) %>\n}\n<% } %> \n<% if (requestBodyType && api.req_body_other.indexOf('{}')<0) { %>\n<%= requestBodyType %> \n<% } %> \n\n/**\n* <%= api.title %> \n* /project/<%= api.project_id %>/interface/api/<%= api._id %> \n* @author <%= api.username %>  \n* \n<% if (api.req_query.length > 0 || api.req_params.length > 0 || api.query_path.params.length > 0) { -%>* @param {I<%= rawSelectedText.slice(0, 1).toUpperCase() + rawSelectedText.slice(1) %>Params} params<%- \"\\n\" %><% } _%>\n<% if (requestBodyType && api.req_body_other.indexOf('{}')<0) { -%>* @param {I<%= rawSelectedText.slice(0, 1).toUpperCase() + rawSelectedText.slice(1) %>Data} data<%- \"\\n\" %><% } _%>\n* @returns\n*/\nexport function <%= rawSelectedText %> (\n<% if (api.req_query.length>0 || api.req_params.length > 0 || api.query_path.params.length > 0) { %>\nparams: I<%= rawSelectedText.slice(0, 1).toUpperCase() + rawSelectedText.slice(1) %>Params,\n<% } _%>\n<% if (requestBodyType) { %> \ndata: I<%= rawSelectedText.slice(0, 1).toUpperCase() + rawSelectedText.slice(1) %>Data\n<% } %> \n) {\nreturn request<I<%= rawSelectedText.slice(0, 1).toUpperCase() + rawSelectedText.slice(1) %>Result>({\n\t    url: `<%= api.query_path.path.replace(/\\{/g,\"${params.\") %>`, \n\t\tmethod: '<%= api.method %>',\n\t\t<% if(api.req_query.length>0 || api.req_params.length > 0) { %>params,<% } _%>\n<% if (requestBodyType && api.req_body_other.indexOf('{}')<0) {%>data,<% } %> \n\t})\n}"
+    },
+    {
+      "path": "~/.vgcode/materials/materials/snippets/form-render",
+      "name": "form-render",
+      "model": {
+        "name": "lowcode"
+      },
+      "schema": {
+        "type": "object",
+        "column": 1,
+        "displayType": "column",
+        "properties": {
+          "name": {
+            "title": "测试表单",
+            "type": "string",
+            "props": {}
+          }
+        }
+      },
+      "preview": {
+        "title": "",
+        "description": "",
+        "img": [
+          "https://gitee.com/img-host/img-host/raw/master/2020/11/05/1604587962875.jpg"
+        ],
+        "category": [],
+        "notShowInCommand": false,
+        "notShowInSnippetsList": false,
+        "notShowInintellisense": false,
+        "schema": "form-render",
+        "scripts": [
+          {
+            "method": "test",
+            "remark": "测试一下"
+          }
+        ]
+      },
+      "template": "<%= name %>"
+    },
+    {
+      "path": "~/.vgcode/materials/materials/snippets/formily",
+      "name": "formily",
+      "model": {
+        "name": "lowcode"
+      },
+      "schema": {
+        "form": {
+          "labelCol": 6,
+          "wrapperCol": 12,
+          "layout": "vertical",
+          "labelAlign": "left",
+          "fullness": false,
+          "inset": false
+        },
+        "schema": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "title": "测试表单",
+              "x-decorator": "FormItem",
+              "x-component": "Input",
+              "x-validator": [],
+              "x-component-props": {},
+              "x-decorator-props": {},
+              "x-designable-id": "v3zwx2xtcfx",
+              "x-index": 0,
+              "name": "name"
+            }
           },
-        },
+          "x-designable-id": "d4ogui2afmr"
+        }
       },
-      formData: { string: '', select: 'a' },
-    },
-    schema: {
-      type: 'object',
-      properties: {
-        string: { title: '字符串', type: 'string' },
-        select: {
-          title: '单选',
-          type: 'string',
-          enum: ['a', 'b', 'c'],
-          enumNames: ['选项1', '选项2', '选项3'],
-        },
+      "preview": {
+        "title": "",
+        "description": "",
+        "img": [
+          "https://gitee.com/img-host/img-host/raw/master/2020/11/05/1604587962875.jpg"
+        ],
+        "category": [],
+        "notShowInCommand": false,
+        "notShowInSnippetsList": false,
+        "notShowInintellisense": false,
+        "schema": "formily",
+        "scripts": [
+          {
+            "method": "test",
+            "remark": "测试一下"
+          }
+        ]
       },
+      "template": "<%= name %>"
     },
-    preview: {
-      title: '哈哈哈',
-      description: 'ksjfdfhdfhdkfjd',
-      img: [
-        'https://fastly.jsdelivr.net/gh/migrate-gitee/img-host/2020/11/05/1604587962875.jpg',
-        'https://s1.ax1x.com/2023/04/16/p9CenKS.jpg',
-      ],
-    },
-    template: '',
-  },
-  {
-    path: '5',
-    name: '5',
-    model: {
-      schema: {
-        type: 'object',
-        properties: {
-          string: { title: '字符串', type: 'string' },
-          select: {
-            title: '单选',
-            type: 'string',
-            enum: ['a', 'b', 'c'],
-            enumNames: ['选项1', '选项2', '选项3'],
-          },
-        },
+    {
+      "path": "~/.vgcode/materials/materials/snippets/taro-request-api",
+      "name": "taro-request-api",
+      "model": {},
+      "schema": {},
+      "preview": {
+        "title": "taro-request-api",
+        "description": "通过 yapi 接口信息生成接口请求方法",
+        "img": "https://gitee.com/img-host/img-host/raw/master/2020/11/05/1604587962875.jpg",
+        "schema": "form-render"
       },
-      formData: { string: '', select: 'a' },
+      "template": "<%= type %>  \n<% if (api.req_query.length > 0 || api.req_params.length > 0 || api.query_path.params.length > 0) { %>\nexport interface I<%= funcName.slice(0, 1).toUpperCase() + funcName.slice(1) %>Params {\n<% api.req_query.map(query => { %><%= query.name %>: string;<% }) %>\n<% api.req_params.map(query => { %><%= query.name %>: string;<% }) %>\n<% api.query_path.params.map(query => { %><%= query.name %>: string;<% }) %>\n}\n<% } %> \n<% if (requestBodyType && api.req_body_other.indexOf('{}')<0) { %>\n<%= requestBodyType %> \n<% } %> \n\n/**\n* <%= api.title %> \n* /project/<%= api.project_id %>/interface/api/<%= api._id %> \n* @author <%= api.username %>  \n* \n<% if (api.req_query.length > 0 || api.req_params.length > 0 || api.query_path.params.length > 0) { -%>* @param {I<%= funcName.slice(0, 1).toUpperCase() + funcName.slice(1) %>Params} params<%- \"\\n\" %><% } _%>\n<% if (requestBodyType && api.req_body_other.indexOf('{}')<0) { -%>* @param {I<%= funcName.slice(0, 1).toUpperCase() + funcName.slice(1) %>Data} data<%- \"\\n\" %><% } _%>\n* @returns\n*/\nexport function <%= funcName %> (\n<% if (api.req_query.length>0 || api.req_params.length > 0 || api.query_path.params.length > 0) { _%>\nparams: I<%= funcName.slice(0, 1).toUpperCase() + funcName.slice(1) %>Params,\n<% } _%>\n<% if (requestBodyType && api.req_body_other.indexOf('{}')<0) { _%> \ndata: I<%= funcName.slice(0, 1).toUpperCase() + funcName.slice(1) %>Data\n<% } _%> \n) {\nreturn request<<%= typeName %>>(`<%= api.query_path.path.replace(/\\{/g,\"${params.\") %>`, {\n\t\tmethod: '<%= api.method %>',\n\t\t<% if(api.req_query.length>0 || api.req_params.length > 0) { %>params,<% } _%>\n<% if (requestBodyType && api.req_body_other.indexOf('{}')<0) {%>data,<% } %> \n\t})\n}"
     },
-    schema: {
-      type: 'object',
-      properties: {
-        string: { title: '字符串', type: 'string' },
-        select: {
-          title: '单选',
-          type: 'string',
-          enum: ['a', 'b', 'c'],
-          enumNames: ['选项1', '选项2', '选项3'],
-        },
+    {
+      "path": "~/.vgcode/materials/materials/snippets/umi-request-api",
+      "name": "umi-request-api",
+      "model": {},
+      "schema": {},
+      "preview": {
+        "title": "umi-request-api",
+        "description": "通过 yapi 接口信息生成接口请求方法",
+        "img": "https://gitee.com/img-host/img-host/raw/master/2020/11/05/1604587962875.jpg",
+        "schema": "form-render"
       },
+      "template": "<%= type %>  \n<% if (api.req_query.length > 0 || api.req_params.length > 0 || api.query_path.params.length > 0) { %>\nexport interface I<%= funcName.slice(0, 1).toUpperCase() + funcName.slice(1) %>Params {\n<% api.req_query.map(query => { %><%= query.name %>: string;<% }) %>\n<% api.req_params.map(query => { %><%= query.name %>: string;<% }) %>\n<% api.query_path.params.map(query => { %><%= query.name %>: string;<% }) %>\n}\n<% } %> \n<% if (requestBodyType && api.req_body_other.indexOf('{}')<0) { %>\n<%= requestBodyType %> \n<% } %> \n\n/**\n* <%= api.title %> \n* /project/<%= api.project_id %>/interface/api/<%= api._id %> \n* @author <%= api.username %>  \n* \n<% if (api.req_query.length > 0 || api.req_params.length > 0 || api.query_path.params.length > 0) { -%>* @param {I<%= funcName.slice(0, 1).toUpperCase() + funcName.slice(1) %>Params} params<%- \"\\n\" %><% } _%>\n<% if (requestBodyType && api.req_body_other.indexOf('{}')<0) { -%>* @param {I<%= funcName.slice(0, 1).toUpperCase() + funcName.slice(1) %>Data} data<%- \"\\n\" %><% } _%>\n* @returns\n*/\nexport function <%= funcName %> (\n<% if (api.req_query.length>0 || api.req_params.length > 0 || api.query_path.params.length > 0) { _%>\nparams: I<%= funcName.slice(0, 1).toUpperCase() + funcName.slice(1) %>Params,\n<% } _%>\n<% if (requestBodyType && api.req_body_other.indexOf('{}')<0) { _%> \ndata: I<%= funcName.slice(0, 1).toUpperCase() + funcName.slice(1) %>Data\n<% } _%> \n) {\nreturn request<<%= typeName %>>(`<%= api.query_path.path.replace(/\\{/g,\"${params.\") %>`, {\n\t\tmethod: '<%= api.method %>',\n\t\t<% if(api.req_query.length>0 || api.req_params.length > 0) { %>params,<% } _%>\n<% if (requestBodyType && api.req_body_other.indexOf('{}')<0) {%>data,<% } %> \n\t})\n}"
     },
-    preview: {
-      title: '哈哈哈',
-      description: 'ksjfdfhdfhdkfjd',
-      img: [
-        'https://fastly.jsdelivr.net/gh/migrate-gitee/img-host/2020/11/05/1604587962875.jpg',
-        'https://s1.ax1x.com/2023/04/16/p9CenKS.jpg',
-      ],
+    {
+      "path": "~/.vgcode/materials/materials/snippets/根据JSON生成API请求方法",
+      "name": "根据JSON生成API请求方法",
+      "model": {},
+      "schema": {},
+      "preview": {
+        "title": "根据JSON生成API请求方法",
+        "description": "根据JSON生成API请求方法",
+        "img": "https://gitee.com/img-host/img-host/raw/master/2020/11/05/1604587962875.jpg",
+        "schema": "form-render"
+      },
+      "template": "<%- type %>\n\nexport interface I<%= rawSelectedText.slice(0, 1).toUpperCase() + rawSelectedText.slice(1) %>Params {\n  id: number;\n}\n  \nexport interface I<%= rawSelectedText.slice(0, 1).toUpperCase() + rawSelectedText.slice(1) %>Data {\n\txx: string;\n}\n  \nexport function <%= rawSelectedText %>(\n  params: I<%= rawSelectedText.slice(0, 1).toUpperCase() + rawSelectedText.slice(1) %>Params,\n  data: I<%= rawSelectedText.slice(0, 1).toUpperCase() + rawSelectedText.slice(1) %>Data,\n) {\n  return request<I<%= rawSelectedText.slice(0, 1).toUpperCase() + rawSelectedText.slice(1) %>Result>({\n    url: `xxxx`,\n    method: 'GET',\n    params,\n    data,\n  });\n}"
     },
-    template: '',
-  },
-];
+    {
+      "path": "~/.vgcode/materials/materials/snippets/根据JSON生成MOCK方法",
+      "name": "根据JSON生成MOCK方法",
+      "model": {},
+      "schema": {},
+      "preview": {
+        "title": "根据JSON生成MOCK方法",
+        "description": "根据JSON生成MOCK方法",
+        "img": "https://gitee.com/img-host/img-host/raw/master/2020/11/05/1604587962875.jpg",
+        "schema": "form-render"
+      },
+      "template": "const Mock = require('mockjs');\nconst { Random } = Mock;\n\nexport function <%= rawSelectedText || 'getRandomData' %>() {\n\t<%- mockCode %>\n  const res = <%- mockData %>\n\treturn Promise.resolve(res);\n}"
+    },
+    {
+      "path": "~/.vgcode/materials/materials/snippets/根据JSON生成TS类型",
+      "name": "根据JSON生成TS类型",
+      "model": {},
+      "schema": {},
+      "preview": {
+        "title": "根据JSON生成TS类型",
+        "description": "根据JSON生成TS类型",
+        "img": "https://gitee.com/img-host/img-host/raw/master/2020/11/05/1604587962875.jpg",
+        "schema": "form-render"
+      },
+      "template": "<%- type %>"
+    },
+    {
+      "path": "~/.vgcode/materials/materials/snippets/根据JSON生成TS类型-去除接口名称",
+      "name": "根据JSON生成TS类型-去除接口名称",
+      "model": {},
+      "schema": {},
+      "preview": {
+        "title": "根据JSON生成TS类型-去除接口名称",
+        "description": "根据JSON生成TS类型-去除接口名称",
+        "img": "https://gitee.com/img-host/img-host/raw/master/2020/11/05/1604587962875.jpg",
+        "schema": "form-render"
+      },
+      "template": "<%- type.replace(\"export interface IFetchResult\",\"\") %>"
+    },
+    {
+      "path": "~/.vgcode/materials/materials/snippets/根据TS类型生成API请求方法",
+      "name": "根据TS类型生成API请求方法",
+      "model": {},
+      "schema": {},
+      "preview": {
+        "title": "",
+        "description": "",
+        "img": "https://gitee.com/img-host/img-host/raw/master/2020/11/05/1604587962875.jpg",
+        "category": [],
+        "schema": "form-render"
+      },
+      "template": "export interface I<%= rawSelectedText.slice(0, 1).toUpperCase() + rawSelectedText.slice(1) %>Result {\n\tcode: number;\n\tmsg: string;\n\tresult: <%- rawClipboardText %>\n}\n\nexport interface I<%= rawSelectedText.slice(0, 1).toUpperCase() + rawSelectedText.slice(1) %>Params {\n\tid: number;\n}\n  \nexport interface I<%= rawSelectedText.slice(0, 1).toUpperCase() + rawSelectedText.slice(1) %>Data {\n\txx: string;\n}\n  \nexport function <%= rawSelectedText %>(\n\tparams: I<%= rawSelectedText.slice(0, 1).toUpperCase() + rawSelectedText.slice(1) %>Params,\n\tdata: I<%= rawSelectedText.slice(0, 1).toUpperCase() + rawSelectedText.slice(1) %>Data,\n) {\n\treturn request<I<%= rawSelectedText.slice(0, 1).toUpperCase() + rawSelectedText.slice(1) %>Result>({\n\t\turl: `xxxx`,\n\t\tmethod: 'GET',\n\t\tparams,\n\t\tdata,\n\t});\n}"
+    },
+    {
+      "path": "~/.vgcode/materials/materials/snippets/根据TS类型生成MOCK方法",
+      "name": "根据TS类型生成MOCK方法",
+      "model": {},
+      "schema": {},
+      "preview": {
+        "title": "根据TS类型生成MOCK方法",
+        "description": "根据TS类型生成MOCK方法",
+        "img": "https://gitee.com/img-host/img-host/raw/master/2020/11/05/1604587962875.jpg",
+        "schema": "form-render"
+      },
+      "template": "const Mock = require('mockjs');\nconst { Random } = Mock;\n\nexport function <%= rawSelectedText || 'getRandomData' %>() {\n\t<%- mockCode %>\n  const res = <%- mockData %>\n\treturn Promise.resolve(res);\n}"
+    },
+    {
+      "path": "~/.vgcode/materials/materials/snippets/根据TS类型生成markdown表格",
+      "name": "根据TS类型生成markdown表格",
+      "model": {
+        "name": "lowcode"
+      },
+      "schema": {
+        "type": "page",
+        "body": [
+          {
+            "type": "form",
+            "title": "",
+            "body": [
+              {
+                "type": "input-text",
+                "name": "name",
+                "label": "测试表单",
+                "id": "u:4886baa626cf",
+                "value": ""
+              }
+            ],
+            "id": "u:67967afb0e69",
+            "submitText": "",
+            "name": "form",
+            "data": "[Circular]"
+          }
+        ],
+        "id": "u:d87dbf6bf8df",
+        "asideResizor": false,
+        "style": {
+          "boxShadow": " 0px 0px 0px 0px transparent"
+        },
+        "pullRefresh": {
+          "disabled": true
+        },
+        "regions": [
+          "body"
+        ],
+        "name": "page"
+      },
+      "preview": {
+        "title": "",
+        "description": "",
+        "img": [
+          "https://gitee.com/img-host/img-host/raw/master/2020/11/05/1604587962875.jpg"
+        ],
+        "category": [],
+        "notShowInCommand": true,
+        "notShowInSnippetsList": true,
+        "notShowInintellisense": true,
+        "schema": "amis"
+      },
+      "template": "<%= name %>"
+    },
+    {
+      "path": "~/.vgcode/materials/materials/snippets/根据YAPI接口定义生成高级Mock脚本",
+      "name": "根据YAPI接口定义生成高级Mock脚本",
+      "model": {},
+      "schema": {},
+      "preview": {
+        "title": "",
+        "description": "",
+        "img": "https://gitee.com/img-host/img-host/raw/master/2020/11/05/1604587962875.jpg",
+        "category": [
+          "YAPI",
+          "脚本"
+        ],
+        "schema": "form-render"
+      },
+      "template": "<%- mockCode %>\nconst mockData = <%- mockData %>\n\nObject.assign( mockJson, mockData)\n"
+    },
+    {
+      "path": "~/.vgcode/materials/materials/snippets/测试编译前后脚本",
+      "name": "测试编译前后脚本",
+      "model": {},
+      "schema": {},
+      "preview": {
+        "title": "",
+        "description": "",
+        "img": "https://gitee.com/img-host/img-host/raw/master/2020/11/05/1604587962875.jpg",
+        "schema": "form-render"
+      },
+      "template": "测试编译前后脚本"
+    }
+  ]
+};

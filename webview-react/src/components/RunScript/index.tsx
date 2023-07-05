@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-06-29 16:07:05
  * @LastEditors: zdd
- * @LastEditTime: 2023-06-29 16:07:26
+ * @LastEditTime: 2023-07-04 17:53:53
  * @FilePath: /vg-vscode-extension/webview-react/src/components/RunScript/index.tsx
  * @Description: 
  */
@@ -52,7 +52,7 @@ const RunScript: React.FC<IProps> = (props) => {
   return (
     <Modal
       title="执行脚本"
-      visible={props.visible}
+      open={props.visible}
       okButtonProps={{ loading, disabled: !script }}
       maskClosable={false}
       onCancel={props.onCancel}

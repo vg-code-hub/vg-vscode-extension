@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-06-17 17:58:06
  * @LastEditors: zdd
- * @LastEditTime: 2023-06-17 18:00:44
+ * @LastEditTime: 2023-07-05 10:54:57
  * @FilePath: /vg-vscode-extension/src/commands/registerCompletion.ts
  * @Description: 
  */
@@ -12,12 +12,12 @@ import { compile as compileEjs, getSnippets } from '@root/utils';
 let provider: vscode.Disposable;
 
 export const registerCompletion = (context: vscode.ExtensionContext) => {
-  if (!vscode.workspace.rootPath) {
+  if (!vscode.workspace.rootPath)
     return;
-  }
-  if (provider) {
+
+  if (provider)
     provider.dispose();
-  }
+
 
   const snippets = getSnippets().filter(
     (s) => !s.preview.notShowInintellisense,
@@ -32,7 +32,7 @@ export const registerCompletion = (context: vscode.ExtensionContext) => {
             s.name.replace('.ejs', ''),
           );
           completionItem.kind = vscode.CompletionItemKind.Class;
-          completionItem.documentation = s.template || 'lowcode';
+          completionItem.documentation = s.template || 'vgcode';
           try {
             const code = compileEjs(s.template, {} as any);
             // 支持 vscode 本身 Snippet 语法

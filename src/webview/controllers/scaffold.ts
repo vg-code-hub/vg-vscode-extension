@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-06-17 09:43:56
  * @LastEditors: zdd
- * @LastEditTime: 2023-06-17 18:10:32
+ * @LastEditTime: 2023-07-05 16:10:35
  * @FilePath: /vg-vscode-extension/src/webview/controllers/scaffold.ts
  * @Description: 
  */
@@ -43,13 +43,13 @@ export const createProject = async (
   }>,
 ) => {
   await compileScaffold(message.data.model, message.data.createDir);
-  if (message.data.immediateOpen) {
+  if (message.data.immediateOpen)
     commands.executeCommand(
       'vscode.openFolder',
       Uri.file(message.data.createDir),
       true,
     );
-  }
+
   return '创建项目成功';
 };
 

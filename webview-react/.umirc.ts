@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-06-17 09:58:32
  * @LastEditors: zdd
- * @LastEditTime: 2023-06-29 17:58:52
+ * @LastEditTime: 2023-07-05 17:24:01
  * @FilePath: /vg-vscode-extension/webview-react/.umirc.ts
  * @Description: 
  */
@@ -22,34 +22,25 @@ export default defineConfig({
   routes: [
     {
       path: '/',
-      redirect: '/snippets',
+      redirect: '/materials',
     },
     {
-      name: '代码片段',
+      hideInMenu: true,
+      name: 'snippets',
       path: '/snippets',
       component: './snippets',
     },
     {
       hideInMenu: true,
       name: '代码片段详情',
-      path: '/snippet-detail',
-      component: './snippets/detail',
+      path: '/material-detail',
+      component: './materials/detail',
     },
     {
       hideInMenu: true,
       name: '创建代码片段',
-      path: '/snippet-create',
-      component: './snippets/create',
-    },
-    {
-      name: '区块',
-      path: '/blocks',
-      component: './blocks',
-    },
-    {
-      name: '脚手架',
-      path: '/scaffold',
-      component: './scaffold',
+      path: '/material-create',
+      component: './materials/create',
     },
     {
       name: '物料中心',
@@ -57,10 +48,15 @@ export default defineConfig({
       component: './materials',
     },
     {
-      name: '更多',
-      path: '/more',
-      component: './more',
+      name: '脚手架',
+      path: '/scaffold',
+      component: './scaffold',
     },
+    {
+      name: '项目配置',
+      path: '/config',
+      component: './config',
+    }
   ],
   npmClient: 'pnpm',
   mfsu: false,

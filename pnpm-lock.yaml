@@ -22,6 +22,9 @@ dependencies:
   generate-schema:
     specifier: ^2.6.0
     version: 2.6.0
+  glob:
+    specifier: ^8.1.0
+    version: 8.1.0
   jimp:
     specifier: ^0.22.8
     version: 0.22.8
@@ -43,6 +46,9 @@ dependencies:
   strip-comments:
     specifier: ^2.0.1
     version: 2.0.1
+  strip-json-comments:
+    specifier: ^3.1.1
+    version: 3.1.1
   tar:
     specifier: ^6.1.15
     version: 6.1.15
@@ -96,9 +102,6 @@ devDependencies:
   eslint:
     specifier: ^8.41.0
     version: 8.41.0
-  glob:
-    specifier: ^8.1.0
-    version: 8.1.0
   mocha:
     specifier: ^10.2.0
     version: 10.2.0
@@ -1934,7 +1937,7 @@ packages:
       inherits: 2.0.4
       minimatch: 5.1.6
       once: 1.4.0
-    dev: true
+    dev: false
 
   /global@4.4.0:
     resolution: {integrity: sha512-wv/LAoHdRE3BeTGz53FAamhGlPLhlssK45usmGFThIi4XqnBmjKQ16u+RNbP7WvigRZDxUsM0J3gcQ5yicaL0w==}
@@ -2434,6 +2437,7 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       brace-expansion: 2.0.1
+    dev: false
 
   /minimist@1.2.8:
     resolution: {integrity: sha512-2yyAR8qBkN3YuheJanUpWC5U3bb5osDywNB8RzDVlDwDHbocAJveqqj1u8+SVD7jkWT4yvsHCpWqqWqAxb0zCA==}
@@ -3007,7 +3011,6 @@ packages:
   /strip-json-comments@3.1.1:
     resolution: {integrity: sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==}
     engines: {node: '>=8'}
-    dev: true
 
   /strtok3@6.3.0:
     resolution: {integrity: sha512-fZtbhtvI9I48xDSywd/somNqgUHl2L2cstmXCCif0itOf96jeW18MBSyrLuNicYQVkvpOxkZtkzujiTJ9LW5Jw==}

@@ -2,8 +2,8 @@
  * @Author: zdd
  * @Date: 2023-05-19 12:07:53
  * @LastEditors: zdd
- * @LastEditTime: 2023-05-23 15:19:22
- * @FilePath: /xt-admin-front/src/shared/network/http.ts
+ * @LastEditTime: 2023-07-04 16:14:23
+ * @FilePath: /vg-vscode-extension/webview-react/src/common/network/http.ts
  * @Description:
  */
 
@@ -69,3 +69,5 @@ export interface Response {
   status: number;
   success: boolean;
 }
+
+export * from './vscode'
