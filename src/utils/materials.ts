@@ -101,10 +101,47 @@ export const getLocalMaterials = (
   return materials.filter((s) => s.name !== '.DS_Store');
 };
 
+export const getLocalSchema2codeMaterials = (
+  materialsFullPath: string,
+) => {
+  let materials: {
+    path: string;
+    name: string;
+    template: string;
+  }[] = [];
+  const getFile: any = (fullPath: string) => {
+    return fs.readdirSync(fullPath).map((s) => {
+      console.log(s);
+      let template = '';
+      const _fullPath = path.join(fullPath, s);
+
+      const stat = fs.statSync(_fullPath);
+
+      if (stat.isDirectory()) {
+        return {
+          path: _fullPath,
+          name: s,
+          children: getFile(_fullPath),
+        };
+      } else {
+        try {
+          template = getFileContent(_fullPath, true);
+        } catch { }
+        return {
+          path: _fullPath,
+          name: s,
+          template,
+        };
+      }
+    });
+  };
+  materials = getFile(materialsFullPath);
+  return materials.filter((s) => s.name !== '.DS_Store');
+};
+
 export const getCodeTemplateListFromFiles = () => {
   const list: { name: string; template: string; type: 'ejs' }[] = [];
   const templateFullPath = path.join(rootPath, getTemplateFilePath());
-  console.log({ templateFullPath });
 
   try {
     const templateFiles = fs

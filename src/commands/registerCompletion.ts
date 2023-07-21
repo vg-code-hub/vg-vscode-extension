@@ -2,12 +2,12 @@
  * @Author: zdd
  * @Date: 2023-06-17 17:58:06
  * @LastEditors: zdd
- * @LastEditTime: 2023-07-05 10:54:57
+ * @LastEditTime: 2023-07-06 14:51:42
  * @FilePath: /vg-vscode-extension/src/commands/registerCompletion.ts
  * @Description: 
  */
 import * as vscode from 'vscode';
-import { compile as compileEjs, getSnippets } from '@root/utils';
+import { compile as compileEjs, getLocalMaterials, tempGlobalDir } from '../utils';
 
 let provider: vscode.Disposable;
 
@@ -19,7 +19,7 @@ export const registerCompletion = (context: vscode.ExtensionContext) => {
     provider.dispose();
 
 
-  const snippets = getSnippets().filter(
+  const snippets = getLocalMaterials('snippets', tempGlobalDir.snippetMaterials).filter(
     (s) => !s.preview.notShowInintellisense,
   );
   provider = vscode.languages.registerCompletionItemProvider(
@@ -41,7 +41,7 @@ export const registerCompletion = (context: vscode.ExtensionContext) => {
             // 无法直接通过 ejs 编译，说明模板中需要额外的数据，触发命令打开 webview
             completionItem.insertText = '';
             completionItem.command = {
-              command: 'yapi-code.openSnippetByWebview',
+              command: 'extension.openSnippetByWebview',
               title: '',
               arguments: [s.name, s.template],
             };

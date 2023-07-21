@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-06-27 22:01:26
  * @LastEditors: zdd
- * @LastEditTime: 2023-07-05 16:20:42
+ * @LastEditTime: 2023-07-19 18:03:05
  * @FilePath: /vg-vscode-extension/webview-react/src/pages/config/index.tsx
  * @Description: 
  */
@@ -14,128 +14,219 @@ import { useImmer } from 'use-immer';
 import { getLocalMaterials, getPluginConfig, savePluginConfig } from '@/common';
 
 const schame: any = {
-  type: 'object',
-  properties: {
-    yapi: {
-      title: 'yapi配置',
-      type: 'object',
-      properties: {
-        domain: {
-          title: '域名',
-          type: 'string',
-          description: '',
-          'ui:labelWidth': 146,
-          'ui:readonly': false,
-          'ui:options': {},
-        },
-        projects: {
-          title: '项目列表',
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              name: {
-                title: '名称',
-                type: 'string',
-                'ui:labelWidth': 0,
-                'ui:options': {},
-              },
-              token: {
-                title: 'token',
-                type: 'string',
-                'ui:options': {},
-              },
-              domain: {
-                title: '域名',
-                type: 'string',
-                description: '单独定义 yapi 项目的域名',
-                'ui:options': {},
-              },
-            },
-          },
-          'ui:options': {},
-        },
-      },
+  "type": "object",
+  "displayType": "row",
+  "labelWidth": 80,
+  "properties": {
+    "type": {
+      "title": "项目类别",
+      "type": "string",
+      "style": { "backgroundColor": "#fff" },
+      "enum": [
+        "dart",
+        "typescript"
+      ],
+      "enumNames": [
+        "dart",
+        "typescript"
+      ],
+      "widget": "radio"
     },
-    mock: {
-      title: 'mock 配置',
-      type: 'object',
-      properties: {
-        mockNumber: {
-          title: '模拟number数据',
-          type: 'string',
-          'ui:options': {},
-        },
-        mockBoolean: {
-          title: '模拟boolean数据',
-          type: 'string',
-          'ui:labelWidth': 0,
-          'ui:options': {},
-        },
-        mockString: {
-          title: '模拟string数据',
-          type: 'string',
-          'ui:options': {},
-        },
-        mockKeyWordEqual: {
-          title: '模拟关键词-全等匹配',
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              key: {
-                title: '关键字',
-                type: 'string',
-                'ui:width': '50%',
-                'ui:options': {},
-              },
-              value: {
-                title: '替换为',
-                type: 'string',
-                'ui:width': '50%',
-                'ui:options': {},
-              },
-            },
+    "yapi": {
+      "title": "swagger配置",
+      "type": "object",
+      "theme": "collapse",
+      "style": { "backgroundColor": "#fff" },
+      "properties": {
+        "jsonUrl": {
+          "title": "域名",
+          "type": "string",
+          "description": "",
+          "labelWidth": 100,
+          "ui:readonly": false,
+          "ui:options": {
+            "labelAlign": "left"
           },
-          'ui:options': {},
+          "props": {}
         },
-        mockKeyWordLike: {
-          title: '模拟关键词-相似匹配',
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              key: {
-                title: '关键字',
-                type: 'string',
-                'ui:width': '50%',
-                'ui:options': {},
-              },
-              value: {
-                title: '替换为',
-                type: 'string',
-                'ui:width': '50%',
-                'ui:options': {},
-              },
-            },
+        "outputDir": {
+          "title": "目标位置",
+          "type": "string",
+          "description": "",
+          "labelWidth": 100,
+          "ui:readonly": false,
+          "ui:options": {},
+          "props": {}
+        },
+        "folderFilter": {
+          "title": "过滤路径",
+          "type": "array",
+          "description": "源路径过滤不会显示",
+          "items": {
+            "type": "object",
+            "properties": {
+              "val": {
+                "title": "源路径",
+                "type": "string",
+                "props": {}
+              }
+            }
           },
-          'ui:options': {},
-          props: {},
+          "ui:options": {},
+          "props": {}
         },
-      },
+        "folderMap": {
+          "title": "路径映射",
+          "type": "array",
+          "ui:options": {},
+          "props": {},
+          "description": "生成文件目录替换",
+          "items": {
+            "type": "object",
+            "column": 2,
+            "displayType": "row",
+            "properties": {
+              "source": {
+                "title": "源路径",
+                "type": "string",
+                "ui:labelWidth": 0,
+                "ui:options": {},
+                "props": {}
+              },
+              "folder": {
+                "title": "目标路径",
+                "type": "string",
+                "ui:options": {},
+                "props": {}
+              }
+            }
+          }
+        },
+        "customPathFolder": {
+          "title": "请求路径映射",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "column": 2,
+            "displayType": "row",
+            "properties": {
+              "source": {
+                "title": "源路径",
+                "type": "string",
+                "ui:labelWidth": 0,
+                "ui:options": {},
+                "props": {}
+              },
+              "folder": {
+                "title": "位置",
+                "type": "string",
+                "ui:options": {},
+                "props": {}
+              }
+            }
+          },
+          "ui:options": {},
+          "props": {}
+        },
+        "customModelFolder": {
+          "title": "model 路径映射",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "column": 2,
+            "displayType": "row",
+            "properties": {
+              "source": {
+                "title": "modelName",
+                "type": "string",
+                "ui:labelWidth": 0,
+                "ui:options": {},
+                "props": {}
+              },
+              "folder": {
+                "title": "位置",
+                "type": "string",
+                "ui:options": {},
+                "props": {}
+              }
+            }
+          },
+          "ui:options": {},
+          "props": {}
+        }
+      }
     },
-    commonlyUsedBlock: {
-      title: '常用区块',
-      description: '',
-      type: 'array',
-      items: {
-        type: 'string',
-      },
-      enum: [],
-      enumNames: [],
-      widget: 'multiSelect',
-    },
-  },
+    "mock": {
+      "title": "mock 配置",
+      "type": "object",
+      "theme": "collapse",
+      "labelWidth": 130,
+      "style": { "backgroundColor": "#fff" },
+      "properties": {
+        "mockNumber": {
+          "title": "模拟number数据",
+          "type": "string",
+          "ui:options": {}
+        },
+        "mockBoolean": {
+          "title": "模拟boolean数据",
+          "type": "string",
+          "ui:labelWidth": 0,
+          "ui:options": {}
+        },
+        "mockString": {
+          "title": "模拟string数据",
+          "type": "string",
+          "ui:options": {}
+        },
+        "mockKeyWordEqual": {
+          "title": "模拟关键词-全等匹配",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "title": "关键字",
+                "type": "string",
+                "ui:width": "50%",
+                "ui:options": {}
+              },
+              "value": {
+                "title": "替换为",
+                "type": "string",
+                "ui:width": "50%",
+                "ui:options": {}
+              }
+            }
+          },
+          "ui:options": {}
+        },
+        "mockKeyWordLike": {
+          "title": "模拟关键词-相似匹配",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "title": "关键字",
+                "type": "string",
+                "ui:width": "50%",
+                "ui:options": {}
+              },
+              "value": {
+                "title": "替换为",
+                "type": "string",
+                "ui:width": "50%",
+                "ui:options": {}
+              }
+            }
+          },
+          "ui:options": {},
+          "props": {}
+        }
+      }
+    }
+  }
 };
 
 const ConfigPage: React.FC = () => {
@@ -171,10 +262,10 @@ const ConfigPage: React.FC = () => {
   });
 
   useEffect(() => {
-    getLocalMaterials('blocks').then((res) => {
+    getLocalMaterials().then(({ blocks }) => {
       form.setSchemaByPath('commonlyUsedBlock', {
-        enum: res.map((s) => s.name),
-        enumNames: res.map((s) => s.name),
+        enum: blocks.map((s) => s.name),
+        enumNames: blocks.map((s) => s.name),
       });
     });
     getPluginConfig().then((data) => {
@@ -198,10 +289,6 @@ const ConfigPage: React.FC = () => {
     >
       <FormRender
         form={form}
-        displayType="column"
-        // showDescIcon={true}
-        labelWidth={170}
-        column={1}
         schema={schame}
         watch={watch}
       />

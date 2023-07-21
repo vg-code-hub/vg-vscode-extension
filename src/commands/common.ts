@@ -2,11 +2,15 @@
  * @Author: zdd
  * @Date: 2023-06-17 09:26:40
  * @LastEditors: zdd
- * @LastEditTime: 2023-07-05 17:20:23
+ * @LastEditTime: 2023-07-19 20:08:08
  * @FilePath: /vg-vscode-extension/src/commands/common.ts
  * @Description: 
  */
 import * as vscode from 'vscode';
+import { TextEditor, TextEditorEdit } from 'vscode';
+import { getClipboardText, pasteToEditor } from '../utils/editor';
+import { jsonIsValid, jsonParse } from '../utils/json';
+import { compile } from '../utils/ejs';
 import { refreshIntelliSense } from '../webview/controllers/intelliSense';
 import { showWebView } from '../webview';
 
@@ -21,9 +25,44 @@ export const commonCommands = (context: vscode.ExtensionContext) => {
       (args) => {
         showWebView(context, {
           key: 'main',
-          viewColumn: vscode.ViewColumn.Two,
+          viewColumn: vscode.ViewColumn.One,
         });
       }
+    ),
+    vscode.commands.registerTextEditorCommand(
+      'extension.openSnippetByWebview',
+      (textEditor: TextEditor, edit: TextEditorEdit, ...args: any[]) => {
+        const name = args[0];
+        const template = args[1];
+
+        const rawClipboardText = getClipboardText();
+        let clipboardText = rawClipboardText.trim();
+        clipboardText = JSON.stringify(jsonParse(clipboardText));
+
+        const validJson = jsonIsValid(clipboardText);
+        if (validJson)
+          try {
+            const code = compile(template, JSON.parse(clipboardText));
+            pasteToEditor(code);
+          } catch {
+            showWebView(context, {
+              key: 'main',
+              task: {
+                task: 'openSnippet',
+                data: { name },
+              },
+            });
+          }
+        else
+          showWebView(context, {
+            key: 'main',
+            task: {
+              task: 'openSnippet',
+              data: { name },
+            },
+          });
+
+      },
     ),
     vscode.commands.registerCommand('extension.openScaffold', () => {
       showWebView(context, {

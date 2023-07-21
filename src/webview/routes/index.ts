@@ -2,12 +2,13 @@
  * @Author: zdd
  * @Date: 2023-06-17 09:43:56
  * @LastEditors: zdd
- * @LastEditTime: 2023-07-05 12:37:49
+ * @LastEditTime: 2023-07-20 11:47:16
  * @FilePath: /vg-vscode-extension/src/webview/routes/index.ts
  * @Description: 
  */
 import alert from '../controllers/alert';
 import material from '../controllers/material';
+import schema from '../controllers/schema';
 import command from '../controllers/command';
 import * as scaffold from '../controllers/scaffold';
 import * as directory from '../controllers/directory';
@@ -26,6 +27,7 @@ export const routes: Record<string, any> = {
 
   downloadMaterials: material.downloadMaterials,
   getLocalMaterials: material.getLocalMaterials,
+  getLocalSchemas: schema.getLocalSchemas,
   saveDownloadMaterials: material.saveDownloadMaterials,
 
   executeVscodeCommand: command.executeVscodeCommand,

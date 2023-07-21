@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-05-30 17:42:04
  * @LastEditors: zdd
- * @LastEditTime: 2023-07-05 17:13:58
+ * @LastEditTime: 2023-07-06 14:53:46
  * @FilePath: /vg-vscode-extension/src/extension.ts
  * @Description: 
  */
@@ -16,6 +16,7 @@ import { newGetxStatefulWidgetGetBuilderPage } from './commands/new-getx-statefu
 import { routersGenerate } from './commands/routers-generate';
 import { genSwaggerConfig, genWebapiForDart, genWebapiForTypescript } from './swagger-generator';
 import { commonCommands } from './commands/common';
+import { registerCompletion } from './commands/registerCompletion';
 
 
 export function activate(context: vscode.ExtensionContext) {
@@ -77,6 +78,7 @@ export function activate(context: vscode.ExtensionContext) {
 	statusBarItem.tooltip = '可视化生成代码';
 	statusBarItem.show();
 
+	registerCompletion(context);
 	commonCommands(context);
 }
 

@@ -2,13 +2,17 @@
  * @Author: zdd
  * @Date: 2023-06-17 09:58:32
  * @LastEditors: zdd
- * @LastEditTime: 2023-07-05 17:24:01
+ * @LastEditTime: 2023-07-19 19:59:27
  * @FilePath: /vg-vscode-extension/webview-react/.umirc.ts
  * @Description: 
  */
 import { defineConfig } from '@umijs/max';
+import path from 'path';
 
 export default defineConfig({
+  alias: {
+    ReactDOM: path.join(__dirname, `node_modules/react-dom`),
+  },
   antd: {},
   theme: { '@primary-color': '#1DA57A' },
   access: {},
@@ -33,7 +37,7 @@ export default defineConfig({
     {
       hideInMenu: true,
       name: '代码片段详情',
-      path: '/material-detail',
+      path: '/material-detail/:name',
       component: './materials/detail',
     },
     {
@@ -41,6 +45,11 @@ export default defineConfig({
       name: '创建代码片段',
       path: '/material-create',
       component: './materials/create',
+    },
+    {
+      name: 'schema2code',
+      path: '/schema2code',
+      component: './schema2code',
     },
     {
       name: '物料中心',
@@ -79,6 +88,9 @@ export default defineConfig({
     // { src: '/main.js' },
   ],
   chainWebpack(memo, args) {
+    // memo.resolve.alias
+    //   .set('ReactDOM', path.join(__dirname, `node_modules/react-dom`));
+
     memo.optimization.splitChunks.merge({
       cacheGroups: {
         vendors: {

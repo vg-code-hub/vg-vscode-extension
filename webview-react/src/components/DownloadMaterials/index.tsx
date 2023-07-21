@@ -17,14 +17,9 @@ const DownloadMaterials: React.FC<IProps> = ({ visible, onCancel, onOk }) => {
     useState<IFetchMaterialRepositoryListResult>({
       git: [
         {
-          title: 'lowcode默认提供的物料',
+          title: '默认提供的物料',
           repository:
-            'https://github.com/lowcode-scaffold/lowcode-materials.git',
-        },
-        {
-          title: 'lowcode默认提供的物料(国内镜像)',
-          repository:
-            'https://gitee.com/lowcode-scaffold/lowcode-materials.git',
+            'https://github.com/JimmyZDD/vg-materials.git',
         },
       ],
       npm: [
@@ -45,9 +40,9 @@ const DownloadMaterials: React.FC<IProps> = ({ visible, onCancel, onOk }) => {
   useEffect(() => {
     if (visible) {
       setFormData({} as any);
-      fetchMaterialRepositoryList().then((res) => {
-        setRepositoryList(res);
-      });
+      // fetchMaterialRepositoryList().then((res) => {
+      //   setRepositoryList(res);
+      // });
     }
   }, [visible]);
 

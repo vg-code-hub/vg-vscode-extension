@@ -2,29 +2,29 @@
  * @Author: zdd
  * @Date: 2023-06-29 15:19:34
  * @LastEditors: zdd
- * @LastEditTime: 2023-07-04 17:54:02
+ * @LastEditTime: 2023-07-21 18:03:03
  * @FilePath: /vg-vscode-extension/webview-react/src/pages/materials/detail.tsx
  * @Description: 
  */
 import { useEffect } from 'react';
 import { useMount } from 'ahooks';
 import { DownOutlined } from '@ant-design/icons';
-import { Form, Space, Button, Dropdown, message, MenuProps, Modal } from 'antd';
+import { Form, Space, Button, Dropdown, message, MenuProps, Modal, Spin } from 'antd';
 import { useImmer } from 'use-immer';
 import FormRender, { useForm } from 'form-render';
-import { useLocation } from '@umijs/max';
+import { useParams } from '@umijs/max';
 
-import { IGetLocalMaterialsResult, genCodeBySnippetMaterial } from '@/common';
+import { IGetLocalMaterialsResult, genCodeBySnippetMaterial, getLocalMaterials } from '@/common';
 import CodeMirror from '@/components/CodeMirror';
 import AmisComponent from '@/components/AmisComponent';
 import JsonToTs from '@/components/JsonToTs';
 import YapiModal from '@/components/YapiModal';
 import RunScript from '@/components/RunScript';
 
-import './index.less';
+// import './index.less';
 
 const MaterialDetailPage: React.FC = () => {
-  const { state }: { state: any } = useLocation();
+  const { name } = useParams();
   const items: MenuProps['items'] = [
     {
       key: '1',
@@ -49,6 +49,7 @@ const MaterialDetailPage: React.FC = () => {
     },
   ]
   const [formData, setFormData] = useImmer({});
+  const [loading, setLoading] = useImmer(false);
   const form = useForm();
   const [selectedMaterial, setSelectedMaterial] = useImmer<IGetLocalMaterialsResult>({ schema: {}, model: {} } as any);
   const [templateModalVisble, setTemplateModalVisble] = useImmer(false);
@@ -60,12 +61,22 @@ const MaterialDetailPage: React.FC = () => {
 
   }, [selectedMaterial])
 
-  useMount(() => {
-    if (state && !state.preview.schema) {
-      state.preview.schema = 'form-render';
-    }
+  useMount(async () => {
+    setLoading(true);
+    getLocalMaterials().then(({ snippets }) => {
+      if (snippets.length) {
+        const selected = snippets.find((s) => s.name === name);
+        if (selected && !selected.preview.schema) {
+          selected.preview.schema = 'form-render';
+        }
+        console.log(snippets, name);
 
-    setSelectedMaterial(state as any);
+        setFormData(selected?.model);
+        setSelectedMaterial(selected!);
+        form.setValues(selected?.model);
+        setLoading(false);
+      }
+    });
   })
 
   const watch = {
@@ -75,8 +86,8 @@ const MaterialDetailPage: React.FC = () => {
   };
 
   return (
-    <>
-      <Form layout="vertical">
+    <Spin spinning={loading}>
+      {!loading && (<Form layout="vertical">
         <Form.Item
           label={<span style={{ fontWeight: 'bold' }}>模板</span>}
           style={{ display: selectedMaterial.path ? 'block' : 'none' }}
@@ -188,7 +199,7 @@ const MaterialDetailPage: React.FC = () => {
             </Button>
           </Space>
         </Form.Item>
-      </Form>
+      </Form>)}
       <div style={{ textAlign: 'center', width: '100%' }}>
         <Button
           shape="round"
@@ -269,7 +280,7 @@ const MaterialDetailPage: React.FC = () => {
           setScriptModalVisible(false);
         }}
       />
-    </>
+    </Spin>
   )
 }
 

@@ -15,6 +15,7 @@ import { getFileContent } from './file';
 import { getInnerLibs } from './lib';
 import { getOutputChannel } from './outputChannel';
 import { getLastAcitveTextEditor } from '../context';
+import { tempGlobalDir } from './env';
 
 export const genCodeByBlock = async (data: {
   material: string;
@@ -129,8 +130,7 @@ export const genCodeBySnippet = async (data: {
   template: string;
   name: string;
 }) => {
-  const snippetPath = path.join(snippetMaterialsPath, data.name);
-  const scriptFile = path.join(snippetPath, 'script/index.js');
+  const scriptFile = path.join(tempGlobalDir.snippetMaterials, data.name, 'script/index.js');
   const hook = {
     beforeCompile: (context: any) =>
       <object | undefined>Promise.resolve(undefined),

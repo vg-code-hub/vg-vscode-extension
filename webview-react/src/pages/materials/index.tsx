@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-06-27 22:07:27
  * @LastEditors: zdd
- * @LastEditTime: 2023-07-05 18:26:03
+ * @LastEditTime: 2023-07-19 19:58:06
  * @FilePath: /vg-vscode-extension/webview-react/src/pages/materials/index.tsx
  * @Description: 
  */
@@ -95,7 +95,7 @@ const MaterialsPage: React.FC = () => {
         rel="noopener noreferrer"
         key="link"
         onClick={() => {
-          history.push(`/material-detail`, row);
+          history.push(`/material-detail/${row.name}`, row);
         }}
       >
         使用模版
@@ -158,8 +158,8 @@ const MaterialsPage: React.FC = () => {
           //   </LightFilter>
           // ),
           menu: {
-            type: 'tab', //'snippets' | 'blocks'
-            activeKey: activeKey,
+            type: 'tab',
+            activeKey: activeKey, //'snippets' | 'blocks'
             items: [
               {
                 key: 'snippets',
@@ -187,7 +187,7 @@ const MaterialsPage: React.FC = () => {
         onItem={(record: any) => {
           return {
             onClick: () => {
-              history.push(`/material-detail`, record);
+              history.push(`/material-detail/${record.name}`, record);
             },
           };
         }}

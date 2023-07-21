@@ -1,3 +1,11 @@
+/*
+ * @Author: zdd
+ * @Date: 2023-06-29 15:25:43
+ * @LastEditors: zdd
+ * @LastEditTime: 2023-07-21 17:57:07
+ * @FilePath: /vg-vscode-extension/webview-react/src/components/CodeMirror/index.tsx
+ * @Description: 
+ */
 import React, { useEffect, useRef } from 'react';
 import * as codemirror from 'codemirror';
 
@@ -14,18 +22,22 @@ interface IProps {
   domId: string;
   onChange?: (value: string) => void;
   defaultValue?: string;
+  height?: string | number;
   value?: string;
   mode?: 'application/json' | 'javascript';
   lint?: boolean;
+  readonly?: boolean;
 }
 
 const CodeMirror: React.FC<IProps> = ({
   domId,
+  height,
   onChange,
   defaultValue,
   value = '',
   mode = 'application/json',
   lint = false,
+  readonly = false,
 }) => {
   const codeMirrorInstant = useRef<CodeMirror.EditorFromTextArea>();
   useEffect(() => {
@@ -35,11 +47,13 @@ const CodeMirror: React.FC<IProps> = ({
         value: defaultValue || value,
         // lineNumbers: true,
         mode,
+        readOnly: readonly,
         // gutters: ['CodeMirror-lint-markers'],
         lint,
         theme: 'monokai',
       },
     );
+    if (height) codeMirrorInstant.current.setSize('auto', height);
     if (typeof onChange === 'function') {
       codeMirrorInstant.current.on('change', () => {
         const value = codeMirrorInstant.current!.getValue();

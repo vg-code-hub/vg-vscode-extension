@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-06-28 18:00:11
  * @LastEditors: zdd
- * @LastEditTime: 2023-07-05 17:52:59
+ * @LastEditTime: 2023-07-21 10:55:15
  * @FilePath: /vg-vscode-extension/webview-react/src/common/network/vscode/index.ts
  * @Description: 
  */
@@ -26,13 +26,24 @@ export interface IGetLocalMaterialsResult {
   template: string;
 }
 /**
+ * 获取本地swagger data schemas
+ *
+ * @export
+ * @returns
+ */
+export function getLocalSchemas() {
+  return request<Record<string, any>[]>({
+    cmd: 'getLocalSchemas'
+  });
+}
+/**
  * 获取本地物料列表
  *
  * @export
  * @returns
  */
 export function getLocalMaterials() {
-  return request<{ blocks: IGetLocalMaterialsResult[], snippets: IGetLocalMaterialsResult[] }>({
+  return request<{ schema2code: any[], blocks: IGetLocalMaterialsResult[], snippets: IGetLocalMaterialsResult[] }>({
     cmd: 'getLocalMaterials'
   });
 }
