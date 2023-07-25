@@ -33,8 +33,8 @@ function routeNamesGenerate(targetDirectory: string) {
     // 相对路径
     let relativePath = vscode.workspace.asRelativePath(filePath);
 
-    // 检查 lib/pages
-    if (relativePath.indexOf("lib/pages/") === -1)
+    // 检查 lib/pages，非dart文件
+    if (relativePath.indexOf("lib/pages/") === -1 || relativePath.indexOf(".dart") === -1)
       return;
 
     // 排除 lib/pages/index.dart

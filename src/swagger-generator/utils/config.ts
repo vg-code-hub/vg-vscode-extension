@@ -105,7 +105,7 @@ class SwaggerConfig {
 
   static testFolder(folder?: string) {
     const folderFilter = this.config.folderFilter;
-    if (!folderFilter || !folder) return true;
+    if (!folderFilter || !folder || folderFilter.length === 0) return true;
     return folderFilter.some((item) => isRegExp(item) ? (item as RegExp).test(folder) : folder.startsWith(item as string));
   }
 

@@ -16,7 +16,8 @@ const defaultConfig: Config = {
   type: "dart",
   yapi: {
     jsonUrl: 'http://127.0.0.1:4523/export/openapi?projectId=xxx&version=3.0',
-    outputDir: 'api'
+    outputDir: 'api',
+    overwrite: false,
   },
   mock: { mockKeyWordEqual: [], mockKeyWordLike: [] },
   commonlyUsedBlock: [],
@@ -27,6 +28,7 @@ export type Config = {
   yapi: {
     jsonUrl: string;
     outputDir: string;
+    overwrite: boolean;
     folderFilter?: string[];
     folderMap?: Record<string, string>;
     customPathFolder?: Record<string, string>;

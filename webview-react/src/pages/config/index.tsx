@@ -54,9 +54,17 @@ const schame: any = {
           "type": "string",
           "description": "",
           "labelWidth": 100,
+          "width": "50%",
           "ui:readonly": false,
           "ui:options": {},
           "props": {}
+        },
+        "overwrite": {
+          "title": "覆盖",
+          "type": "boolean",
+          "labelWidth": 100,
+          "width": "50%",
+          "widget": "switch"
         },
         "folderFilter": {
           "title": "过滤路径",
