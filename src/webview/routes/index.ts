@@ -27,8 +27,9 @@ export const routes: Record<string, any> = {
 
   downloadMaterials: material.downloadMaterials,
   getLocalMaterials: material.getLocalMaterials,
-  getLocalSchemas: schema.getLocalSchemas,
   saveDownloadMaterials: material.saveDownloadMaterials,
+  getLocalSchemas: schema.getLocalSchemas,
+  genPagesCode: schema.genPagesCode,
 
   executeVscodeCommand: command.executeVscodeCommand,
 

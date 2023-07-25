@@ -6,9 +6,8 @@
  * @FilePath: /vg-vscode-extension/src/swagger-generator/utils/config.ts
  * @Description: 
  */
-import { parse } from 'yaml';
 import { commands } from "vscode";
-import { existsSync, isRegExp, join, readFileSync, readFileSyncToObj, rmSync, writeFileSync } from "@root/utils";
+import { existsSync, getConfig, isRegExp, join, readFileSyncToObj, rmSync, writeFileSync } from "@root/utils";
 import { baiduTranslationHandle, zhiyiTranslationHandle } from '../translation';
 import { getRegExp } from "./helper";
 
@@ -54,17 +53,16 @@ class SwaggerConfig {
   };
 
   async getConfig(rootPath: string) {
-    if (!existsSync(rootPath.concat(`/swagger.yaml`))) {
+    if (!existsSync(rootPath.concat(`/vgcode.yaml`))) {
       await new Promise<void>((resolve) => {
-        commands.executeCommand('extension.swagger-config-init').then(() => {
+        commands.executeCommand('extension.vgcode-config-init').then(() => {
           setTimeout(resolve, 100);
         });
       });
-      throw Error('config your swagger.yaml then  try again');
+      throw Error('config your vgcode.yaml then  try again');
     }
 
-    const file = readFileSync(rootPath.concat(`/swagger.yaml`), 'utf8');
-    const data = parse(file);
+    const data = getConfig().yapi;
     let folderFilter = data.folderFilter;
     if (folderFilter) {
       if (!Array.isArray(folderFilter)) throw Error('folderFilter must be array');

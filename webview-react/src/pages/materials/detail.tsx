@@ -21,7 +21,6 @@ import JsonToTs from '@/components/JsonToTs';
 import YapiModal from '@/components/YapiModal';
 import RunScript from '@/components/RunScript';
 
-// import './index.less';
 
 const MaterialDetailPage: React.FC = () => {
   const { name } = useParams();
@@ -69,7 +68,6 @@ const MaterialDetailPage: React.FC = () => {
         if (selected && !selected.preview.schema) {
           selected.preview.schema = 'form-render';
         }
-        console.log(snippets, name);
 
         setFormData(selected?.model);
         setSelectedMaterial(selected!);

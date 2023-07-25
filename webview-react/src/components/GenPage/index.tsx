@@ -7,7 +7,7 @@
  * @Description: 
  */
 import React, { useEffect, useState } from 'react';
-import { Modal, Form, Input, Checkbox, Card, Space, Divider, Menu, Radio, Select } from 'antd';
+import { Modal, Form, Input, Checkbox, Card, Space, Divider, Menu, Radio, Select, message } from 'antd';
 import CodeMirror from '../CodeMirror';
 
 import styles from "./index.less";
@@ -15,7 +15,7 @@ import { camelCase, find, snakeCase, upperFirst } from 'lodash';
 import { render as ejsRender } from 'ejs';
 import { useImmer } from 'use-immer';
 import { useMount } from 'ahooks';
-import { getLocalMaterials } from '@/common';
+import { getLocalMaterials, genPagesCode } from '@/common';
 
 interface IProps {
   visible: boolean;
@@ -130,7 +130,7 @@ const GenPage: React.FC<IProps> = ({ visible, config, pageName: _pageName, onClo
             key: `${_key}/controllers`,
             label: 'controllers',
             children: selectPages.map(p => ({
-              key: `${_key}/controllers/${snakeCaseName}/${p}`,
+              key: `${_key}/controllers/${snakeCaseName}_${p}.dart`,
               label: `${snakeCaseName}_${p}.dart`,
             }))
           },
@@ -140,14 +140,14 @@ const GenPage: React.FC<IProps> = ({ visible, config, pageName: _pageName, onClo
               label: 'widgets',
               children: [
                 {
-                  key: `${_key}/widgets/${snakeCaseName}_item`,
+                  key: `${_key}/widgets/${snakeCaseName}_item.dart`,
                   label: `${snakeCaseName}_item.dart`,
                 },
               ]
             },
           ] : [],
           ...selectPages.map(p => ({
-            key: `${_key}/${p}`,
+            key: `${_key}/${snakeCaseName}_${p}_page.dart`,
             label: `${snakeCaseName}_${p}_page.dart`,
           })),
         ]
@@ -175,25 +175,26 @@ const GenPage: React.FC<IProps> = ({ visible, config, pageName: _pageName, onClo
           }
         }
         if (schema2codeMaterial) {
-          _codeMap[`${_key}/create`] = findCodeTemplate(['dart', 'create', 'page'])
-          _codeMap[`${_key}/detail`] = findCodeTemplate(['dart', 'detail', 'page'])
-          _codeMap[`${_key}/list`] = findCodeTemplate(['dart', 'refresh-list', 'page'])
-          _codeMap[`${_key}/widgets/${snakeCaseName}_item`] = findCodeTemplate(['dart', 'refresh-list', 'item'])
+          _codeMap[`${_key}/${snakeCaseName}_create_page.dart`] = findCodeTemplate(['dart', 'create', 'page'])
+          _codeMap[`${_key}/${snakeCaseName}_detail_page.dart`] = findCodeTemplate(['dart', 'detail', 'page'])
+          _codeMap[`${_key}/${snakeCaseName}_list_page.dart`] = findCodeTemplate(['dart', 'refresh-list', 'page'])
+          _codeMap[`${_key}/widgets/${snakeCaseName}_item.dart`] = findCodeTemplate(['dart', 'refresh-list', 'item'])
 
-          _codeMap[`${_key}/controllers/${snakeCaseName}/create`] = findCodeTemplate(['dart', 'create', 'controller'])
-          _codeMap[`${_key}/controllers/${snakeCaseName}/detail`] = findCodeTemplate(['dart', 'detail', 'controller'])
-          _codeMap[`${_key}/controllers/${snakeCaseName}/list`] = findCodeTemplate(['dart', 'refresh-list', 'controller'])
+          _codeMap[`${_key}/controllers/${snakeCaseName}_create.dart`] = findCodeTemplate(['dart', 'create', 'controller'])
+          _codeMap[`${_key}/controllers/${snakeCaseName}_detail.dart`] = findCodeTemplate(['dart', 'detail', 'controller'])
+          _codeMap[`${_key}/controllers/${snakeCaseName}_list.dart`] = findCodeTemplate(['dart', 'refresh-list', 'controller'])
         }
         _codeMap['index.dart'] = `export '${_key}/${snakeCaseName}_create_page.dart';\nexport '${_key}/${snakeCaseName}_detail_page.dart';\nexport '${_key}/${snakeCaseName}_list_page.dart';\n`
       }
     }
     if (pages.length > 0) {
-      var _selectedKey = pages.slice(0, pages.length - 1).join('/') + '/list';
+      var _selectedKey = [...pages.slice(0, pages.length - 1), snakeCaseName].join('/') + '_list_page.dart';
       setSelectedKey(_selectedKey);
       setFileItems(s => {
         s[0].children[0] = menuItem
       })
     }
+
     setCodeMap(_codeMap)
   }, [pageNameFull, selectPages])
 
@@ -216,8 +217,10 @@ const GenPage: React.FC<IProps> = ({ visible, config, pageName: _pageName, onClo
       onCancel={() => {
         onClose();
       }}
-      onOk={() => {
+      onOk={async () => {
+        await genPagesCode(codeMap);
         onClose();
+        message.success('生成成功');
       }}
       cancelText="取消"
       okText="确定"

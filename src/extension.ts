@@ -14,7 +14,7 @@ import { newGetxGetBuilderPage } from './commands/new-getx-getbuilder-page';
 import { newGetxFullPage } from './commands/new-getx-full-page';
 import { newGetxStatefulWidgetGetBuilderPage } from './commands/new-getx-stateful-getbuilder-page';
 import { routersGenerate } from './commands/routers-generate';
-import { genSwaggerConfig, genWebapiForDart, genWebapiForTypescript } from './swagger-generator';
+import { genVgcodeConfig, genWebapiForDart, genWebapiForTypescript } from './swagger-generator';
 import { commonCommands } from './commands/common';
 import { registerCompletion } from './commands/registerCompletion';
 
@@ -57,8 +57,8 @@ export function activate(context: vscode.ExtensionContext) {
 			newGetxStatefulWidgetGetBuilderPage
 		),
 		vscode.commands.registerCommand(
-			"extension.swagger-config-init",
-			genSwaggerConfig
+			"extension.vgcode-config-init",
+			genVgcodeConfig
 		),
 		vscode.commands.registerCommand(
 			"extension.swagger-2-dart",
@@ -74,7 +74,7 @@ export function activate(context: vscode.ExtensionContext) {
 		-1,
 	);
 	statusBarItem.command = 'extension.generateCodeByWebview';
-	statusBarItem.text = '$(octoface) Vg Code';
+	statusBarItem.text = '$(smiley) Vg Code';
 	statusBarItem.tooltip = '可视化生成代码';
 	statusBarItem.show();
 

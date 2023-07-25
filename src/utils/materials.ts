@@ -111,7 +111,6 @@ export const getLocalSchema2codeMaterials = (
   }[] = [];
   const getFile: any = (fullPath: string) => {
     return fs.readdirSync(fullPath).map((s) => {
-      console.log(s);
       let template = '';
       const _fullPath = path.join(fullPath, s);
 

@@ -26,7 +26,7 @@ export default defineConfig({
   routes: [
     {
       path: '/',
-      redirect: '/materials',
+      redirect: '/schema2code',
     },
     {
       hideInMenu: true,

@@ -65,7 +65,7 @@ const schame: any = {
           "items": {
             "type": "object",
             "properties": {
-              "val": {
+              "value": {
                 "title": "源路径",
                 "type": "string",
                 "props": {}
@@ -231,16 +231,11 @@ const schame: any = {
 
 const ConfigPage: React.FC = () => {
   const form = useForm();
-  const [formData, setFormDate] = useImmer({
+  const [formData, setFormDate] = useImmer<any>({
+    type: "dart",
     yapi: {
-      domain: '',
-      projects: [
-        {
-          name: '',
-          token: '',
-          domain: '',
-        },
-      ],
+      jsonUrl: '',
+      outputDir: '',
     },
     mock: {
       mockNumber: '',
@@ -269,10 +264,47 @@ const ConfigPage: React.FC = () => {
       });
     });
     getPluginConfig().then((data) => {
-      setFormDate(data);
-      form.setValues(data);
+      console.log(data);
+      const { folderFilter, folderMap, customPathFolder, customModelFolder } = data.yapi;
+
+      setFormDate((s: any) => {
+        for (const key in data) {
+          s[key] = data[key as keyof typeof data];
+          if (key === 'yapi' && folderFilter) {
+            s[key].folderFilter = folderFilter.map((value) => ({ value }));
+          }
+          if (key === 'yapi' && folderMap) {
+            s[key].folderMap = Object.keys(folderMap).map((source) => {
+              return {
+                source,
+                folder: folderMap[source],
+              };
+            });
+          }
+          if (key === 'yapi' && customPathFolder) {
+            s[key].customPathFolder = Object.keys(customPathFolder).map((source) => {
+              return {
+                source,
+                folder: customPathFolder[source],
+              };
+            });
+          }
+          if (key === 'yapi' && customModelFolder) {
+            s[key].customModelFolder = Object.keys(customModelFolder).map((source) => {
+              return {
+                source,
+                folder: customModelFolder[source],
+              };
+            });
+          }
+        }
+      });
     });
   }, []);
+
+  useEffect(() => {
+    form.setValues(formData);
+  }, [formData])
 
   const watch = {
     '#': (val: any) => {
@@ -298,7 +330,32 @@ const ConfigPage: React.FC = () => {
           type="primary"
           style={{ width: '30%' }}
           onClick={() => {
-            savePluginConfig(formData).then(() => {
+            const { folderFilter, folderMap, customPathFolder, customModelFolder } = formData.yapi;
+            const _formData = JSON.parse(JSON.stringify(formData));
+            if (folderFilter && folderFilter.length > 0) {
+              _formData.yapi.folderFilter = folderFilter.filter((f: any) => !!f).map(({ value }: any) => value);
+            }
+            if (folderMap && folderMap.length > 0) {
+              _formData.yapi.folderMap = {}
+              folderMap.filter((f: any) => !!f).forEach(({ source, folder }: any) => {
+                _formData.yapi.folderMap[source] = folder;
+              });
+            }
+            if (customPathFolder && customPathFolder.length > 0) {
+              _formData.yapi.customPathFolder = {}
+              customPathFolder.filter((f: any) => !!f).forEach(({ source, folder }: any) => {
+                _formData.yapi.customPathFolder[source] = folder;
+              });
+            }
+            if (customModelFolder && customModelFolder.length > 0) {
+              _formData.yapi.customModelFolder = {}
+              customModelFolder.filter((f: any) => !!f).forEach(({ source, folder }: any) => {
+                _formData.yapi.customModelFolder[source] = folder;
+              });
+            }
+            console.log(_formData);
+
+            savePluginConfig(_formData).then(() => {
               message.success('保存成功');
             });
           }}

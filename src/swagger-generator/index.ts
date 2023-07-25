@@ -8,7 +8,7 @@
  */
 import { Uri, window } from "vscode";
 import { existsSync, writeFile } from "fs";
-import { getRootPath } from '@root/utils';
+import { getConfig, getRootPath, saveConfig } from '@root/utils';
 export * from "./dart";
 export * from "./ts";
 
@@ -41,18 +41,14 @@ folderMap:
   "驾驶员:driver": driver
   "项目:project": project
 `;
-export const genSwaggerConfig = async (uri: Uri) => {
+export const genVgcodeConfig = async (uri: Uri) => {
   try {
     let rootPath = getRootPath(undefined);
     if (!rootPath) throw Error('no root path');
 
-    if (!existsSync(rootPath.concat(`/swagger.yaml`)))
-      writeFile(
-        rootPath.concat(`/swagger.yaml`),
-        values,
-        'utf-8',
-        () => { }
-      );
+    if (!existsSync(rootPath.concat(`/vgcode.yaml`)))
+      saveConfig(getConfig());
+
     window.showInformationMessage(
       `Successfully Generated api yaml`
     );

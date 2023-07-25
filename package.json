@@ -70,8 +70,8 @@
         "category": "VG"
       },
       {
-        "command": "extension.swagger-config-init",
-        "title": "swagger config init",
+        "command": "extension.vgcode-config-init",
+        "title": "vgcode config init",
         "category": "VG"
       },
       {
@@ -168,15 +168,7 @@
         "path": "./snippets/html.json"
       }
     ],
-    "viewsContainers": {
-      "activitybar": [
-        {
-          "id": "VgCode",
-          "title": "v gen",
-          "icon": "image/activitybar.svg"
-        }
-      ]
-    }
+    "viewsContainers": {}
   },
   "scripts": {
     "vsce-package": "vsce package --no-dependencies",

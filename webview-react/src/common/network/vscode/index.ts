@@ -24,7 +24,22 @@ export interface IGetLocalMaterialsResult {
     scripts?: [{ method: string; remark: string; }];
   };
   template: string;
+  type: string
 }
+
+/**
+ * 生成代码
+ *
+ * @export
+ * @returns
+ */
+export function genPagesCode(codeMap: Record<string, any>) {
+  return request<string>({
+    cmd: 'genPagesCode',
+    data: codeMap,
+  });
+}
+
 /**
  * 获取本地swagger data schemas
  *
@@ -36,6 +51,7 @@ export function getLocalSchemas() {
     cmd: 'getLocalSchemas'
   });
 }
+
 /**
  * 获取本地物料列表
  *
@@ -319,13 +335,14 @@ export function createBlockTemplate(data: {
  */
 export function getPluginConfig() {
   return request<{
+    type: "dart" | "typescript"
     yapi: {
-      domain: string;
-      projects: {
-        name: string;
-        token: string;
-        domain: string;
-      }[];
+      jsonUrl: string;
+      outputDir: string;
+      folderFilter?: string[];
+      folderMap?: Record<string, string>;
+      customPathFolder?: Record<string, string>;
+      customModelFolder?: Record<string, string>;
     };
     mock: {
       mockNumber: string;

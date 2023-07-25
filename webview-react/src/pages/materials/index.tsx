@@ -9,13 +9,14 @@
 
 import { ActionType, ProColumns, ProList } from '@ant-design/pro-components';
 import { history } from '@umijs/max';
-import { Badge, Button, Space, Tag, message } from 'antd';
+import { Badge, Button, Modal, Space, Tag, message } from 'antd';
 import ImageViewer from 'react-simple-image-viewer';
 import { useImmer } from 'use-immer';
-import { IDownloadMaterialsResult, IGetLocalMaterialsResult, insertSnippet } from '@/common';
+import { IDownloadMaterialsResult, IGetLocalMaterialsResult, getLocalMaterials, insertSnippet } from '@/common';
 import { useMaterial } from '@/common/hooks';
 import DownloadMaterials from '@/components/DownloadMaterials';
 import { useEffect, useRef } from 'react';
+import CodeMirror from '@/components/CodeMirror';
 
 
 const metas: ProColumns<IGetLocalMaterialsResult> = {
@@ -42,10 +43,6 @@ const metas: ProColumns<IGetLocalMaterialsResult> = {
       },
     },
   },
-  // avatar: {
-  //   dataIndex: 'image',
-  //   search: false,
-  // },
   description: {
     dataIndex: ['preview', 'description'],
     search: false,
@@ -60,12 +57,13 @@ const metas: ProColumns<IGetLocalMaterialsResult> = {
     render: (text: string, row: IGetLocalMaterialsResult, index: number, ...rests: any) => {
       return (
         <Space size={0}>
-          <Tag color="blue">{row.preview.schema ?? 'form-render'}</Tag>
+          <Tag color="blue">{row.preview?.schema ?? 'form-render'}</Tag>
         </Space>
       );
     },
   },
 }
+
 const renderBadge = (count: number, active = false) => {
   return (
     <Badge
@@ -79,31 +77,43 @@ const renderBadge = (count: number, active = false) => {
     />
   );
 };
+
 const MaterialsPage: React.FC = () => {
   const actionRef = useRef<ActionType>();
-  const { count, handleSearch } = useMaterial();
+  const { count, handleSearch, schema2codeMaterial } = useMaterial();
   const [activeKey, setActiveKey] = useImmer<React.Key>('snippets');
+  const [templateModalVisble, setTemplateModalVisble] = useImmer(false);
   const [isViewerOpen, setIsViewerOpen] = useImmer(false);
   const [previewImages, setPreviewImages] = useImmer<string[]>([]);
   const [downloadMaterialsVisible, setDownloadMaterialsVisible] = useImmer(false);
+  const [selectedSchema, setSelectedSchema] = useImmer<any>({});
+
+  function onDetailClick(row: IGetLocalMaterialsResult) {
+    if (activeKey === 'schema2code') {
+      setTemplateModalVisble(true);
+      setSelectedSchema(row);
+      return
+    }
+    history.push(`/material-detail/${row.name}`, row);
+  }
 
   const actions = {
     cardActionProps: 'actions',
     search: false,
     render: (text: string, row: IGetLocalMaterialsResult) => [
-      <a
-        rel="noopener noreferrer"
-        key="link"
+      <Button
+        type="text"
+        block
         onClick={() => {
-          history.push(`/material-detail/${row.name}`, row);
+          onDetailClick(row)
         }}
       >
-        使用模版
-      </a>,
-      <a
-        target="_blank"
-        rel="noopener noreferrer"
-        key="warning"
+        {activeKey === 'schema2code' ? '查看模版' : '使用模版'}
+      </Button>,
+      <Button
+        type="text"
+        block
+        disabled
         onClick={() => {
           if (!row.template) {
             message.error('添加失败，模板为空');
@@ -117,11 +127,11 @@ const MaterialsPage: React.FC = () => {
         }}
       >
         直接添加
-      </a>,
-      <a
-        target="_blank"
-        rel="noopener noreferrer"
-        key="view"
+      </Button>,
+      <Button
+        type="text"
+        block
+        disabled
         onClick={() => {
           setIsViewerOpen(true)
           if (row.preview.img && Array.isArray(row.preview.img)) {
@@ -130,7 +140,7 @@ const MaterialsPage: React.FC = () => {
         }}
       >
         查看
-      </a>,
+      </Button>,
     ],
   }
 
@@ -169,6 +179,10 @@ const MaterialsPage: React.FC = () => {
                 key: 'blocks',
                 label: <span>区块{renderBadge(count.blocks, activeKey === 'blocks')}</span>,
               },
+              {
+                key: 'schema2code',
+                label: <span>schema2code{renderBadge(count.schema2code, activeKey === 'schema2code')}</span>,
+              },
             ],
             onChange: (key: string) => {
               setActiveKey(key);
@@ -184,14 +198,19 @@ const MaterialsPage: React.FC = () => {
           ],
         }}
         search={{}}
-        onItem={(record: any) => {
-          return {
-            onClick: () => {
-              history.push(`/material-detail/${record.name}`, record);
-            },
-          };
+        onItem={(record: any) => ({
+          onClick: () => {
+            onDetailClick(record)
+          },
+        })}
+        request={async (params: any) => {
+          const data = await handleSearch({ ...params, type: activeKey })
+          if (activeKey === 'schema2code') return {
+            data: schema2codeMaterial,
+            success: true,
+          }
+          return data;
         }}
-        request={(params: any) => handleSearch({ ...params, type: activeKey })}
         pagination={{
           defaultPageSize: 8,
           showSizeChanger: false,
@@ -203,7 +222,23 @@ const MaterialsPage: React.FC = () => {
         showActions="hover"
         showExtra="hover"
         metas={{
-          ...metas,
+          ...activeKey === 'schema2code' ? {
+            title: {
+              title: '关键字',
+              dataIndex: ['title']
+            },
+            subTitle: {
+              search: false,
+              dataIndex: ['preview', 'description'],
+              render: (text: string, row: IGetLocalMaterialsResult, index: number, ...rests: any) => {
+                return (
+                  <Space size={0}>
+                    <Tag color="blue">{row.type}</Tag>
+                  </Space>
+                );
+              },
+            },
+          } : metas,
           actions,
         }}
       />
@@ -218,6 +253,27 @@ const MaterialsPage: React.FC = () => {
           }}
         />
       )}
+      <Modal
+        open={templateModalVisble}
+        width={'calc(100% - 80px)'}
+        title="查看模板"
+        okText="确定"
+        cancelText="取消"
+        onCancel={() => {
+          setTemplateModalVisble(false);
+        }}
+        onOk={() => {
+          setTemplateModalVisble(false);
+        }}
+      >
+        <CodeMirror
+          domId="templateCodeMirrorEditDialog"
+          lint={false}
+          height='60vh'
+          readonly
+          value={selectedSchema.template}
+        />
+      </Modal>
       <DownloadMaterials
         visible={downloadMaterialsVisible}
         onOk={(data) => {
