@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-06-05 11:28:07
  * @LastEditors: zdd
- * @LastEditTime: 2023-06-08 15:55:41
+ * @LastEditTime: 2023-06-19 14:55:00
  * @FilePath: /vg-vscode-extension/src/swagger-generator/utils/config.ts
  * @Description: 
  */
@@ -14,6 +14,7 @@ import { getRegExp } from "./helper";
 interface Config {
   jsonUrl: string,
   outputDir: string,
+  overwrite?: boolean,
   folderFilter?: (string | RegExp)[],
   folderMap?: Record<string, string>
   customPathFolder?: Map<string | RegExp, string>

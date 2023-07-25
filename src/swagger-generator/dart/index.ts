@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-06-01 15:12:03
  * @LastEditors: zdd
- * @LastEditTime: 2023-06-09 16:58:35
+ * @LastEditTime: 2023-06-19 14:54:20
  * @FilePath: /vg-vscode-extension/src/swagger-generator/dart/index.ts
  * @Description: 
  */
@@ -15,8 +15,6 @@ import ModelGenerate from "./generate/model";
 import RequestGenerate from "./generate/request";
 
 export const genWebapiForDart = async (uri: Uri) => {
-
-
   try {
     let rootPath = getRootPath(undefined);
     if (!rootPath) throw Error('no root path');

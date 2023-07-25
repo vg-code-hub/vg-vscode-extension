@@ -17,8 +17,9 @@ const values = `# swagger 配置文件
 # http://127.0.0.1:4523/export/openapi?projectId=2540665&version=3.1
 # http://127.0.0.1:4523/export/openapi?projectId=2540665&version=3.0
 # https://petstore.swagger.io/v2/swagger.json
-jsonUrl: http://127.0.0.1:4523/export/openapi?projectId=2540665&version=3.1
+jsonUrl: https://petstore.swagger.io/v2/swagger.json
 outputDir: api
+overwrite: true # 是否覆盖requests和entitys
 # 1、首先过滤需要的文件夹[folderFilter]， 2、然后根据 customPathFolder ｜ customModelFolder 自定义 Folder
 # 3、最后如果没有第二步，folderMap 转换 folder path
 folderFilter:
