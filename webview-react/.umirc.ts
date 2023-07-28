@@ -12,6 +12,7 @@ import path from 'path';
 export default defineConfig({
   alias: {
     ReactDOM: path.join(__dirname, `node_modules/react-dom`),
+    React: path.join(__dirname, `node_modules/react`),
   },
   antd: {},
   theme: { '@primary-color': '#1DA57A' },
@@ -73,9 +74,6 @@ export default defineConfig({
   mfsu: false,
   history: {
     type: 'hash',
-  },
-  targets: {
-    ie: 11,
   },
   legacy: {
     nodeModulesTransform: true
