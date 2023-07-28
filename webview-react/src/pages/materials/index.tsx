@@ -7,49 +7,28 @@
  * @Description: 
  */
 
-import { ActionType, ProColumns, ProList } from '@ant-design/pro-components';
-import { history } from '@umijs/max';
-import { Badge, Button, Modal, Space, Tag, message } from 'antd';
-import ImageViewer from 'react-simple-image-viewer';
 import { useImmer } from 'use-immer';
-import { IDownloadMaterialsResult, IGetLocalMaterialsResult, getLocalMaterials, insertSnippet } from '@/common';
-import { useMaterial } from '@/common/hooks';
+import { useEffect } from 'react';
+import { history, KeepAlive, useModel } from '@umijs/max';
+import { ProColumns, ProList } from '@ant-design/pro-components';
+import { Badge, Button, Card, Descriptions, Popconfirm, Space, Tag, message } from 'antd';
+import { IDownloadMaterialsResult, IGetLocalMaterialsResult, deleteMaterialTemplate, insertSnippet, refreshIntelliSense } from '@/common';
 import DownloadMaterials from '@/components/DownloadMaterials';
-import { useEffect, useRef } from 'react';
-import CodeMirror from '@/components/CodeMirror';
+import JsonToTs from '@/components/JsonToTs';
+import { LoadingOutlined, ReloadOutlined } from '@ant-design/icons';
 
 
-const metas: ProColumns<IGetLocalMaterialsResult> = {
+const metasDefault: ProColumns<IGetLocalMaterialsResult> = {
   title: {
-    title: '关键字',
-    dataIndex: ['preview', 'title']
-  },
-  schema: {
-    title: '渲染器',
-    valueType: 'select',
-    valueEnum: {
-      all: { text: '全部 ', status: '' },
-      'form-render': {
-        text: 'form-render',
-        status: 'form-render',
-      },
-      amis: {
-        text: 'amis',
-        status: 'amis',
-      },
-      formily: {
-        text: 'formily',
-        status: 'formily',
-      },
-    },
-  },
-  description: {
-    dataIndex: ['preview', 'description'],
-    search: false,
+    dataIndex: ['name']
   },
   content: {
-    search: false,
     dataIndex: ['preview', 'description'],
+    render: (text: string) => {
+      return (
+        <Space size={0}>{text ?? ''}</Space>
+      );
+    },
   },
   subTitle: {
     search: false,
@@ -62,6 +41,7 @@ const metas: ProColumns<IGetLocalMaterialsResult> = {
       );
     },
   },
+  actions: {}
 }
 
 const renderBadge = (count: number, active = false) => {
@@ -79,69 +59,22 @@ const renderBadge = (count: number, active = false) => {
 };
 
 const MaterialsPage: React.FC = () => {
-  const actionRef = useRef<ActionType>();
-  const { count, handleSearch, schema2codeMaterial } = useMaterial();
-  const [activeKey, setActiveKey] = useImmer<React.Key>('snippets');
-  const [templateModalVisble, setTemplateModalVisble] = useImmer(false);
-  const [isViewerOpen, setIsViewerOpen] = useImmer(false);
-  const [previewImages, setPreviewImages] = useImmer<string[]>([]);
+  const { dataList, count, activeKey, setActiveKey } = useModel('useMaterial');
+  const { loading, refresh } = useModel('@@initialState', ({ loading, refresh }) => ({ loading, refresh }));
   const [downloadMaterialsVisible, setDownloadMaterialsVisible] = useImmer(false);
-  const [selectedSchema, setSelectedSchema] = useImmer<any>({});
+  const [metas, setMetas] = useImmer<any>(metasDefault);
+  const [jsonToTsModalVisble, setJsonToTsModalVisble] = useImmer(false);
 
   function onDetailClick(row: IGetLocalMaterialsResult) {
     if (activeKey === 'schema2code') {
-      setTemplateModalVisble(true);
-      setSelectedSchema(row);
+      onEditClick(row);
       return
     }
     history.push(`/material-detail/${row.name}`, row);
   }
 
-  const actions = {
-    cardActionProps: 'actions',
-    search: false,
-    render: (text: string, row: IGetLocalMaterialsResult) => [
-      <Button
-        type="text"
-        block
-        onClick={() => {
-          onDetailClick(row)
-        }}
-      >
-        {activeKey === 'schema2code' ? '查看模版' : '使用模版'}
-      </Button>,
-      <Button
-        type="text"
-        block
-        disabled
-        onClick={() => {
-          if (!row.template) {
-            message.error('添加失败，模板为空');
-            return;
-          }
-          insertSnippet({
-            template: row.template,
-          }).then(() => {
-            message.success('添加成功');
-          });
-        }}
-      >
-        直接添加
-      </Button>,
-      <Button
-        type="text"
-        block
-        disabled
-        onClick={() => {
-          setIsViewerOpen(true)
-          if (row.preview.img && Array.isArray(row.preview.img)) {
-            setPreviewImages(row.preview.img);
-          }
-        }}
-      >
-        查看
-      </Button>,
-    ],
+  function onEditClick(row: IGetLocalMaterialsResult) {
+    history.push(`/material-create`, { record: row, type: activeKey });
   }
 
   const handleDownloadMaterialsOk = (materials: IDownloadMaterialsResult) => {
@@ -149,24 +82,68 @@ const MaterialsPage: React.FC = () => {
       message.warning('未设置物料');
     }
     setDownloadMaterialsVisible(false);
-    actionRef.current?.reloadAndRest();
+    refresh();
     message.success('下载成功');
   };
 
   useEffect(() => {
-    actionRef.current?.reloadAndRest();
+    refresh();
+    setMetas((m: any) => {
+      m.subTitle = activeKey === 'blocks' ? metasDefault.subTitle : null
+      m.actions.render = (text: string, row: IGetLocalMaterialsResult) => [
+        activeKey !== 'schema2code' && <Button
+          type="link"
+          block
+          onClick={() => {
+            onDetailClick(row)
+          }}
+        >
+          使用模版
+        </Button>,
+        activeKey !== 'schema2code' && <Button
+          type="link"
+          block
+          onClick={() => {
+            if (!row.template) {
+              message.error('添加失败，模板为空');
+              return;
+            }
+            insertSnippet({
+              template: row.template,
+            }).then(() => {
+              message.success('添加成功');
+            });
+          }}
+        >
+          直接添加
+        </Button>,
+        activeKey !== 'schema2code' && <Popconfirm
+          title="Delete"
+          description={`您确定要删除此${activeKey}吗?`}
+          onConfirm={() => {
+            deleteMaterialTemplate({
+              name: row.name,
+              type: activeKey
+            }).then(() => {
+              message.success('删除成功');
+            })
+          }}
+          onCancel={() => { }}
+          okText="Yes"
+          cancelText="No"
+        >
+          <Button danger type="link">Delete</Button>
+        </Popconfirm>,
+      ]
+    })
   }, [activeKey])
+
 
   return (
     <>
       <ProList<IGetLocalMaterialsResult, {}>
-        actionRef={actionRef}
+        loading={loading}
         toolbar={{
-          // filter: (
-          //   <LightFilter>
-          //     <ProFormDatePicker name="startdate" label="响应日期" />
-          //   </LightFilter>
-          // ),
           menu: {
             type: 'tab',
             activeKey: activeKey, //'snippets' | 'blocks'
@@ -178,13 +155,14 @@ const MaterialsPage: React.FC = () => {
               {
                 key: 'blocks',
                 label: <span>区块{renderBadge(count.blocks, activeKey === 'blocks')}</span>,
+                // disabled: true
               },
               {
                 key: 'schema2code',
                 label: <span>schema2code{renderBadge(count.schema2code, activeKey === 'schema2code')}</span>,
               },
             ],
-            onChange: (key: string) => {
+            onChange: (key: "snippets" | "blocks" | "schema2code") => {
               setActiveKey(key);
             },
           },
@@ -197,83 +175,49 @@ const MaterialsPage: React.FC = () => {
             </Button>,
           ],
         }}
-        search={{}}
+        search={false}
         onItem={(record: any) => ({
           onClick: () => {
-            onDetailClick(record)
+            onEditClick(record)
           },
         })}
-        request={async (params: any) => {
-          const data = await handleSearch({ ...params, type: activeKey })
-          if (activeKey === 'schema2code') return {
-            data: schema2codeMaterial,
-            success: true,
-          }
-          return data;
-        }}
-        pagination={{
-          defaultPageSize: 8,
-          showSizeChanger: false,
-        }}
-        rowSelection={{}}
+        dataSource={dataList}
+        // request={(params: any) => handleSearch({ ...params, type: activeKey })}
+        pagination={false}
         grid={{ gutter: 16, column: 2 }}
         rowKey="name"
-        headerTitle="代码片段"
-        showActions="hover"
-        showExtra="hover"
-        metas={{
-          ...activeKey === 'schema2code' ? {
-            title: {
-              title: '关键字',
-              dataIndex: ['title']
-            },
-            subTitle: {
-              search: false,
-              dataIndex: ['preview', 'description'],
-              render: (text: string, row: IGetLocalMaterialsResult, index: number, ...rests: any) => {
-                return (
-                  <Space size={0}>
-                    <Tag color="blue">{row.type}</Tag>
-                  </Space>
-                );
-              },
-            },
-          } : metas,
-          actions,
+        // showActions="hover"
+        // showExtra="hover"
+        tableExtraRender={(_: any, data: any) => (
+          <Card>
+            <Descriptions size="small" column={3}>
+              <Descriptions.Item>
+                <Button onClick={() => { setJsonToTsModalVisble(true) }}>JSON TO TS</Button>
+              </Descriptions.Item>
+              <Descriptions.Item>
+                <Button type="primary" shape="circle" icon={loading ? <LoadingOutlined /> : <ReloadOutlined />} onClick={refresh}></Button>
+              </Descriptions.Item>
+              <Descriptions.Item>
+                <Button type='primary' onClick={async () => {
+                  await refreshIntelliSense();
+                  message.success('刷新成功');
+                }}>刷新代码智能提示</Button>
+              </Descriptions.Item>
+            </Descriptions>
+          </Card>
+        )}
+        metas={metas}
+      />
+      <JsonToTs
+        visible={jsonToTsModalVisble}
+        json={{}}
+        onCancel={() => {
+          setJsonToTsModalVisble(false);
+        }}
+        onOk={(type) => {
+          setJsonToTsModalVisble(false);
         }}
       />
-      {isViewerOpen && (
-        <ImageViewer
-          src={previewImages}
-          currentIndex={0}
-          disableScroll={false}
-          closeOnClickOutside={true}
-          onClose={() => {
-            setIsViewerOpen(false);
-          }}
-        />
-      )}
-      <Modal
-        open={templateModalVisble}
-        width={'calc(100% - 80px)'}
-        title="查看模板"
-        okText="确定"
-        cancelText="取消"
-        onCancel={() => {
-          setTemplateModalVisble(false);
-        }}
-        onOk={() => {
-          setTemplateModalVisble(false);
-        }}
-      >
-        <CodeMirror
-          domId="templateCodeMirrorEditDialog"
-          lint={false}
-          height='60vh'
-          readonly
-          value={selectedSchema.template}
-        />
-      </Modal>
       <DownloadMaterials
         visible={downloadMaterialsVisible}
         onOk={(data) => {
@@ -287,4 +231,8 @@ const MaterialsPage: React.FC = () => {
   );
 };
 
-export default MaterialsPage;
+export default () => (
+  <KeepAlive name="/materials" saveScrollPosition="screen">
+    <MaterialsPage />
+  </KeepAlive>
+);

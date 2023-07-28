@@ -28,9 +28,8 @@ export const registerCompletion = (context: vscode.ExtensionContext) => {
       provideCompletionItems() {
         const completionItems: vscode.CompletionItem[] = [];
         snippets.map((s) => {
-          const completionItem = new vscode.CompletionItem(
-            s.name.replace('.ejs', ''),
-          );
+          const title = s.name.replace('.ejs', '');
+          const completionItem = new vscode.CompletionItem(title);
           completionItem.kind = vscode.CompletionItemKind.Class;
           completionItem.documentation = s.template || 'vgcode';
           try {
@@ -42,7 +41,7 @@ export const registerCompletion = (context: vscode.ExtensionContext) => {
             completionItem.insertText = '';
             completionItem.command = {
               command: 'extension.openSnippetByWebview',
-              title: '',
+              title,
               arguments: [s.name, s.template],
             };
           }

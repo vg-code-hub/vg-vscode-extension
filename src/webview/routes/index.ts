@@ -28,8 +28,14 @@ export const routes: Record<string, any> = {
   downloadMaterials: material.downloadMaterials,
   getLocalMaterials: material.getLocalMaterials,
   saveDownloadMaterials: material.saveDownloadMaterials,
+  deleteMaterialTemplate: material.deleteMaterialTemplate,
   getLocalSchemas: schema.getLocalSchemas,
   genPagesCode: schema.genPagesCode,
+
+  insertSnippet: snippet.insertSnippet,
+  addSnippets: snippet.addSnippets,
+
+  createBlockTemplate: block.createBlock,
 
   executeVscodeCommand: command.executeVscodeCommand,
 
@@ -47,11 +53,6 @@ export const routes: Record<string, any> = {
   genTemplateModelByYapi: generate.genTemplateModelByYapi,
   genCodeByBlockMaterial: generate.genCodeByBlockMaterial,
   genCodeBySnippetMaterial: generate.genCodeBySnippetMaterial,
-
-  insertSnippet: snippet.insertSnippet,
-  addSnippets: snippet.addSnippets,
-
-  createBlockTemplate: block.createBlock,
 
   jsonToTs: json.jsonToTs,
 

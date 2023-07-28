@@ -164,11 +164,13 @@ export const showWebView = (context: vscode.ExtensionContext, options: {
       panel,
       disposables,
     });
-    if (options.task)
-      panel.webview.postMessage({
-        cmd: 'vscodePushTask',
-        task: options.task.task,
-        data: options.task.data,
-      });
+    setTimeout(() => {
+      if (options.task)
+        panel.webview.postMessage({
+          cmd: 'vscodePushTask',
+          task: options.task.task,
+          data: options.task.data,
+        });
+    }, 1100);
   }
 };

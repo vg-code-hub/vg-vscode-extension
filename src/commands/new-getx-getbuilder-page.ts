@@ -38,7 +38,7 @@ async function generateCode(pageName: string, targetDirectory: string, pageType:
   const snakeCaseName = snakeCase(pageName);
   const pageFile = `${targetDirectory}/${snakeCaseName}_page.dart`;
   if (!existsSync(pageFile)) {
-    await Promise.all(['bindings', 'controllers', 'widgets'].map(async item => {
+    await Promise.all((pageType === 'refresh list' ? ['controllers', 'widgets'] : ['controllers']).map(async item => {
       const directoryPath = `${targetDirectory}/${item}`;
       if (!existsSync(directoryPath)) await mkdirp(directoryPath);
     }));

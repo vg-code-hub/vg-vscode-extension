@@ -42,46 +42,13 @@ class ${pascalCaseName}Controller extends GetxController {
     case "refresh list":
       template = `import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
-import 'package:easy_refresh/easy_refresh.dart';
 
-/// TODO: import form other files ===> start
-const DEFAULT_PAGE_SIZE = 20;
-
-class MyResponse<T> {
-  MyResponse({required this.data});
-  T data;
-  bool? hasNext;
-}
-
-class Animal {
-  Animal({
-    required this.name,
-    required this.type,
-    required this.age,
-  });
-  final String name;
-  final String type;
-  final int age;
-}
-
-var fakeList = [
-  Animal(name: '花花', type: '小猫', age: 3),
-  Animal(name: '麒麟', type: '小猫', age: 2),
-  Animal(name: '来福', type: '小猫', age: 5),
-  Animal(name: '白泽', type: '小狗', age: 6),
-  Animal(name: '猴子警长', type: '猴子', age: 16),
-];
-
-/// TODO: import form other files ===> end
-
-class ${pascalCaseName}Controller extends GetxController with StateMixin<List<Animal>> {
+class ${pascalCaseName}Controller extends GetxController with StateMixin<List<T>> {
   ${pascalCaseName}Controller();
 
   late EasyRefreshController refreshController;
-  List<Animal> dataList = [];
+  List<T> dataList = [];
   int page = 0;
-
-  void onTap() {}
 
   @override
   void onInit() {
@@ -98,11 +65,6 @@ class ${pascalCaseName}Controller extends GetxController with StateMixin<List<An
     feachData();
   }
 
-  // @override
-  // void onClose() {
-  //   super.onClose();
-  // }
-
   Future<bool> feachData() async {
     try {
       if (page == 0) {
@@ -111,9 +73,10 @@ class ${pascalCaseName}Controller extends GetxController with StateMixin<List<An
       }
 
       /// TODO: feach data
-      // var res = await repository.listAnimal(page);
-      var res = MyResponse<List<Animal>>(data: fakeList);
-      dataList.addAll(res.data);
+      // var data = await repository.listAnimal(page);
+      var hasNext = data.length >= DEFAULT_PAGE_SIZE;
+
+      dataList.addAll(data);
       change(dataList,
           status: dataList.isEmpty ? RxStatus.empty() : RxStatus.success());
       return res.hasNext ?? false;
@@ -143,6 +106,34 @@ class ${pascalCaseName}Controller extends GetxController with StateMixin<List<An
 }`;
       break;
     case "form":
+      template = `import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+class ${pascalCaseName}CreatController extends GetxController {
+  ${pascalCaseName}CreatController();
+
+  FormProInstance formInstance = FormProInstance();
+  List<Map<String, dynamic>> formColumns = [];
+
+  create${pascalCaseName}Data() async {
+    try {
+      var map = formInstance.getFormValue();
+      showLoading();
+      await App${pascalCaseName}RecordsRequest.instance.createV1${pascalCaseName}Record(
+          body: ${pascalCaseName}ListResp.fromJson({
+        ...map
+      }));
+      await hiddenLoading();
+      ${pascalCaseName}ListController controller = Get.find();
+      controller.onRefresh();
+      await Future.delayed(const Duration(milliseconds: 100));
+      Get.back(closeOverlays: true);
+    } catch (e) {
+      Loading.error("数据错误：$e");
+      Log.e(e.toString());
+    }
+  }
+}`;
       break;
   }
 
@@ -171,7 +162,6 @@ export function viewTemplate(pageName: string, targetDirectory: string, pageType
 import 'package:get/get.dart';
 
 import './controllers/${snakeCaseName}.dart';
-
 
 class ${pascalCaseName}Page extends StatefulWidget {
   const ${pascalCaseName}Page({Key? key}) : super(key: key);
@@ -221,8 +211,7 @@ class _${pascalCaseName}ViewGetX extends GetView<${pascalCaseName}Controller> {
 `;
       break;
     case "refresh list":
-      template = `import 'package:easy_refresh/easy_refresh.dart';
-import 'package:flutter/material.dart';
+      template = `import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import './controllers/${snakeCaseName}.dart';
@@ -252,14 +241,17 @@ class _${pascalCaseName}ViewGetX extends GetView<${pascalCaseName}Controller> {
 
   // ListView
   _buildListView(List<Animal> state) {
-    return ListView.builder(itemBuilder: (context, index) {
-      var item = state[index];
-      return ListTile(
-        title: Text(item.name),
-        subtitle: Text(item.type),
-        trailing: Text(item.age.toString()),
-      );
-    });
+    return ListView.builder(
+      itemBuilder: (context, index) {
+        var item = state[index];
+        return ListTile(
+          title: Text(item.name),
+          subtitle: Text(item.type),
+          trailing: Text(item.age.toString()),
+        );
+      },
+      itemCount: state!.length,
+    );
   }
 
   @override
@@ -288,6 +280,84 @@ class _${pascalCaseName}ViewGetX extends GetView<${pascalCaseName}Controller> {
 `;
       break;
     case "form":
+      template = `import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+import './controllers/${snakeCaseName}.dart';
+
+
+class ${pascalCaseName}Page extends StatefulWidget {
+  const ${pascalCaseName}Page({Key? key}) : super(key: key);
+
+  @override
+  State<${pascalCaseName}Page> createState() => _${pascalCaseName}PageState();
+}
+
+class _${pascalCaseName}PageState extends State<${pascalCaseName}Page>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return const _${pascalCaseName}ViewGetX();
+  }
+}
+
+class _${pascalCaseName}ViewGetX extends GetView<${pascalCaseName}Controller> {
+  const _${pascalCaseName}ViewGetX({Key? key}) : super(key: key);
+
+  // 主视图
+  Widget _buildView() {
+    return FormPro(
+      controller.formInstance,
+      // ignore: invalid_use_of_protected_member
+      controller.formColumns,
+      uploadProvider: uploadProvider,
+      topChildren: [
+        Gaps.vGap15,
+        const Text(
+          '创建 ${pascalCaseName}',
+          style: TextStyles.textBold18,
+        ),
+        Gaps.vGap15,
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GetBuilder<${pascalCaseName}Controller>(
+      init: ${pascalCaseName}Controller(),
+      id: "${snakeCaseName}",
+      builder: (_) {
+        return KeyboardDismisser(
+          gestures: const [
+            GestureType.onTap,
+            GestureType.onPanUpdateDownDirection
+          ],
+          child: Scaffold(
+            appBar: const NavBar(title: '创建${snakeCaseName}'),
+            bottomNavigationBar: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: BrnBigMainButton(
+                  title: '确定',
+                  onTap: controller.createDriverData,
+                ),
+              ),
+            ),
+            body: SafeArea(
+              child: _buildView(),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+`;
       break;
   }
 

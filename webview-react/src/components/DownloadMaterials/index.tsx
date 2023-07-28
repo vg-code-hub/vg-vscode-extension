@@ -23,10 +23,10 @@ const DownloadMaterials: React.FC<IProps> = ({ visible, onCancel, onOk }) => {
         },
       ],
       npm: [
-        {
-          title: '@lowcoding/materials-template',
-          repository: '@lowcoding/materials-template',
-        },
+        // {
+        //   title: '@lowcoding/materials-template',
+        //   repository: '@lowcoding/materials-template',
+        // },
       ],
     });
 

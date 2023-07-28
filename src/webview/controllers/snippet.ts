@@ -8,7 +8,7 @@
  */
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import { pasteToEditor, snippetMaterialsPath } from '@root/utils';
+import { pasteToEditor, tempGlobalDir } from '@root/utils';
 import { IMessage } from '../type';
 
 export const insertSnippet = (message: IMessage<{ template: string }>) => {
@@ -22,9 +22,11 @@ export const addSnippets = (
     model: string;
     schema: string;
     preview: string;
+    schemaType: string;
   }>,
 ) => {
-  const snippetPath = path.join(snippetMaterialsPath, message.data.name);
+  const snippetPath = path.join(!message.data.schemaType ? tempGlobalDir.snippetMaterials : tempGlobalDir.blockMaterials, message.data.name);
+
   fs.outputFileSync(
     path.join(snippetPath, 'src', 'template.ejs'),
     message.data.template,
@@ -34,22 +36,25 @@ export const addSnippets = (
     message.data.model,
   );
   fs.outputFileSync(
-    path.join(snippetPath, 'config', 'schema.json'),
-    message.data.schema,
-  );
-  fs.outputFileSync(
     path.join(snippetPath, 'config', 'preview.json'),
     message.data.preview,
   );
-  fs.outputFileSync(
-    path.join(snippetPath, 'script', 'index.js'),
-    `const path = require("path");
+  if (message.data.schemaType) {
+    fs.outputFileSync(
+      path.join(snippetPath, 'config', 'schema.json'),
+      message.data.schema,
+    );
+    fs.outputFileSync(
+      path.join(snippetPath, 'script', 'index.js'),
+      `const path = require("path");
 module.exports = {
   beforeCompile: (context) => {},
   afterCompile: (context) => {
     context.outputChannel.appendLine("compile ${message.data.name} end");
   },
 };`,
-  );
+    );
+  }
+
   return '添加成功';
 };

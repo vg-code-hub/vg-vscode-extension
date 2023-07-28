@@ -7,75 +7,41 @@
  * @Description: 
  */
 import { useEffect } from 'react';
-import { useMount } from 'ahooks';
-import { DownOutlined } from '@ant-design/icons';
-import { Form, Space, Button, Dropdown, message, MenuProps, Modal, Spin } from 'antd';
+import { Form, Space, Button, message, Modal, Spin } from 'antd';
 import { useImmer } from 'use-immer';
 import FormRender, { useForm } from 'form-render';
-import { useParams } from '@umijs/max';
+import { useParams, useLocation, useModel } from '@umijs/max';
 
-import { IGetLocalMaterialsResult, genCodeBySnippetMaterial, getLocalMaterials } from '@/common';
+import { IGetLocalMaterialsResult, genCodeBySnippetMaterial } from '@/common';
 import CodeMirror from '@/components/CodeMirror';
 import AmisComponent from '@/components/AmisComponent';
-import JsonToTs from '@/components/JsonToTs';
 import YapiModal from '@/components/YapiModal';
 import RunScript from '@/components/RunScript';
 
-
 const MaterialDetailPage: React.FC = () => {
   const { name } = useParams();
-  const items: MenuProps['items'] = [
-    {
-      key: '1',
-      label: 'JSON TO TS',
-      onClick: () => {
-        setJsonToTsModalVisble(true)
-      }
-    },
-    {
-      key: '2',
-      label: '根据 YAPI 接口追加模板数据',
-      onClick: () => {
-        setYapiModalVsible(true)
-      }
-    },
-    {
-      key: '3',
-      label: '编辑模板',
-      onClick: () => {
-        setTemplateModalVisble(true);
-      }
-    },
-  ]
-  const [formData, setFormData] = useImmer({});
-  const [loading, setLoading] = useImmer(false);
+  const location = useLocation();
   const form = useForm();
+  const [formData, setFormData] = useImmer({});
+  const { initialState, loading } = useModel('@@initialState', ({ initialState, loading }) => ({ initialState, loading }));
   const [selectedMaterial, setSelectedMaterial] = useImmer<IGetLocalMaterialsResult>({ schema: {}, model: {} } as any);
   const [templateModalVisble, setTemplateModalVisble] = useImmer(false);
-  const [jsonToTsModalVisble, setJsonToTsModalVisble] = useImmer(false);
   const [yapiModalVsible, setYapiModalVsible] = useImmer(false);
   const [scriptModalVisible, setScriptModalVisible] = useImmer(false);
 
   useEffect(() => {
-
-  }, [selectedMaterial])
-
-  useMount(async () => {
-    setLoading(true);
-    getLocalMaterials().then(({ snippets }) => {
-      if (snippets.length) {
-        const selected = snippets.find((s) => s.name === name);
-        if (selected && !selected.preview.schema) {
-          selected.preview.schema = 'form-render';
-        }
-
-        setFormData(selected?.model);
-        setSelectedMaterial(selected!);
-        form.setValues(selected?.model);
-        setLoading(false);
-      }
-    });
-  })
+    if (location.state) {
+      const selected = location.state as IGetLocalMaterialsResult;
+      setFormData(selected.model);
+      setSelectedMaterial(selected);
+      form.setValues(selected.model);
+    } else if (initialState?.localMaterials.snippets) {
+      const selected = initialState?.localMaterials.snippets.find((s) => s.name === name)!;
+      setFormData(selected.model);
+      setSelectedMaterial(selected);
+      form.setValues(selected.model);
+    }
+  }, [location.state, name, initialState])
 
   const watch = {
     '#': (val: any) => {
@@ -172,14 +138,6 @@ const MaterialDetailPage: React.FC = () => {
           />
           <br></br>
           <Space>
-            <Dropdown menu={{ items }}>
-              <a
-                className="ant-dropdown-link"
-                onClick={(e) => e.preventDefault()}
-              >
-                更多功能 <DownOutlined />
-              </a>
-            </Dropdown>
             <Button
               type="primary"
               size="small"
@@ -222,20 +180,7 @@ const MaterialDetailPage: React.FC = () => {
           setYapiModalVsible(false);
         }}
       />
-      <JsonToTs
-        visible={jsonToTsModalVisble}
-        json={selectedMaterial.model}
-        onCancel={() => {
-          setJsonToTsModalVisble(false);
-        }}
-        onOk={(type) => {
-          setSelectedMaterial((s) => ({
-            ...s,
-            model: { ...selectedMaterial.model, type },
-          }));
-          setJsonToTsModalVisble(false);
-        }}
-      />
+
       <Modal
         open={templateModalVisble}
         title="编辑模板"

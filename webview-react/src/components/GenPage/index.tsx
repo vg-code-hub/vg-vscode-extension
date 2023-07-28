@@ -7,15 +7,14 @@
  * @Description: 
  */
 import React, { useEffect, useState } from 'react';
-import { Modal, Form, Input, Checkbox, Card, Space, Divider, Menu, Radio, Select, message } from 'antd';
-import CodeMirror from '../CodeMirror';
-
-import styles from "./index.less";
 import { camelCase, find, snakeCase, upperFirst } from 'lodash';
 import { render as ejsRender } from 'ejs';
+import { useModel } from '@umijs/max';
 import { useImmer } from 'use-immer';
-import { useMount } from 'ahooks';
-import { getLocalMaterials, genPagesCode } from '@/common';
+import { Modal, Form, Input, Checkbox, Card, Space, Divider, Menu, Radio, Select, message } from 'antd';
+import { genPagesCode } from '@/common';
+import CodeMirror from '../CodeMirror';
+import styles from "./index.less";
 
 interface IProps {
   visible: boolean;
@@ -32,7 +31,7 @@ const GenPage: React.FC<IProps> = ({ visible, config, pageName: _pageName, onClo
   const [checkedList, setCheckedList] = useState<any[]>([]);
   const [plainOptions, setPlainOptions] = useState<any[]>([]);
   const [selectPages, setSelectPages] = useImmer<string[]>(['list', 'detail', 'create']);
-
+  const { initialState } = useModel('@@initialState', ({ initialState }) => ({ initialState }));
 
   const [fileItems, setFileItems] = useImmer<any[]>([
     {
@@ -56,12 +55,11 @@ const GenPage: React.FC<IProps> = ({ visible, config, pageName: _pageName, onClo
   const [schema2codeMaterial, setSchema2codeMaterial] = useState<any[]>([]);
   const [codeMap, setCodeMap] = useImmer<Record<string, string>>({});
 
-
-  useMount(async () => {
-    const { schema2code } = await getLocalMaterials();
-    setSchema2codeMaterial(schema2code);
-  })
-
+  useEffect(() => {
+    if (initialState?.localMaterials) {
+      setSchema2codeMaterial(initialState?.localMaterials.schema2code);
+    }
+  }, [initialState?.localMaterials])
 
   useEffect(() => {
     setIndeterminate(!!checkedList.length && checkedList.length < plainOptions.length);
@@ -153,36 +151,28 @@ const GenPage: React.FC<IProps> = ({ visible, config, pageName: _pageName, onClo
         ]
 
         function findCodeTemplate(arr: string[]) {
-          let children = schema2codeMaterial
-          for (let i = 0; i < arr.length; i++) {
-            const name = arr[i];
-            if (!children) return '';
-            if (i !== arr.length - 1) {
-              children = find(children, { name })?.children;
-            } else {
-              let { required = [], properties } = config.value;
 
-              return ejsRender(find(children, { name })?.template, {
-                className: upperFirst(camelCase(snakeCaseName)),
-                camelClassName: camelCase(snakeCaseName),
-                snakeName: snakeCaseName,
-                dataClass: upperFirst(config.key),
-                properties: properties ? Object.keys(properties).map((key) => {
-                  return { key: key, title: properties[key].title, required: required.includes(key) };
-                }) : []
-              });
-            }
-          }
+          let { required = [], properties } = config.value;
+
+          return ejsRender(find(schema2codeMaterial, { name: arr.join('-') })?.template, {
+            className: upperFirst(camelCase(snakeCaseName)),
+            camelClassName: camelCase(snakeCaseName),
+            snakeName: snakeCaseName,
+            dataClass: upperFirst(config.key),
+            properties: properties ? Object.keys(properties).map((key) => {
+              return { key: key, title: properties[key].title, required: required.includes(key) };
+            }) : []
+          });
         }
         if (schema2codeMaterial) {
           _codeMap[`${_key}/${snakeCaseName}_create_page.dart`] = findCodeTemplate(['dart', 'create', 'page'])
           _codeMap[`${_key}/${snakeCaseName}_detail_page.dart`] = findCodeTemplate(['dart', 'detail', 'page'])
-          _codeMap[`${_key}/${snakeCaseName}_list_page.dart`] = findCodeTemplate(['dart', 'refresh-list', 'page'])
-          _codeMap[`${_key}/widgets/${snakeCaseName}_item.dart`] = findCodeTemplate(['dart', 'refresh-list', 'item'])
+          _codeMap[`${_key}/${snakeCaseName}_list_page.dart`] = findCodeTemplate(['dart', 'list', 'page'])
+          _codeMap[`${_key}/widgets/${snakeCaseName}_item.dart`] = findCodeTemplate(['dart', 'list', 'item'])
 
           _codeMap[`${_key}/controllers/${snakeCaseName}_create.dart`] = findCodeTemplate(['dart', 'create', 'controller'])
           _codeMap[`${_key}/controllers/${snakeCaseName}_detail.dart`] = findCodeTemplate(['dart', 'detail', 'controller'])
-          _codeMap[`${_key}/controllers/${snakeCaseName}_list.dart`] = findCodeTemplate(['dart', 'refresh-list', 'controller'])
+          _codeMap[`${_key}/controllers/${snakeCaseName}_list.dart`] = findCodeTemplate(['dart', 'list', 'controller'])
         }
         _codeMap['index.dart'] = `export '${_key}/${snakeCaseName}_create_page.dart';\nexport '${_key}/${snakeCaseName}_detail_page.dart';\nexport '${_key}/${snakeCaseName}_list_page.dart';\n`
       }

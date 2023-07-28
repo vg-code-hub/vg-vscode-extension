@@ -43,7 +43,7 @@ export const pasteToEditor = (content: string, isInsertSnippet = true) => {
 };
 
 export const insertSnippet = (content: string) => {
-  const activeTextEditor = window.activeTextEditor || getLastAcitveTextEditor();
+  const activeTextEditor = getLastAcitveTextEditor();
   if (activeTextEditor === undefined)
     throw new Error('无打开文件');
 

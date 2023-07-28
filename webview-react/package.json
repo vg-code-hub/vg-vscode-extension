@@ -21,8 +21,10 @@
     "form-render": "^2.2.9",
     "jsonlint": "^1.6.3",
     "react": "18.2.0",
+    "react-activation": "^0.12.4",
     "react-dom": "18.2.0",
     "react-simple-image-viewer": "^1.2.2",
+    "umi-plugin-keep-alive": "0.0.1-beta.35",
     "use-immer": "^0.9.0"
   },
   "devDependencies": {

@@ -7,21 +7,23 @@
  * @Description: 
  */
 
+import { existsSync } from '@root/utils';
 import {
   copyMaterialsFromTemp,
   downloadMaterialsFromGit,
   downloadMaterialsFromNpm,
 } from '../../utils/download';
 import { tempGlobalDir } from '../../utils/env';
-import { getLocalMaterials, getLocalSchema2codeMaterials } from '../../utils/materials';
+import { deleteMaterialTemplate, getLocalMaterials } from '../../utils/materials';
 import { materialsPath } from '../../utils/vscodeEnv';
 import { IMessage } from '../type';
 
 const material = {
   getLocalMaterials: () => {
+    if (!existsSync(tempGlobalDir.materials)) return '';
     const data = {
       blocks: getLocalMaterials('blocks', tempGlobalDir.blockMaterials),
-      schema2code: getLocalSchema2codeMaterials(tempGlobalDir.schema2codeMaterials),
+      schema2code: getLocalMaterials('schema2code', tempGlobalDir.schema2codeMaterials),
       snippets: getLocalMaterials('snippets', tempGlobalDir.snippetMaterials),
     };
     return data;
@@ -46,6 +48,15 @@ const material = {
     message: IMessage<{ blocks: string[]; snippets: string[] }>,
   ) => {
     copyMaterialsFromTemp(message.data, materialsPath);
+  },
+
+  deleteMaterialTemplate: async (
+    message: IMessage<{
+      name: string;
+      type: 'schema2code' | 'blocks' | 'snippets';
+    }>,
+  ) => {
+    return deleteMaterialTemplate(message.data);
   },
 };
 

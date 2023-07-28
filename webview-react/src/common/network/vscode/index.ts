@@ -10,6 +10,7 @@ import { AxiosRequestConfig } from 'axios';
 import { request } from './vscode';
 export * from './vscode';
 
+export type IMaterialType = 'blocks' | 'snippets' | 'schema2code';
 export interface IGetLocalMaterialsResult {
   path: string;
   name: string;
@@ -59,7 +60,7 @@ export function getLocalSchemas() {
  * @returns
  */
 export function getLocalMaterials() {
-  return request<{ schema2code: any[], blocks: IGetLocalMaterialsResult[], snippets: IGetLocalMaterialsResult[] }>({
+  return request<{ schema2code: IGetLocalMaterialsResult[], blocks: IGetLocalMaterialsResult[], snippets: IGetLocalMaterialsResult[] }>({
     cmd: 'getLocalMaterials'
   });
 }
@@ -323,6 +324,26 @@ export function createBlockTemplate(data: {
 }) {
   return request<string>({
     cmd: 'createBlockTemplate',
+    data,
+  });
+}
+
+
+/**
+ * @description 删除物料模板
+ * @export
+ * @param {{
+ *   name: string;
+ *   type: 'schema2code' | 'blocks' | 'snippets';
+ * }} data
+ * @returns
+ */
+export function deleteMaterialTemplate(data: {
+  name: string;
+  type: 'schema2code' | 'blocks' | 'snippets';
+}) {
+  return request<string>({
+    cmd: 'deleteMaterialTemplate',
     data,
   });
 }

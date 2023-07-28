@@ -17,11 +17,7 @@ export const materialsPath = path.join(rootPath, 'materials');
 
 export const blockMaterialsPath = path.join(rootPath, 'materials', 'blocks');
 
-export const snippetMaterialsPath = path.join(
-  rootPath,
-  'materials',
-  'snippets',
-);
+export const snippetMaterialsPath = path.join(rootPath, 'materials', 'snippets');
 
 export const getEnv = () => ({
   rootPath,

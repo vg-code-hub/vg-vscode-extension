@@ -34,12 +34,18 @@ dependencies:
   react:
     specifier: 18.2.0
     version: 18.2.0
+  react-activation:
+    specifier: ^0.12.4
+    version: 0.12.4(prop-types@15.8.1)(react@18.2.0)
   react-dom:
     specifier: 18.2.0
     version: 18.2.0(react@18.2.0)
   react-simple-image-viewer:
     specifier: ^1.2.2
     version: 1.2.2(react-dom@18.2.0)(react@18.2.0)
+  umi-plugin-keep-alive:
+    specifier: 0.0.1-beta.35
+    version: 0.0.1-beta.35(prop-types@15.8.1)(react@18.2.0)(umi@4.0.71)
   use-immer:
     specifier: ^0.9.0
     version: 0.9.0(immer@8.0.4)(react@18.2.0)
@@ -5788,6 +5794,18 @@ packages:
       object-assign: 4.1.1
     dev: false
 
+  /create-react-context@0.3.0(prop-types@15.8.1)(react@18.2.0):
+    resolution: {integrity: sha512-dNldIoSuNSvlTJ7slIKC/ZFGKexBMBrrcc+TTe1NdmROnaASuLPvqpwj9v4XS4uXZ8+YPu0sNmShX2rXI5LNsw==}
+    peerDependencies:
+      prop-types: ^15.0.0
+      react: ^0.14.0 || ^15.0.0 || ^16.0.0
+    dependencies:
+      gud: 1.0.0
+      prop-types: 15.8.1
+      react: 18.2.0
+      warning: 4.0.3
+    dev: false
+
   /cropperjs@1.5.13:
     resolution: {integrity: sha512-by7jKAo73y5/Do0K6sxdTKHgndY0NMjG2bEdgeJxycbcmHuCiMXqw8sxy5C5Y5WTOTcDGmbT7Sr5CgKOXR06OA==}
     dev: false
@@ -7280,6 +7298,10 @@ packages:
     resolution: {integrity: sha512-bzh50DW9kTPM00T8y4o8vQg89Di9oLJVLW/KaOGIXJWP/iqCN6WKYkbNOF04vFLJhwcpYUh9ydh/+5vpOqV4YQ==}
     dev: false
 
+  /gud@1.0.0:
+    resolution: {integrity: sha512-zGEOVKFM5sVPPrYs7J5/hYEw2Pof8KCyOwyhG8sAF26mCAeUFAcYPu1mwB7hhpIP29zOIBaDqwuHdLp0jvZXjw==}
+    dev: false
+
   /handle-thing@2.0.1:
     resolution: {integrity: sha512-9Qn4yBxelxoh2Ow62nP+Ka/kMnOXRi8BXnRaUwezLNhqelnN49xKz4F/dPP8OYLxLxq6JDtZb2i9XznUQbNPTg==}
     dev: false
@@ -8136,6 +8158,14 @@ packages:
     dependencies:
       JSV: 4.0.2
       nomnom: 1.8.1
+    dev: false
+
+  /jsx-ast-utils@2.4.1:
+    resolution: {integrity: sha512-z1xSldJ6imESSzOjd3NNkieVJKRlKYSOtMG8SFyCj2FIrvSaSuli/WjpBkEzCBoR9bYYYFgqJw61Xhu7Lcgk+w==}
+    engines: {node: '>=4.0'}
+    dependencies:
+      array-includes: 3.1.6
+      object.assign: 4.1.4
     dev: false
 
   /jsx-ast-utils@3.3.3:
@@ -10928,6 +10958,20 @@ packages:
       react-dom: 18.2.0(react@18.2.0)
     dev: false
 
+  /react-activation@0.12.4(prop-types@15.8.1)(react@18.2.0):
+    resolution: {integrity: sha512-6jJtnUnQBKCrWgvHkzCJP3QZAtthnhDuoPa5LJnj1+1TxS5qkh3Z74zdNZY40wMbkTsLbo6CYoS51Fx/bTM3/w==}
+    peerDependencies:
+      react: '>=16'
+    dependencies:
+      create-react-context: 0.3.0(prop-types@15.8.1)(react@18.2.0)
+      hoist-non-react-statics: 3.3.2
+      react: 18.2.0
+      react-node-key: 0.4.0(react@18.2.0)
+      szfe-tools: 0.0.0-beta.7
+    transitivePeerDependencies:
+      - prop-types
+    dev: false
+
   /react-base16-styling@0.6.0:
     resolution: {integrity: sha512-yvh/7CArceR/jNATXOKDlvTnPKPmGZz7zsenQ3jUwLzHkNUR0CvY3yGYJbWJ/nnxsL8Sgmt5cO3/SILVuPO6TQ==}
     dependencies:
@@ -11107,6 +11151,16 @@ packages:
 
   /react-merge-refs@1.1.0:
     resolution: {integrity: sha512-alTKsjEL0dKH/ru1Iyn7vliS2QRcBp9zZPGoWxUOvRGWPUYgjo+V01is7p04It6KhgrzhJGnIj9GgX8W4bZoCQ==}
+    dev: false
+
+  /react-node-key@0.4.0(react@18.2.0):
+    resolution: {integrity: sha512-puiuP2QYEuNBVVvcjpUE8d8/jdAhiXHBHMmjZzQT4+fe276RMYea/tY7JoZoYlrhAX8DORLPvjySjXYJZ1m6/A==}
+    peerDependencies:
+      react: '>=16'
+    dependencies:
+      jsx-ast-utils: 2.4.1
+      react: 18.2.0
+      szfe-tools: 0.0.0-beta.7
     dev: false
 
   /react-overlays@5.1.1(react-dom@18.2.0)(react@18.2.0):
@@ -12339,6 +12393,12 @@ packages:
       '@pkgr/utils': 2.4.1
       tslib: 2.5.3
 
+  /szfe-tools@0.0.0-beta.7:
+    resolution: {integrity: sha512-/M7+Tel2G8zapfDYZlz17hf9ViqAi/loZMfM81b5iZMyaWL/t5dajBszEBI2kyIDFzlLT4btBcq+BimFgmAHug==}
+    dependencies:
+      '@babel/runtime': 7.22.5
+    dev: false
+
   /table@6.8.1:
     resolution: {integrity: sha512-Y4X9zqrCftUhMeH2EptSSERdVKt/nEdijTOacGD/97EKjhQ/Qs8RTlEGABSJNNN8lac9kheH+af7yAkEWlgneA==}
     engines: {node: '>=10.0.0'}
@@ -12594,6 +12654,18 @@ packages:
 
   /uc.micro@1.0.6:
     resolution: {integrity: sha512-8Y75pvTYkLJW2hWQHXxoqRgV7qb9B+9vFEtidML+7koHUFapnVJAZ6cKs+Qjz5Aw3aZWHMC6u0wJE3At+nSGwA==}
+    dev: false
+
+  /umi-plugin-keep-alive@0.0.1-beta.35(prop-types@15.8.1)(react@18.2.0)(umi@4.0.71):
+    resolution: {integrity: sha512-VaQXS911MnBzdnEZkSjqF+GbbfIby4iqNPLH4PDbOVGR8fNZgAF+9u4iWUPESJQ4receFDT/tkqv6nZ+W1ANRg==}
+    peerDependencies:
+      umi: 3.x || 4.x
+    dependencies:
+      react-activation: 0.12.4(prop-types@15.8.1)(react@18.2.0)
+      umi: 4.0.71(@babel/core@7.22.5)(@types/react@18.2.12)(eslint@8.35.0)(postcss@8.4.24)(prettier@2.8.8)(react-dom@18.2.0)(react@18.2.0)(styled-components@5.3.11)(stylelint@14.8.2)(typescript@5.1.3)(webpack@5.87.0)
+    transitivePeerDependencies:
+      - prop-types
+      - react
     dev: false
 
   /umi@4.0.71(@babel/core@7.22.5)(@types/react@18.2.12)(eslint@8.35.0)(postcss@8.4.24)(prettier@2.8.8)(react-dom@18.2.0)(react@18.2.0)(styled-components@5.3.11)(stylelint@14.8.2)(typescript@5.1.3)(webpack@5.87.0):
