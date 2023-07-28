@@ -20,7 +20,11 @@ jobs:
       #   uses: DerYeger/yarn-setup-action@v1.0.1
       #   with:
       #     node-version: 16
-      - run: pnpm install --frozen-lockfile
+      - name: pnpm install
+        run: pnpm install --frozen-lockfile |
+          pnpm --dir webview-react install --frozen-lockfile
+      - name: build webview
+        run: pnpm webview:build
       - name: Publish to Open VSX Registry
         uses: HaaLeo/publish-vscode-extension@v1
         id: publishToOpenVSX
