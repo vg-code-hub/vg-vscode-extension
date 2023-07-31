@@ -38,14 +38,14 @@ const View: React.FC<IProps> = ({ visible, onClose }) => {
       okButtonProps={{ disabled: model.processing, loading: model.processing }}
     >
       <Form layout="vertical">
-        <Form.Item label="类型" required>
+        <Form.Item label="仓库类型" required>
           <Select
             placeholder="请选择"
             value={model.formData.type}
             onChange={(value) => {
               model.setFormData((s) => ({
-                ...s,
                 url: '',
+                tag: '',
                 type: value,
               }));
             }}
@@ -56,24 +56,54 @@ const View: React.FC<IProps> = ({ visible, onClose }) => {
             </Select.Option>
           </Select>
         </Form.Item>
-        {model.formData.type && (
-          <Form.Item
-            label={model.formData.type === 'git' ? '仓库地址' : '包名称'}
-            required
+        <Form.Item label="项目类型" required>
+          <Select
+            placeholder="请选择"
+            value={model.formData.projectType}
+            onChange={(value) => {
+              model.setFormData((s) => {
+                s.projectType = value
+              });
+            }}
+            options={[
+              { label: 'flutter', value: 'flutter' },
+              { label: 'vue', value: 'vue' },
+              { label: 'react', value: 'react' },
+            ]}
           >
-            <Input
-              placeholder={`输入${model.formData.type === 'git' ? 'git仓库地址' : 'npm包名称'
-                }`}
-              value={model.formData.url}
-              onChange={(e) => {
-                const { value } = e.target;
-                model.setFormData((s) => ({
-                  ...s,
-                  url: value,
-                }));
-              }}
-            />
-          </Form.Item>
+          </Select>
+        </Form.Item>
+        {model.formData.type && (
+          <>
+            <Form.Item
+              label={model.formData.type === 'git' ? '仓库地址' : '包名称'}
+              required
+            >
+              <Input
+                placeholder={`输入${model.formData.type === 'git' ? 'git仓库地址' : 'npm包名称'
+                  }`}
+                value={model.formData.url}
+                onChange={(e) => {
+                  const { value } = e.target;
+                  model.setFormData((s) => {
+                    s.url = value
+                  });
+                }}
+              />
+            </Form.Item>
+            {model.formData.type === 'git' && <Form.Item label='tag'>
+              <Input
+                placeholder='输入tag'
+                value={model.formData.tag}
+                onChange={(e) => {
+                  const { value } = e.target;
+                  model.setFormData((s) => {
+                    s.url = value
+                  });
+                }}
+              />
+            </Form.Item>}
+          </>
         )}
       </Form>
       <FormModal

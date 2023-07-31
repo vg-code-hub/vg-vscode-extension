@@ -9,7 +9,7 @@
 import React, { useEffect } from 'react';
 import { message } from 'antd';
 import { useForm } from 'form-render';
-import { createProject, selectDirectory } from '@/common';
+import { IScaffoldResponse, createProject, selectDirectory } from '@/common';
 import { defaultConfig, useModel } from './model';
 import Service from './service';
 
@@ -17,7 +17,7 @@ export const usePresenter = (props: {
   visible: boolean;
   config: {
     formSchema?: { schema?: object; formData?: object;[key: string]: any };
-  };
+  } & IScaffoldResponse['scaffolds'][0];
   onClose: (ok?: boolean) => void;
 }) => {
   const model = useModel();
@@ -62,9 +62,10 @@ export const usePresenter = (props: {
       },
       immediateOpen: model.config.immediateOpen,
       createDir: `${model.config.createDir}/${model.config.projectName}`,
+      type: props.config.type,
     }).then(() => {
       message.success('创建成功');
-      props.onClose(true);
+      console.log('创建成功');
     });
   };
 

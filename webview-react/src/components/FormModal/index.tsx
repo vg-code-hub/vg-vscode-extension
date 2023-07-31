@@ -10,12 +10,13 @@ import React from 'react';
 import { Modal, Form, Input, Checkbox } from 'antd';
 import FormRender from 'form-render';
 import { usePresenter } from './presenter';
+import { IScaffoldResponse } from '@/common';
 
 interface IProps {
   visible: boolean;
   config: {
     formSchema?: { schema?: object; formData?: object;[key: string]: any };
-  };
+  } & IScaffoldResponse['scaffolds'][0];
   onClose: (ok?: boolean) => void;
 }
 
@@ -32,6 +33,7 @@ const View: React.FC<IProps> = ({ visible, config, onClose }) => {
       }}
       onOk={() => {
         presenter.createProjectByVsCode();
+        onClose();
       }}
       cancelText="取消"
       okText="确定"

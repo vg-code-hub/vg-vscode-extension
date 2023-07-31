@@ -22,10 +22,11 @@ export const downloadScaffold = (
   message: IMessage<{
     type: 'git' | 'npm';
     repository: string;
+    tag?: string;
   }>,
 ) => {
   if (message.data.type === 'git') {
-    const config = downloadScaffoldFromGit(message.data.repository);
+    const config = downloadScaffoldFromGit(message.data.repository, message.data.tag);
     return config;
   }
 };
@@ -40,9 +41,10 @@ export const createProject = async (
     model: any;
     createDir: string;
     immediateOpen: boolean;
+    type?: 'flutter' | 'react' | 'vue';
   }>,
 ) => {
-  await compileScaffold(message.data.model, message.data.createDir);
+  await compileScaffold(message.data.model, message.data.createDir, message.data.type);
   if (message.data.immediateOpen)
     commands.executeCommand(
       'vscode.openFolder',

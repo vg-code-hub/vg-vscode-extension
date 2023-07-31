@@ -413,6 +413,23 @@ export function savePluginConfig(data: IConfigResult) {
   });
 }
 
+export interface IScaffoldResponse {
+  category: string;
+  icon: string;
+  uuid: string;
+  scaffolds: {
+    title: string;
+    description: string;
+    screenshot: string;
+    repository: string;
+    repositoryType: 'git' | 'npm';
+    uuid: string;
+    tag?: string;
+    type?: 'flutter' | 'react' | 'vue';
+  }[];
+}
+
+
 /**
  * 获取脚手架列表
  *
@@ -420,21 +437,7 @@ export function savePluginConfig(data: IConfigResult) {
  * @param {string} [url]
  */
 export function getScaffolds(url: string) {
-  return request<
-    {
-      category: string;
-      icon: string;
-      uuid: string;
-      scaffolds: {
-        title: string;
-        description: string;
-        screenshot: string;
-        repository: string;
-        repositoryType: 'git' | 'npm';
-        uuid: string;
-      }[];
-    }[]
-  >({
+  return request<IScaffoldResponse[]>({
     cmd: 'getScaffolds',
     data: {
       url,
@@ -455,6 +458,7 @@ export function getScaffolds(url: string) {
 export function downloadScaffoldByVsCode(data: {
   type: 'git' | 'npm';
   repository: string;
+  tag?: string
 }) {
   return request<{
     config: { formSchema?: { schema?: object; formData?: object } };
@@ -503,9 +507,10 @@ export function selectDirectory() {
  * @returns
  */
 export function createProject(data: {
-  model: any;
+  model: { projectName: string;[key: string]: any };
   createDir: string;
   immediateOpen: boolean;
+  type?: IScaffoldResponse['scaffolds'][0]['type'];
 }) {
   return request<string>({
     cmd: 'createProject',

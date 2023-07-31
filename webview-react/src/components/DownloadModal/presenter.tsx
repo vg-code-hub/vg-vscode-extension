@@ -21,7 +21,11 @@ export const usePresenter = (props: {
 
   useEffect(() => {
     if (props.visible) {
-      model.setFormData({} as any);
+      model.setFormData({
+        type: 'git',
+        projectType: 'flutter',
+        url: ''
+      });
     }
   }, [props.visible]);
 
@@ -32,12 +36,13 @@ export const usePresenter = (props: {
     }
     model.setProcessing(true);
     downloadScaffoldByVsCode({
+      tag: model.formData.tag,
       type: model.formData.type,
       repository: model.formData.url,
     })
       .then((res) => {
         model.setFormModal((s) => {
-          s.config = res;
+          s.config = { ...res, type: model.formData.projectType };
           s.visible = true;
         });
       })

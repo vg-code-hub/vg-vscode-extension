@@ -9,42 +9,22 @@
 import { Row, Col, Spin, Button, Tooltip } from 'antd';
 import { useImmer } from 'use-immer';
 import { SyncOutlined, QuestionCircleOutlined } from '@ant-design/icons';
-import { useEffect } from 'react';
-import { downloadScaffoldByVsCode, getScaffolds } from '@/common';
+import { useEffect, useState } from 'react';
+import { IScaffoldResponse, downloadScaffoldByVsCode, getScaffolds } from '@/common';
 import FormModal from '@/components/FormModal';
 import DownloadModal from '@/components/DownloadModal';
 import LocalProjectModal from '@/components/LocalProjectModal';
 import './index.less';
 
+type IScaffold = IScaffoldResponse['scaffolds'][0];
+
 const ScaffoldPage: React.FC = () => {
   const [categories, setCategories] = useImmer<
-    { name: string; icon: string; uuid: string }[]
+    { name: string; icon: string; }[]
   >([]);
 
-  const [allScaffolds, setAllScaffolds] = useImmer<
-    {
-      category: string;
-      title: string;
-      description: string;
-      screenshot: string;
-      repository: string;
-      repositoryType: 'git' | 'npm';
-      uuid: string;
-    }[]
-  >([]);
-
-  const [scaffolds, setScaffolds] = useImmer<
-    {
-      category: string;
-      title: string;
-      description: string;
-      screenshot: string;
-      repository: string;
-      repositoryType: 'git' | 'npm';
-      uuid: string;
-    }[]
-  >([]);
-
+  const [allScaffolds, setAllScaffolds] = useState<IScaffoldResponse[]>([]);
+  const [scaffolds, setScaffolds] = useState<IScaffold[]>([]);
   const [currentCategory, setCurrentCategory] = useImmer('');
 
   const [formModal, setFormModal] = useImmer<{ visible: boolean; config: any }>(
@@ -72,9 +52,9 @@ const ScaffoldPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (currentCategory) {
+    if (currentCategory && allScaffolds.length > 0) {
       setScaffolds(
-        allScaffolds.filter((s) => s.category === currentCategory),
+        allScaffolds.find((s) => s.category === currentCategory)!.scaffolds,
       );
     }
   }, [currentCategory]);
@@ -88,33 +68,30 @@ const ScaffoldPage: React.FC = () => {
         'https://gitee.com/lowcoding/scaffold/raw/master/index.json',
       ),
     ];
+
     Promise.all(promises)
       .then((allRes) => {
         const res = allRes.flat();
+
+        res[0].scaffolds.push({
+          uuid: "29066c2267cf4d4e91684e9204cbe021",
+          title: "flutter-base",
+          description: "flutter getx 组件化 vgcode",
+          screenshot: "https://gitee.com/img-host/img-host/raw/master/2020/11/05/1604587962875.jpg",
+          repository: "git@git.grizzlychina.com:frontend/xt_app.git",
+          tag: '1.0.0',
+          type: 'flutter',
+          repositoryType: "git"
+        })
         setCategories(
           res.map((s) => ({
             name: s.category,
             icon: s.icon,
-            uuid: s.uuid,
           })),
         );
-        const scaffolds: typeof allScaffolds = [];
-        res.map((r) => {
-          r.scaffolds.map((s) => {
-            scaffolds.push({
-              category: r.uuid,
-              title: s.title,
-              description: s.description,
-              screenshot: s.screenshot,
-              repository: s.repository,
-              repositoryType: s.repositoryType,
-              uuid: s.uuid,
-            });
-          });
-        });
-        setAllScaffolds(scaffolds);
+        setAllScaffolds(res);
         if (res.length > 0) {
-          setCurrentCategory(res[0].uuid);
+          setCurrentCategory(res[0].category);
         }
       })
       .finally(() => {
@@ -124,11 +101,9 @@ const ScaffoldPage: React.FC = () => {
       });
   };
 
-  const changeCategory = (uuid: string) => {
-    if (uuid === currentCategory) {
-      return;
-    }
-    setCurrentCategory(uuid);
+  const changeCategory = (name: string) => {
+    if (name === currentCategory) return;
+    setCurrentCategory(name);
   };
 
   const downloadScaffold = (config: typeof scaffolds[0]) => {
@@ -138,11 +113,12 @@ const ScaffoldPage: React.FC = () => {
     downloadScaffoldByVsCode({
       repository: config.repository,
       type: config.repositoryType,
+      tag: config.tag,
     })
       .then((res) => {
         setFormModal((s) => {
           s.visible = true;
-          s.config = res;
+          s.config = Object.assign({}, config, res);
         });
       })
       .finally(() => {
@@ -179,18 +155,18 @@ const ScaffoldPage: React.FC = () => {
             <div className="category">
               {categories.map((item) => (
                 <div
-                  className={`category-item ${currentCategory === item.uuid ? 'checked-item' : ''
+                  className={`category-item ${currentCategory === item.name ? 'checked-item' : ''
                     }`}
-                  key={item.uuid}
+                  key={item.name}
                   onClick={() => {
-                    changeCategory(item.uuid);
+                    changeCategory(item.name);
                   }}
                 >
                   <div className="icon">
                     <img src={item.icon} />
                   </div>
                   <div className="title">{item.name}</div>
-                  {currentCategory === item.uuid && (
+                  {currentCategory === item.name && (
                     <div className="badge">
                       <span className="tick">✓</span>
                     </div>
@@ -218,9 +194,9 @@ const ScaffoldPage: React.FC = () => {
           </Col>
           <Col>
             <div className="scaffold">
+              {scaffolds.length}
               {scaffolds.map((s) => (
                 <div
-                  key={s.uuid}
                   className="scaffold-item"
                   onClick={() => {
                     downloadScaffold(s);
