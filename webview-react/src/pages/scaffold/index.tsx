@@ -10,7 +10,7 @@ import { Row, Col, Spin, Button, Tooltip } from 'antd';
 import { useImmer } from 'use-immer';
 import { SyncOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
-import { IScaffoldResponse, downloadScaffoldByVsCode, getScaffolds } from '@/common';
+import { IScaffoldResponse, downloadScaffoldByVsCode, getPluginConfig, getScaffolds } from '@/common';
 import FormModal from '@/components/FormModal';
 import DownloadModal from '@/components/DownloadModal';
 import LocalProjectModal from '@/components/LocalProjectModal';
@@ -59,46 +59,24 @@ const ScaffoldPage: React.FC = () => {
     }
   }, [currentCategory]);
 
-  const fetchScaffolds = () => {
-    setLoading((s) => {
-      s.fetch = true;
-    });
-    const promises: ReturnType<typeof getScaffolds>[] = [
-      getScaffolds(
-        'https://gitee.com/lowcoding/scaffold/raw/master/index.json',
-      ),
-    ];
+  const fetchScaffolds = async () => {
+    setLoading((s) => { s.fetch = true; });
+    try {
+      const { scaffoldJson } = await getPluginConfig();
+      const res = await getScaffolds(scaffoldJson);
 
-    Promise.all(promises)
-      .then((allRes) => {
-        const res = allRes.flat();
-
-        res[0].scaffolds.push({
-          uuid: "29066c2267cf4d4e91684e9204cbe021",
-          title: "flutter-base",
-          description: "flutter getx 组件化 vgcode",
-          screenshot: "https://gitee.com/img-host/img-host/raw/master/2020/11/05/1604587962875.jpg",
-          repository: "git@git.grizzlychina.com:frontend/xt_app.git",
-          tag: '1.0.0',
-          type: 'flutter',
-          repositoryType: "git"
-        })
-        setCategories(
-          res.map((s) => ({
-            name: s.category,
-            icon: s.icon,
-          })),
-        );
-        setAllScaffolds(res);
-        if (res.length > 0) {
-          setCurrentCategory(res[0].category);
-        }
-      })
-      .finally(() => {
-        setLoading((s) => {
-          s.fetch = false;
-        });
-      });
+      setCategories(
+        res.map((s) => ({
+          name: s.category,
+          icon: s.icon,
+        })),
+      );
+      setAllScaffolds(res);
+      if (res.length > 0) {
+        setCurrentCategory(res[0].category);
+      }
+    } catch (error) { }
+    setLoading((s) => { s.fetch = false; });
   };
 
   const changeCategory = (name: string) => {
@@ -137,7 +115,7 @@ const ScaffoldPage: React.FC = () => {
         <Row className="header">
           <Col span={20}>
             选择模板创建应用{' '}
-            <Tooltip title="分享物料可提交到https://github.com/lowcoding/scaffold">
+            <Tooltip title="分享物料可提交到https://github.com/JimmyZDD/vg-materials">
               <QuestionCircleOutlined />
             </Tooltip>
           </Col>
@@ -213,6 +191,7 @@ const ScaffoldPage: React.FC = () => {
                   </div>
                   <div className="title">{s.title}</div>
                   <div className="description">{s.description}</div>
+                  {s.tag && <div className="description">tag: {s.tag}</div>}
                 </div>
               ))}
             </div>

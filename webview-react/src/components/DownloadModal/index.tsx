@@ -56,23 +56,6 @@ const View: React.FC<IProps> = ({ visible, onClose }) => {
             </Select.Option>
           </Select>
         </Form.Item>
-        <Form.Item label="项目类型" required>
-          <Select
-            placeholder="请选择"
-            value={model.formData.projectType}
-            onChange={(value) => {
-              model.setFormData((s) => {
-                s.projectType = value
-              });
-            }}
-            options={[
-              { label: 'flutter', value: 'flutter' },
-              { label: 'vue', value: 'vue' },
-              { label: 'react', value: 'react' },
-            ]}
-          >
-          </Select>
-        </Form.Item>
         {model.formData.type && (
           <>
             <Form.Item

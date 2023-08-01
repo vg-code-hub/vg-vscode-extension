@@ -1,6 +1,7 @@
 export default {
   "type": "dart",
-  "yapi": {
+  "scaffoldJson": "https://raw.githubusercontent.com/JimmyZDD/vg-materials/main/scaffold/index.json",
+  "swagger": {
     "jsonUrl": "http://127.0.0.1:4523/export/openapi?projectId=2540665&version=3.0",
     "outputDir": "api",
     "folderFilter": [

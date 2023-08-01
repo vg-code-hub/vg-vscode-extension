@@ -25,6 +25,9 @@ dependencies:
   glob:
     specifier: ^8.1.0
     version: 8.1.0
+  gradlejs:
+    specifier: ^1.0.0
+    version: 1.0.0
   jimp:
     specifier: ^0.22.8
     version: 0.22.8
@@ -1167,6 +1170,10 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
+  /bluebird@3.3.5:
+    resolution: {integrity: sha512-faZBGhJIH4H7lQm5LLmXwV8tAfBQwG+2iijIMHiFc99xKH8BKzyXHD7sie5diltjZXwnNA7IKLkkYE3WUnKGFw==}
+    dev: false
+
   /bmp-js@0.1.0:
     resolution: {integrity: sha512-vHdS19CnY3hwiNdkaqk93DvjVLfbEcI8mys4UjuWrlX1haDmroo8o4xCzh4wD6DGV6HxRCyauwhHRqMTfERtjw==}
     dev: false
@@ -1967,6 +1974,13 @@ packages:
 
   /graceful-fs@4.2.11:
     resolution: {integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==}
+
+  /gradlejs@1.0.0:
+    resolution: {integrity: sha512-0ter5XIaqLo2CgLOrpXe+45xeY4wyVdbRpCKDF+RXp0qBjwGgag753OVtLXTtV9Q4lirLnjoAvJnB0E9lFMqOw==}
+    dependencies:
+      bluebird: 3.3.5
+      underscore: 1.8.3
+    dev: false
 
   /grapheme-splitter@1.0.4:
     resolution: {integrity: sha512-bzh50DW9kTPM00T8y4o8vQg89Di9oLJVLW/KaOGIXJWP/iqCN6WKYkbNOF04vFLJhwcpYUh9ydh/+5vpOqV4YQ==}
@@ -3280,6 +3294,10 @@ packages:
   /typical@5.2.0:
     resolution: {integrity: sha512-dvdQgNDNJo+8B2uBQoqdb11eUCE1JQXhvjC/CZtgvZseVd5TYMXnq0+vuUemXbd/Se29cTaUuPX3YIc2xgbvIg==}
     engines: {node: '>=8'}
+    dev: false
+
+  /underscore@1.8.3:
+    resolution: {integrity: sha512-5WsVTFcH1ut/kkhAaHf4PVgI8c7++GiVcpCGxPouI6ZVjsqPnSDf8h/8HtVqc0t4fzRXwnMK70EcZeAs3PIddg==}
     dev: false
 
   /universalify@2.0.0:

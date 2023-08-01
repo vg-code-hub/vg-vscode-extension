@@ -14,9 +14,10 @@ import { newGetxGetBuilderPage } from './commands/new-getx-getbuilder-page';
 import { newGetxFullPage } from './commands/new-getx-full-page';
 import { newGetxStatefulWidgetGetBuilderPage } from './commands/new-getx-stateful-getbuilder-page';
 import { routersGenerate } from './commands/routers-generate';
-import { genVgcodeConfig, genWebapiForDart, genWebapiForTypescript } from './swagger-generator';
+import { genWebapiForDart, genWebapiForTypescript } from './swagger-generator';
 import { commonCommands } from './commands/common';
 import { registerCompletion } from './commands/registerCompletion';
+import { genVgcodeConfig } from './utils';
 
 
 export function activate(context: vscode.ExtensionContext) {

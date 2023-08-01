@@ -54,33 +54,23 @@ class SwaggerConfig {
   };
 
   async getConfig(rootPath: string) {
-    if (!existsSync(rootPath.concat(`/vgcode.yaml`))) {
-      await new Promise<void>((resolve) => {
-        commands.executeCommand('extension.vgcode-config-init').then(() => {
-          setTimeout(resolve, 100);
-        });
-      });
-      throw Error('config your vgcode.yaml then  try again');
-    }
+    if (!existsSync(rootPath.concat(`/vgcode.yaml`))) throw Error('config your vgcode.yaml then  try again');
 
-    const data = getConfig().yapi;
-    let folderFilter = data.folderFilter;
-    if (folderFilter) {
+    const data = getConfig().swagger;
+    let folderFilter: (string | RegExp)[] = [];
+    if (data.folderFilter) {
       if (!Array.isArray(folderFilter)) throw Error('folderFilter must be array');
-      folderFilter = folderFilter.map(getRegExp);
+      folderFilter = data.folderFilter.map(getRegExp);
     }
-    let customPathFolder = data.customPathFolder;
-    if (customPathFolder) {
-      let mapCustomPathFolder = new Map();
-      for (const key in customPathFolder) {
-        const element = customPathFolder[key];
+    let customPathFolder = new Map();
+    if (data.customPathFolder)
+      for (const key in data.customPathFolder) {
+        const element = data.customPathFolder[key];
         let _key = getRegExp(key);
-        mapCustomPathFolder.set(_key, element);
+        customPathFolder.set(_key, element);
       }
-      data.customPathFolder = mapCustomPathFolder;
-    }
 
-    this._config = { ...data, outputDir: data.outputDir ?? 'api', folderFilter };
+    this._config = { ...data, outputDir: data.outputDir ?? 'api', rootPath, swaggerVersion: 3, folderFilter, customPathFolder };
     return this.config;
   }
 

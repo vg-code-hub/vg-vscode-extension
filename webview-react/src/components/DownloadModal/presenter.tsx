@@ -23,7 +23,6 @@ export const usePresenter = (props: {
     if (props.visible) {
       model.setFormData({
         type: 'git',
-        projectType: 'flutter',
         url: ''
       });
     }
@@ -42,7 +41,7 @@ export const usePresenter = (props: {
     })
       .then((res) => {
         model.setFormModal((s) => {
-          s.config = { ...res, type: model.formData.projectType };
+          s.config = res;
           s.visible = true;
         });
       })

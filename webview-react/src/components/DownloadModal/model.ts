@@ -11,17 +11,14 @@ import { useImmer } from "use-immer";
 export const useModel = () => {
   const [formData, setFormData] = useImmer<{
     type: 'git' | 'npm';
-    projectType: 'flutter' | 'react' | 'vue';
     url: string;
     tag?: string;
   }>({
     type: 'git',
-    projectType: 'flutter',
     url: ''
   });
 
   const [processing, setProcessing] = useImmer(false);
-
   const [formModal, setFormModal] = useImmer<{ visible: boolean; config: any }>(
     {
       visible: false,

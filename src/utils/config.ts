@@ -8,24 +8,26 @@
  */
 import * as path from 'path';
 import * as fs from 'fs-extra';
-import { readFileSync } from "@root/utils";
+import { Uri, commands, window } from "vscode";
+
+import { existsSync, getRootPath, readFileSync } from "@root/utils";
 import { parse, stringify } from 'yaml';
 import { rootPath } from './vscodeEnv';
 
 const defaultConfig: Config = {
   type: "dart",
-  yapi: {
+  scaffoldJson: 'https://raw.githubusercontent.com/JimmyZDD/vg-materials/main/scaffold/index.json',
+  swagger: {
     jsonUrl: 'http://127.0.0.1:4523/export/openapi?projectId=xxx&version=3.0',
     outputDir: 'api',
-    overwrite: false,
+    overwrite: true,
   },
-  mock: { mockKeyWordEqual: [], mockKeyWordLike: [] },
-  commonlyUsedBlock: [],
 };
 
 export type Config = {
   type: "dart" | "typescript"
-  yapi: {
+  scaffoldJson: string
+  swagger: {
     jsonUrl: string;
     outputDir: string;
     overwrite: boolean;
@@ -50,11 +52,21 @@ export type Config = {
   commonlyUsedBlock?: string[];
 };
 
-export const getConfig = () => {
+export const getConfig: () => Config = () => {
   if (fs.existsSync(rootPath.concat(`/vgcode.yaml`))) {
     const file = readFileSync(rootPath.concat(`/vgcode.yaml`), 'utf8');
+    if (parse(file).yapi) window.showErrorMessage('发现旧版 vgcode.yaml 立即迁移配置', '确定').then((res) => {
+      if (res) {
+        fs.copySync(rootPath.concat(`/vgcode.yaml`), rootPath.concat(`/vgcode.yaml.old`));
+        fs.rmSync(rootPath.concat(`/vgcode.yaml`));
+        commands.executeCommand('extension.vgcode-config-init');
+      }
+    });
     return parse(file);
   }
+  if (!existsSync(rootPath.concat(`/vgcode.yaml`))) window.showInformationMessage('初始化 vgcode.yaml', '确定').then((res) => {
+    if (res) commands.executeCommand('extension.vgcode-config-init');
+  });
   return defaultConfig;
 };
 
@@ -72,3 +84,54 @@ export const saveConfig = (config: Config) => {
  * @returns
  */
 export const getTemplateFilePath = () => 'codeTemplate';
+
+
+const values = `# swagger 配置文件
+# http://127.0.0.1:4523/export/openapi?projectId=2540665&version=2.0
+# http://127.0.0.1:4523/export/openapi?projectId=2540665&version=3.1
+# http://127.0.0.1:4523/export/openapi?projectId=2540665&version=3.0
+# https://petstore.swagger.io/v2/swagger.json
+jsonUrl: https://petstore.swagger.io/v2/swagger.json
+outputDir: api
+overwrite: true # 是否覆盖requests和entitys
+# 1、首先过滤需要的文件夹[folderFilter]， 2、然后根据 customPathFolder ｜ customModelFolder 自定义 Folder
+# 3、最后如果没有第二步，folderMap 转换 folder path
+folderFilter:
+  - app接口
+  # - /^app接口/
+  # - /^app接口模型/
+customPathFolder:
+  /v1/app/login: test/login
+  # string startsWith
+  /v1/common/upload: test/upload
+  # reg match
+  /v1/driver.*/: test/driver
+customModelFolder:
+  DeviceListResp: test
+  DeviceHistoryNewResp: test/history
+folderMap:
+  app接口: app
+  app接口模型: app
+  app模型: app
+  "驾驶员:driver": driver
+  "项目:project": project
+`;
+export const genVgcodeConfig = async (uri: Uri) => {
+  try {
+    let rootPath = getRootPath(undefined);
+    if (!rootPath) throw Error('no root path');
+
+    if (!existsSync(rootPath.concat(`/vgcode.yaml`)))
+      saveConfig(getConfig());
+
+    window.showInformationMessage(
+      `Successfully Generated api yaml`
+    );
+  } catch (error) {
+    window.showErrorMessage(
+      `Error:
+        ${error instanceof Error ? error.message : JSON.stringify(error)}`
+    );
+  }
+};
+

@@ -62,7 +62,6 @@ export const usePresenter = (props: {
       },
       immediateOpen: model.config.immediateOpen,
       createDir: `${model.config.createDir}/${model.config.projectName}`,
-      type: props.config.type,
     }).then(() => {
       message.success('创建成功');
       console.log('创建成功');

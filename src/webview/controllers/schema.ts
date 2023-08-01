@@ -6,7 +6,6 @@
  * @FilePath: /vg-vscode-extension/src/webview/controllers/schema.ts
  * @Description: 
  */
-import { SwaggerConfig } from '@root/swagger-generator/utils';
 import { getLocalSchemas } from '../../utils/schema';
 import { existsSync, getConfig, getRootPath, join, mkdirpSync, writeFileSync } from '@root/utils';
 
@@ -14,18 +13,11 @@ const schema = {
   getLocalSchemas: async () => {
     let rootPath = getRootPath(undefined);
     if (!rootPath) throw Error('no root path');
-    await SwaggerConfig.instance.getConfig(rootPath);
-    const { type, yapi: { outputDir } } = getConfig();
+    const { type, swagger: { outputDir } } = getConfig();
     const targetDirectory = outputDir.startsWith('/') ? join(rootPath, outputDir) : join(rootPath, type === 'dart' ? 'lib' : 'src', outputDir);
     return getLocalSchemas(targetDirectory);
   },
   genPagesCode: async ({ data: codeMap }: Record<string, any>) => {
-    // let rootPath = getRootPath(undefined);
-    // if (!rootPath) throw Error('no root path');
-    // await SwaggerConfig.instance.getConfig(rootPath);
-    // const { type, yapi: { outputDir } } = getConfig();
-    // const targetDirectory = outputDir.startsWith('/') ? join(rootPath, outputDir) : join(rootPath, type === 'dart' ? 'lib' : 'src', outputDir);
-    // return getLocalSchemas(targetDirectory);
     let rootPath = getRootPath(undefined);
     if (!rootPath) throw Error('no root path');
 

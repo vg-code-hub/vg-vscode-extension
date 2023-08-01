@@ -21,7 +21,11 @@ const schame: any = {
     "type": {
       "title": "项目类别",
       "type": "string",
+      "labelWidth": 120,
       "style": { "backgroundColor": "#fff" },
+      "ui:options": {
+        "labelAlign": "left"
+      },
       "enum": [
         "dart",
         "typescript"
@@ -32,7 +36,18 @@ const schame: any = {
       ],
       "widget": "radio"
     },
-    "yapi": {
+    "scaffoldJson": {
+      "title": "脚手架 json 文件",
+      "type": "string",
+      "description": "",
+      "labelWidth": 120,
+      "ui:readonly": false,
+      "ui:options": {
+        "labelAlign": "left"
+      },
+      "props": {}
+    },
+    "swagger": {
       "title": "swagger配置",
       "type": "object",
       "theme": "collapse",
@@ -164,76 +179,76 @@ const schame: any = {
         }
       }
     },
-    "mock": {
-      "title": "mock 配置",
-      "type": "object",
-      "theme": "collapse",
-      "labelWidth": 130,
-      "style": { "backgroundColor": "#fff" },
-      "properties": {
-        "mockNumber": {
-          "title": "模拟number数据",
-          "type": "string",
-          "ui:options": {}
-        },
-        "mockBoolean": {
-          "title": "模拟boolean数据",
-          "type": "string",
-          "ui:labelWidth": 0,
-          "ui:options": {}
-        },
-        "mockString": {
-          "title": "模拟string数据",
-          "type": "string",
-          "ui:options": {}
-        },
-        "mockKeyWordEqual": {
-          "title": "模拟关键词-全等匹配",
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "key": {
-                "title": "关键字",
-                "type": "string",
-                "ui:width": "50%",
-                "ui:options": {}
-              },
-              "value": {
-                "title": "替换为",
-                "type": "string",
-                "ui:width": "50%",
-                "ui:options": {}
-              }
-            }
-          },
-          "ui:options": {}
-        },
-        "mockKeyWordLike": {
-          "title": "模拟关键词-相似匹配",
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "key": {
-                "title": "关键字",
-                "type": "string",
-                "ui:width": "50%",
-                "ui:options": {}
-              },
-              "value": {
-                "title": "替换为",
-                "type": "string",
-                "ui:width": "50%",
-                "ui:options": {}
-              }
-            }
-          },
-          "ui:options": {},
-          "props": {}
-        }
-      }
-    }
+    // "mock": {
+    //   "title": "mock 配置",
+    //   "type": "object",
+    //   "theme": "collapse",
+    //   "labelWidth": 130,
+    //   "style": { "backgroundColor": "#fff" },
+    //   "properties": {
+    //     "mockNumber": {
+    //       "title": "模拟number数据",
+    //       "type": "string",
+    //       "ui:options": {}
+    //     },
+    //     "mockBoolean": {
+    //       "title": "模拟boolean数据",
+    //       "type": "string",
+    //       "ui:labelWidth": 0,
+    //       "ui:options": {}
+    //     },
+    //     "mockString": {
+    //       "title": "模拟string数据",
+    //       "type": "string",
+    //       "ui:options": {}
+    //     },
+    //     "mockKeyWordEqual": {
+    //       "title": "模拟关键词-全等匹配",
+    //       "type": "array",
+    //       "items": {
+    //         "type": "object",
+    //         "properties": {
+    //           "key": {
+    //             "title": "关键字",
+    //             "type": "string",
+    //             "ui:width": "50%",
+    //             "ui:options": {}
+    //           },
+    //           "value": {
+    //             "title": "替换为",
+    //             "type": "string",
+    //             "ui:width": "50%",
+    //             "ui:options": {}
+    //           }
+    //         }
+    //       },
+    //       "ui:options": {}
+    //     },
+    //     "mockKeyWordLike": {
+    //       "title": "模拟关键词-相似匹配",
+    //       "type": "array",
+    //       "items": {
+    //         "type": "object",
+    //         "properties": {
+    //           "key": {
+    //             "title": "关键字",
+    //             "type": "string",
+    //             "ui:width": "50%",
+    //             "ui:options": {}
+    //           },
+    //           "value": {
+    //             "title": "替换为",
+    //             "type": "string",
+    //             "ui:width": "50%",
+    //             "ui:options": {}
+    //           }
+    //         }
+    //       },
+    //       "ui:options": {},
+    //       "props": {}
+    //     }
+    //   }
+    // }
   }
 };
 
@@ -241,27 +256,27 @@ const ConfigPage: React.FC = () => {
   const form = useForm();
   const [formData, setFormDate] = useImmer<any>({
     type: "dart",
-    yapi: {
+    swagger: {
       jsonUrl: '',
       outputDir: '',
     },
-    mock: {
-      mockNumber: '',
-      mockBoolean: '',
-      mockString: '',
-      mockKeyWordEqual: [
-        {
-          key: '',
-          value: '',
-        },
-      ],
-      mockKeyWordLike: [
-        {
-          key: '',
-          value: '',
-        },
-      ],
-    },
+    // mock: {
+    //   mockNumber: '',
+    //   mockBoolean: '',
+    //   mockString: '',
+    //   mockKeyWordEqual: [
+    //     {
+    //       key: '',
+    //       value: '',
+    //     },
+    //   ],
+    //   mockKeyWordLike: [
+    //     {
+    //       key: '',
+    //       value: '',
+    //     },
+    //   ],
+    // },
   });
 
   useEffect(() => {
@@ -273,15 +288,15 @@ const ConfigPage: React.FC = () => {
     });
     getPluginConfig().then((data) => {
       console.log(data);
-      const { folderFilter, folderMap, customPathFolder, customModelFolder } = data.yapi;
+      const { folderFilter, folderMap, customPathFolder, customModelFolder } = data.swagger;
 
       setFormDate((s: any) => {
         for (const key in data) {
           s[key] = data[key as keyof typeof data];
-          if (key === 'yapi' && folderFilter) {
+          if (key === 'swagger' && folderFilter) {
             s[key].folderFilter = folderFilter.map((value) => ({ value }));
           }
-          if (key === 'yapi' && folderMap) {
+          if (key === 'swagger' && folderMap) {
             s[key].folderMap = Object.keys(folderMap).map((source) => {
               return {
                 source,
@@ -289,7 +304,7 @@ const ConfigPage: React.FC = () => {
               };
             });
           }
-          if (key === 'yapi' && customPathFolder) {
+          if (key === 'swagger' && customPathFolder) {
             s[key].customPathFolder = Object.keys(customPathFolder).map((source) => {
               return {
                 source,
@@ -297,7 +312,7 @@ const ConfigPage: React.FC = () => {
               };
             });
           }
-          if (key === 'yapi' && customModelFolder) {
+          if (key === 'swagger' && customModelFolder) {
             s[key].customModelFolder = Object.keys(customModelFolder).map((source) => {
               return {
                 source,
@@ -338,27 +353,27 @@ const ConfigPage: React.FC = () => {
           type="primary"
           style={{ width: '30%' }}
           onClick={() => {
-            const { folderFilter, folderMap, customPathFolder, customModelFolder } = formData.yapi;
+            const { folderFilter, folderMap, customPathFolder, customModelFolder } = formData.swagger;
             const _formData = JSON.parse(JSON.stringify(formData));
             if (folderFilter && folderFilter.length > 0) {
-              _formData.yapi.folderFilter = folderFilter.filter((f: any) => !!f).map(({ value }: any) => value);
+              _formData.swagger.folderFilter = folderFilter.filter((f: any) => !!f).map(({ value }: any) => value);
             }
             if (folderMap && folderMap.length > 0) {
-              _formData.yapi.folderMap = {}
+              _formData.swagger.folderMap = {}
               folderMap.filter((f: any) => !!f).forEach(({ source, folder }: any) => {
-                _formData.yapi.folderMap[source] = folder;
+                _formData.swagger.folderMap[source] = folder;
               });
             }
             if (customPathFolder && customPathFolder.length > 0) {
-              _formData.yapi.customPathFolder = {}
+              _formData.swagger.customPathFolder = {}
               customPathFolder.filter((f: any) => !!f).forEach(({ source, folder }: any) => {
-                _formData.yapi.customPathFolder[source] = folder;
+                _formData.swagger.customPathFolder[source] = folder;
               });
             }
             if (customModelFolder && customModelFolder.length > 0) {
-              _formData.yapi.customModelFolder = {}
+              _formData.swagger.customModelFolder = {}
               customModelFolder.filter((f: any) => !!f).forEach(({ source, folder }: any) => {
-                _formData.yapi.customModelFolder[source] = folder;
+                _formData.swagger.customModelFolder[source] = folder;
               });
             }
             console.log(_formData);

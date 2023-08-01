@@ -15,12 +15,12 @@ export const genCodeByYapi = async (
   yapiId: string,
   rawClipboardText: string,
 ) => {
-  const domain = getConfig().yapi?.domain || '';
+  const domain = getConfig().swagger?.jsonUrl || '';
   if (!domain.trim()) {
     window.showErrorMessage('请配置yapi域名');
     return;
   }
-  const projectList: any[] = getConfig().yapi?.projects || [];
+  const projectList: any[] = getConfig().swagger?.folderFilter || [];
   if (projectList.length === 0) {
     window.showErrorMessage('请配置项目');
     return;

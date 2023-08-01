@@ -41,10 +41,9 @@ export const createProject = async (
     model: any;
     createDir: string;
     immediateOpen: boolean;
-    type?: 'flutter' | 'react' | 'vue';
   }>,
 ) => {
-  await compileScaffold(message.data.model, message.data.createDir, message.data.type);
+  await compileScaffold(message.data.model, message.data.createDir);
   if (message.data.immediateOpen)
     commands.executeCommand(
       'vscode.openFolder',

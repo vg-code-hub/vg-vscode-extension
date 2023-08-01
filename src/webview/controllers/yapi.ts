@@ -11,11 +11,11 @@ import { getConfig } from '@root/utils';
 const config = getConfig();
 
 export const getYapiDomain = () => {
-  const domian = config.yapi?.domain;
+  const domian = config.swagger?.jsonUrl;
   return domian;
 };
 
 export const getYapiProjects = () => {
-  const projects = config.yapi?.projects || [];
+  const projects = config.swagger?.folderFilter || [];
   return projects;
 };

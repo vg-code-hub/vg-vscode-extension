@@ -2,7 +2,7 @@
   "name": "vg-vscode-extension",
   "displayName": "Frontend Code Generator - VG",
   "description": "It supports effective creation of business modules for frontend applications.",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "engines": {
     "vscode": "^1.69.0"
   },
@@ -194,6 +194,7 @@
     "fs-extra": "^11.1.1",
     "generate-schema": "^2.6.0",
     "glob": "^8.1.0",
+    "gradlejs": "^1.0.0",
     "jimp": "^0.22.8",
     "json-schema-to-typescript": "^13.0.2",
     "lodash": "^4.17.21",

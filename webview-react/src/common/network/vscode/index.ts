@@ -357,7 +357,8 @@ export function deleteMaterialTemplate(data: {
 export function getPluginConfig() {
   return request<{
     type: "dart" | "typescript"
-    yapi: {
+    scaffoldJson: string
+    swagger: {
       jsonUrl: string;
       outputDir: string;
       folderFilter?: string[];
@@ -365,7 +366,7 @@ export function getPluginConfig() {
       customPathFolder?: Record<string, string>;
       customModelFolder?: Record<string, string>;
     };
-    mock: {
+    mock?: {
       mockNumber: string;
       mockBoolean: string;
       mockString: string;
@@ -383,7 +384,7 @@ export function getPluginConfig() {
   });
 }
 export interface IConfigResult {
-  yapi: {
+  swagger: {
     domain: string;
     projects: {
       name: string;
@@ -391,7 +392,7 @@ export interface IConfigResult {
       domain: string;
     }[];
   };
-  mock: {
+  mock?: {
     mockNumber: string;
     mockBoolean: string;
     mockString: string;
@@ -425,7 +426,6 @@ export interface IScaffoldResponse {
     repositoryType: 'git' | 'npm';
     uuid: string;
     tag?: string;
-    type?: 'flutter' | 'react' | 'vue';
   }[];
 }
 
@@ -510,7 +510,6 @@ export function createProject(data: {
   model: { projectName: string;[key: string]: any };
   createDir: string;
   immediateOpen: boolean;
-  type?: IScaffoldResponse['scaffolds'][0]['type'];
 }) {
   return request<string>({
     cmd: 'createProject',

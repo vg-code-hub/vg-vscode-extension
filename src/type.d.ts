@@ -7,3 +7,6 @@
  * @Description: 
  */
 export type PageType = 'normal' | 'refresh list' | 'form';
+declare interface gradlejs {
+  parseFile: (path: string) => Promise<object>
+}
