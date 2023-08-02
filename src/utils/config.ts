@@ -8,15 +8,16 @@
  */
 import * as path from 'path';
 import * as fs from 'fs-extra';
-import { Uri, commands, window } from "vscode";
+import { Uri, WorkspaceConfiguration, commands, window, workspace } from "vscode";
 
 import { existsSync, getRootPath, readFileSync } from "@root/utils";
 import { parse, stringify } from 'yaml';
 import { rootPath } from './vscodeEnv';
 
+const defaultScaffoldJson = "https://raw.githubusercontent.com/JimmyZDD/vg-materials/main/scaffold/index.json";
+
 const defaultConfig: Config = {
   type: "dart",
-  scaffoldJson: 'https://raw.githubusercontent.com/JimmyZDD/vg-materials/main/scaffold/index.json',
   swagger: {
     jsonUrl: 'http://127.0.0.1:4523/export/openapi?projectId=xxx&version=3.0',
     outputDir: 'api',
@@ -26,7 +27,6 @@ const defaultConfig: Config = {
 
 export type Config = {
   type: "dart" | "typescript"
-  scaffoldJson: string
   swagger: {
     jsonUrl: string;
     outputDir: string;
@@ -121,12 +121,14 @@ export const genVgcodeConfig = async (uri: Uri) => {
     let rootPath = getRootPath(undefined);
     if (!rootPath) throw Error('no root path');
 
-    if (!existsSync(rootPath.concat(`/vgcode.yaml`)))
-      saveConfig(getConfig());
-
-    window.showInformationMessage(
-      `Successfully Generated api yaml`
-    );
+    if (!existsSync(rootPath.concat(`/vgcode.yaml`))) {
+      saveConfig(defaultConfig);
+      window.showInformationMessage(
+        `Successfully Generated api yaml`
+      );
+    } else {
+      window.showWarningMessage('已存在vgcode.yaml');
+    }
   } catch (error) {
     window.showErrorMessage(
       `Error:
@@ -135,3 +137,16 @@ export const genVgcodeConfig = async (uri: Uri) => {
   }
 };
 
+export function getScaffoldJsonUrl(fsPath?: string): string {
+  if (!fsPath) return workspace.getConfiguration().get('vgcode.scaffoldJson') || defaultScaffoldJson;
+  return getSetting(fsPath, "scaffoldJson") || defaultScaffoldJson;
+}
+
+function getSetting(fsPath: string, configKey: string): any {
+  const uri = Uri.file(fsPath);
+  const workspaceConfiguration: WorkspaceConfiguration = workspace.getConfiguration(
+    "vgcode",
+    uri,
+  );
+  if (workspaceConfiguration.has(configKey)) return workspaceConfiguration.get(configKey);
+}

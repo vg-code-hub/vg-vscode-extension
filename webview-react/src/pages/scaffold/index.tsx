@@ -10,7 +10,7 @@ import { Row, Col, Spin, Button, Tooltip } from 'antd';
 import { useImmer } from 'use-immer';
 import { SyncOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
-import { IScaffoldResponse, downloadScaffoldByVsCode, getPluginConfig, getScaffolds } from '@/common';
+import { IScaffoldResponse, downloadScaffoldByVsCode, getPluginScaffoldJsonUrl, getScaffolds } from '@/common';
 import FormModal from '@/components/FormModal';
 import DownloadModal from '@/components/DownloadModal';
 import LocalProjectModal from '@/components/LocalProjectModal';
@@ -62,7 +62,7 @@ const ScaffoldPage: React.FC = () => {
   const fetchScaffolds = async () => {
     setLoading((s) => { s.fetch = true; });
     try {
-      const { scaffoldJson } = await getPluginConfig();
+      const scaffoldJson = await getPluginScaffoldJsonUrl();
       const res = await getScaffolds(scaffoldJson);
 
       setCategories(
@@ -115,7 +115,7 @@ const ScaffoldPage: React.FC = () => {
         <Row className="header">
           <Col span={20}>
             选择模板创建应用{' '}
-            <Tooltip title="分享物料可提交到https://github.com/JimmyZDD/vg-materials">
+            <Tooltip title="分享物料可提交到 https://github.com/JimmyZDD/vg-materials 或配置本地json">
               <QuestionCircleOutlined />
             </Tooltip>
           </Col>

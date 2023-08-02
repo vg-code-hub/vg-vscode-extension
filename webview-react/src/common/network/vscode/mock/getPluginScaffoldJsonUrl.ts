@@ -1,0 +1,1 @@
+export default 'https://raw.githubusercontent.com/JimmyZDD/vg-materials/main/scaffold/index.json';

@@ -57,6 +57,7 @@ export const routes: Record<string, any> = {
   jsonToTs: json.jsonToTs,
 
   getPluginConfig: config.getPluginConfig,
+  getPluginScaffoldJsonUrl: config.getPluginScaffoldJsonUrl,
   savePluginConfig: config.savePluginConfig,
 
   refreshIntelliSense: intelliSense.refreshIntelliSense,

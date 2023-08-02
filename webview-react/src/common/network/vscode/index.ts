@@ -354,10 +354,21 @@ export function deleteMaterialTemplate(data: {
  * @export
  * @returns
  */
+export function getPluginScaffoldJsonUrl() {
+  return request<string>({
+    cmd: 'getPluginScaffoldJsonUrl',
+  });
+}
+
+/**
+ * 获取插件配置
+ *
+ * @export
+ * @returns
+ */
 export function getPluginConfig() {
   return request<{
     type: "dart" | "typescript"
-    scaffoldJson: string
     swagger: {
       jsonUrl: string;
       outputDir: string;

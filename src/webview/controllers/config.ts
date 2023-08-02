@@ -6,10 +6,11 @@
  * @FilePath: /vg-vscode-extension/src/webview/controllers/config.ts
  * @Description: 
  */
-import { Config, getConfig, saveConfig } from '@root/utils';
+import { Config, getConfig, getScaffoldJsonUrl, saveConfig } from '@root/utils';
 import { IMessage } from '../type';
 
 export const getPluginConfig = () => getConfig();
+export const getPluginScaffoldJsonUrl = () => getScaffoldJsonUrl();
 
 export const savePluginConfig = (message: IMessage<Config>) => {
   saveConfig(message.data);

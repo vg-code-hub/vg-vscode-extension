@@ -11,23 +11,27 @@ import * as fs from 'fs';
 import { getFileContent } from './file';
 import { pascalCase } from './tools';
 import { SwaggerConfig, getDirPath } from '@root/swagger-generator/utils';
+import { getConfig } from './config';
+import { rootPath } from './vscodeEnv';
 
 /**
  * 获取本地 Schemas
  *
  */
-export const getLocalSchemas = (targetDirectory: string) => {
+export const getLocalSchemas = async (targetDirectory: string) => {
   var schemaFullPath = path.join(targetDirectory, 'swagger.json');
   if (!fs.existsSync(schemaFullPath)) throw new Error('schema不存在');
   const data = JSON.parse(getFileContent(schemaFullPath, true) || '{data:{}}').data;
   targetDirectory.concat(`/translation.json`);
   var filesMap: Record<string, any[]> = {};
+  const { customModelFolder } = getConfig().swagger;
+  await SwaggerConfig.instance.getConfig(rootPath);
+
   try {
     for (let key in data) {
       var value = data[key];
       const className = pascalCase(key);
 
-      const { customModelFolder } = SwaggerConfig.config;
       let folder;
       if (customModelFolder && customModelFolder[className]) {
         folder = customModelFolder[className];

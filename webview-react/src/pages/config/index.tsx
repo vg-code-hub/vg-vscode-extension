@@ -36,17 +36,6 @@ const schame: any = {
       ],
       "widget": "radio"
     },
-    "scaffoldJson": {
-      "title": "脚手架 json 文件",
-      "type": "string",
-      "description": "",
-      "labelWidth": 120,
-      "ui:readonly": false,
-      "ui:options": {
-        "labelAlign": "left"
-      },
-      "props": {}
-    },
     "swagger": {
       "title": "swagger配置",
       "type": "object",
