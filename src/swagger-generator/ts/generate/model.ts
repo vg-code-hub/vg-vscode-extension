@@ -110,6 +110,7 @@ export class ${className} {
       SwaggerConfig.addException(`warn: [class ${className}] already exists, please check orginal swagger.json`);
       return;
     }
+    if (!value.properties) value = this.data[className];
 
     this.filesMap[dirPath] += `
 export class ${className} {
