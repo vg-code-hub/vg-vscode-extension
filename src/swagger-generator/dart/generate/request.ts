@@ -63,7 +63,7 @@ class RequestGenerate {
     if (!existsSync(join(requestsDir, 'base_connect.dart')))
       writeFileSync(
         join(requestsDir, 'base_connect.dart'),
-        `abstract class BaseConnect {
+        `abstract class GetConnect {
   onInit() {}
   dispose() {}
   get(path, {query}) {}
@@ -71,35 +71,10 @@ class RequestGenerate {
   put(path, body) {}
   delete(path, {query}) {}
 }
-/**
- * GetConnect
- * 
-import 'package:get/get.dart';
-class BaseConnect extends GetConnect {
-  @override
-  // ignore: overridden_fields
-  Duration timeout = const Duration(seconds: 30);
 
-  @override
-  void onInit() {
-    httpClient.baseUrl = 'xxx';
+class BaseProvider extends GetConnect {}
 
-    httpClient.addRequestModifier<void>((request) {
-      if (UserService.to.hasToken) {
-        request.headers['Authorization'] = xxx.token;
-      }
-      return request;
-    });
-
-    httpClient.addResponseModifier((request, response) {
-      if (response.body is Map && (response.body as Map)['success'] == false) {
-        // do some thing
-      }
-      return response;
-    });
-  }
-}
- */ 
+var httpInstance = BaseProvider()..onInit(); 
 `,
         'utf-8',
       );
@@ -145,19 +120,7 @@ class BaseConnect extends GetConnect {
 import '${join(...Array(deeps).fill('..'), 'entitys', 'index.dart')}';
 import '${join(...Array(deeps - 1).fill('..'), 'base_connect.dart')}';
 
-class ${className} extends BaseConnect {
-  static ${className} get instance => _getInstance();
-  static ${className}? _instance;
-
-  static ${className} _getInstance() {
-    _instance ??= ${className}()..onInit();
-    return _instance!;
-  }
-
-  @override
-  dispose() {
-    ${className}._instance = null;
-  }\n`;
+class ${className} {\n`;
 
     const { params, desc } = this.getParams(value.parameters);
     const returnType = this.getReturnType(value.responses, method);
@@ -166,8 +129,8 @@ class ${className} extends BaseConnect {
   /// ${value.summary}${value.description ? `\n${INDENT}/// ${value.description}` : ''}${value.operationId ? `\n${INDENT}/// Operation ID: ${value.operationId}` : ''}${desc}`;
     // 写入请求
     this.filesMap[dirPath] += `${functionDesc}
-  ${returnType} ${methodName}(${params}) async {
-    ${returnType !== 'Future<void>' ? 'final res = ' : ''}await ${method.toLowerCase()}(${functionArgs});${this.getReturnContent(value.responses, method)}
+  static ${returnType} ${methodName}(${params}) async {
+    ${returnType !== 'Future<void>' ? 'final res = ' : ''}await httpInstance.${method.toLowerCase()}(${functionArgs});${this.getReturnContent(value.responses, method)}
   }
 `;
   }

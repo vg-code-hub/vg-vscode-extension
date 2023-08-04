@@ -16,10 +16,23 @@
       > common/routers/names.txt  
       > common/routers/pages.txt  
       > pages/index.txt
-- [ ] 3. swagger gen
+- [x] 3. swagger gen
   - [x] 1. swagger to dart
   - [x] 2. swagger to ts
-- [ ] 4. snippets
+- [ ] 4. VgCode UI
+  - [ ] 1. schema2code
+    - [x] 1. schema2code dart
+    - [ ] 2. schema2code react
+    - [ ] 3. schema2code vue
+  - [ ] 2. 物料中心
+    - [x] 1. 代码片段（代码智能提示）
+    - [ ] 2. 代码区块
+    - [x] 3. schema2code 模版
+  - [ ] 3. 脚手架
+    - [x] 1. normal project
+    - [x] 2. flutter (with .gitmodules)
+    - [ ] 2. react (with .gitmodules)
+  - [x] 4. 可视化配置
 
 ---
 # 使用说明
@@ -186,13 +199,16 @@ assets/svgs/files.txt
 }
 ```
 
-#### swagger.yaml 配置
-- jsonUrl
-- outputDir?
-- folderFilter? {string|reg[]} 文件夹过滤配置（不配置取所有）
-- customPathFolder
-- customModelFolder
-- folderMap
+### 4. vgcode.yaml 配置
+```yml
+type: dart
+swagger:
+  jsonUrl: http://xxx
+  outputDir: domains/api
+  overwrite: true
+  folderFilter: # {string|reg[]} 文件夹过滤配置（不配置取所有）
+  folderMap:
+```
 
 文件夹规则
 > 1、首先过滤需要的文件夹[folderFilter]   
@@ -205,7 +221,13 @@ assets/svgs/files.txt
 > 目前根据 `tags` 和 `x-apifox-folder` 生成目录，其他一律放在 api/entitys 或  api/requests 目录下 
 > 首次会生成 xxx.g.dart 文件，你也可以做修改。再次生成不会覆盖已有文件，生成一个同名的 xxx.g.vg 文件      
 
-end
+### 5. VgCode UI
+#### 5.1 schema2code
+![](images/16.47.31.png)
+读取本地 swagger.json 中模型
+
+![](images/16.48.17.png)
+根据读取到模型生成list、form、detail 页面
 
 大家可以自己动手体验下~
 

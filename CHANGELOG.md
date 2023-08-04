@@ -8,6 +8,32 @@
 -->
 # Release Notes
 
+### 2.3.0
+
+- refactor[swagger2dart]: request class
+### 2.2.2
+
+- fix[swagger2code]: gen model check sub bug
+### 2.2.1
+
+- fix[schema2code]: get schema bug
+ 
+### 2.2.0
+
+- fix: scaffold bug
+- refactor: config swagger.yaml to vgconfig.yaml
+
+### 2.1.0
+
+- feat: scaffold complete
+### 2.0.1
+
+- perf: update vscodeignore: thin vsix
+
+### 2.0.0
+
+- feat: add vg code window
+
 ### 1.0.0
 
 - feat: add `swagger config` overwrite
