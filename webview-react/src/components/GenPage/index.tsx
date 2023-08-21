@@ -164,6 +164,7 @@ const GenPage: React.FC<IProps> = ({ visible, config, pageName: _pageName, onClo
             }) : []
           });
         }
+
         if (schema2codeMaterial) {
           _codeMap[`${_key}/${snakeCaseName}_create_page.dart`] = findCodeTemplate(['dart', 'create', 'page'])
           _codeMap[`${_key}/${snakeCaseName}_detail_page.dart`] = findCodeTemplate(['dart', 'detail', 'page'])

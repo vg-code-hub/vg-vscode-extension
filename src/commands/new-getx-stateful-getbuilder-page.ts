@@ -47,5 +47,7 @@ async function generateCode(pageName: string, targetDirectory: string, pageType:
       controllerTemplate(pageName, targetDirectory, pageType),
       viewTemplate(pageName, targetDirectory, pageType),
     ]);
+  } else {
+    throw Error(` ${pageFile} already exists`);
   }
 }

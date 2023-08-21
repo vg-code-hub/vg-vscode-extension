@@ -20,10 +20,10 @@ export const newGetxFullPage = async (uri: Uri) => {
     return;
   }
   const pascalCasepageName = pascalCase(pageName);
-  const pageType = await promptForPageTypePick();
+
   let targetDirectory = uri.fsPath;
   try {
-    await generateCode(pageName, targetDirectory, pageType);
+    await generateCode(pageName, targetDirectory);
     window.showInformationMessage(
       `Successfully Generated ${pascalCasepageName} Getx Page`
     );
@@ -35,19 +35,21 @@ export const newGetxFullPage = async (uri: Uri) => {
   }
 };
 
-async function generateCode(pageName: string, targetDirectory: string, pageType: PageType) {
+async function generateCode(pageName: string, targetDirectory: string) {
   const snakeCaseName = snakeCase(pageName);
   const pageFile = `${targetDirectory}/${snakeCaseName}_page.dart`;
   if (!existsSync(pageFile)) {
-    await Promise.all((pageType === 'refresh list' ? ['bindings', 'controllers', 'widgets'] : ['bindings', 'controllers']).map(async item => {
+    await Promise.all((['bindings', 'controllers']).map(async item => {
       const directoryPath = `${targetDirectory}/${item}`;
       if (!existsSync(directoryPath)) await mkdirp(directoryPath);
     }));
 
     await Promise.all([
-      controllerTemplate(pageName, targetDirectory, pageType),
+      controllerTemplate(pageName, targetDirectory),
       bindingsTemplate(pageName, targetDirectory),
-      viewTemplate(pageName, targetDirectory, pageType),
+      viewTemplate(pageName, targetDirectory),
     ]);
+  } else {
+    throw Error(` ${pageFile} already exists`);
   }
 }

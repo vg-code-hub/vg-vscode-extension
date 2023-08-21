@@ -14,4 +14,7 @@ declare let vscode: IVscode;
 
 declare interface Window {
   vscode: IVscode;
+  MozWebSocket: any;
 }
+
+declare let MozWebSocket: any;

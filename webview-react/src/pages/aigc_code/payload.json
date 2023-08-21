@@ -1,0 +1,556 @@
+[
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b58f2@dx18a16058775b8f2540",
+      "status": 0
+    },
+    "payload": {
+      "choices": {
+        "status": 0,
+        "seq": 0,
+        "text": [
+          {
+            "content": "``",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b58f2@dx18a16058775b8f2540",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 1,
+        "text": [
+          {
+            "content": "`d",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b58f2@dx18a16058775b8f2540",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 2,
+        "text": [
+          {
+            "content": "art\nimport",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b58f2@dx18a16058775b8f2540",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 3,
+        "text": [
+          {
+            "content": " 'package:flutter",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b58f2@dx18a16058775b8f2540",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 4,
+        "text": [
+          {
+            "content": "/material.",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b58f2@dx18a16058775b8f2540",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 5,
+        "text": [
+          {
+            "content": "dart';\nimport 'package:test/test.dart';\n\n/// 扩展颜色\n",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b58f2@dx18a16058775b8f2540",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 6,
+        "text": [
+          {
+            "content": "extension ExColor on Color {\n  /// 生成 MaterialColor 色阶表\n",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b58f2@dx18a16058775b8f2540",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 7,
+        "text": [
+          {
+            "content": "  MaterialColor get materialColor {\n    List\u003cdouble\u003e strengths = \u003cdouble\u003e[.05];\n",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b58f2@dx18a16058775b8f2540",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 8,
+        "text": [
+          {
+            "content": "    Map\u003cint, Color\u003e swatch = \u003cint, Color\u003e{};\n    final int r = red, g = green, b = blue;\n",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b58f2@dx18a16058775b8f2540",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 9,
+        "text": [
+          {
+            "content": "\n    for (int i = 1; i \u003c 10; i++) {\n",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b58f2@dx18a16058775b8f2540",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 10,
+        "text": [
+          {
+            "content": "      strengths.add(0.1 * i);\n    }\n",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b58f2@dx18a16058775b8f2540",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 11,
+        "text": [
+          {
+            "content": "    for (var strength in strengths) {\n      final double ds = 0.",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b58f2@dx18a16058775b8f2540",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 12,
+        "text": [
+          {
+            "content": "5 - strength;\n      swatch[(strength * 1000).round()] = Color.",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b58f2@dx18a16058775b8f2540",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 13,
+        "text": [
+          {
+            "content": "fromRGBO(\n        r + ((ds \u003c 0 ?",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b58f2@dx18a16058775b8f2540",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 14,
+        "text": [
+          {
+            "content": " r : (255 - r)) * ds).round(),\n        g + ((ds \u003c 0 ?",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b58f2@dx18a16058775b8f2540",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 15,
+        "text": [
+          {
+            "content": " g : (255 - g)) * ds).round(),\n        b + ((ds \u003c 0 ?",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b58f2@dx18a16058775b8f2540",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 16,
+        "text": [
+          {
+            "content": " b : (255 - b)) * ds).round(),\n        1,\n      );\n",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b58f2@dx18a16058775b8f2540",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 17,
+        "text": [
+          {
+            "content": "    }\n    return MaterialColor(value, swatch);\n  }\n}\n\nvoid main() async {\n",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b58f2@dx18a16058775b8f2540",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 18,
+        "text": [
+          {
+            "content": "  test('ExColor extension', (t) async {\n    t.assert(ExColor.",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b58f2@dx18a16058775b8f2540",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 19,
+        "text": [
+          {
+            "content": "toString == 'MaterialColor(value: $value, colors: Map\u003cInt, Color\u003e{..})');\n    t.assert(ExColor.",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b58f2@dx18a16058775b8f2540",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 20,
+        "text": [
+          {
+            "content": "materialColor == null);\n    t.assert(ExColor().",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b58f2@dx18a16058775b8f2540",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 21,
+        "text": [
+          {
+            "content": "materialColor != null);\n    t.assertAll(\n",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b58f2@dx18a16058775b8f2540",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 22,
+        "text": [
+          {
+            "content": "      (color) =\u003e color.isNotNull,\n      (color) =\u003e color.",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b58f2@dx18a16058775b8f2540",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 23,
+        "text": [
+          {
+            "content": "red == color.green == color.blue == color.",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b58f2@dx18a16058775b8f2540",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 24,
+        "text": [
+          {
+            "content": "alpha == 255,\n    );\n    t.runTest(findWidgets());\n",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b58f2@dx18a16058775b8f2540",
+      "status": 2
+    },
+    "payload": {
+      "choices": {
+        "status": 2,
+        "seq": 25,
+        "text": [
+          {
+            "content": "  });\n}\n```",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      },
+      "usage": {
+        "text": {
+          "question_tokens": 339,
+          "prompt_tokens": 351,
+          "completion_tokens": 492,
+          "total_tokens": 843
+        }
+      }
+    }
+  }
+]

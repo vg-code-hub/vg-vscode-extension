@@ -1,0 +1,1438 @@
+[
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 0
+    },
+    "payload": {
+      "choices": {
+        "status": 0,
+        "seq": 0,
+        "text": [
+          {
+            "content": "秦始皇嬴政（前2",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 1,
+        "text": [
+          {
+            "content": "59年—前210",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 2,
+        "text": [
+          {
+            "content": "年），嬴姓，赵氏",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 3,
+        "text": [
+          {
+            "content": " ，名政（一说名",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 4,
+        "text": [
+          {
+            "content": "“正”），又称赵",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 5,
+        "text": [
+          {
+            "content": "政、祖龙 ，也有",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 6,
+        "text": [
+          {
+            "content": "吕政一说）。 秦",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 7,
+        "text": [
+          {
+            "content": "庄襄王和赵姬之子",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 8,
+        "text": [
+          {
+            "content": "中国古代杰出的政",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 9,
+        "text": [
+          {
+            "content": "治家、战略家、改",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 10,
+        "text": [
+          {
+            "content": "革家，首次完成中",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 11,
+        "text": [
+          {
+            "content": "国大一统的政治人",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 12,
+        "text": [
+          {
+            "content": "物，也是中国第一",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 13,
+        "text": [
+          {
+            "content": "个称皇帝的君主。",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 14,
+        "text": [
+          {
+            "content": "\n嬴政出生于赵国",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 15,
+        "text": [
+          {
+            "content": "都城邯郸，后回到",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 16,
+        "text": [
+          {
+            "content": "秦国，十三岁时继",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 17,
+        "text": [
+          {
+            "content": "承王位。 前23",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 18,
+        "text": [
+          {
+            "content": "8年，平定长信侯",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 19,
+        "text": [
+          {
+            "content": "嫪毐的叛乱，之后",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 20,
+        "text": [
+          {
+            "content": "又除掉权臣吕不韦",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 21,
+        "text": [
+          {
+            "content": "，开始独揽大政。",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 22,
+        "text": [
+          {
+            "content": " 重用李斯、王翦",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 23,
+        "text": [
+          {
+            "content": "等人，自前230",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 24,
+        "text": [
+          {
+            "content": "年至前221年，",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 25,
+        "text": [
+          {
+            "content": "先后灭韩、赵、魏",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 26,
+        "text": [
+          {
+            "content": "、楚、燕、齐六国",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 27,
+        "text": [
+          {
+            "content": "，完成了统一中国",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 28,
+        "text": [
+          {
+            "content": "大业，建立起一个",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 29,
+        "text": [
+          {
+            "content": "中央集权的统一的",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 30,
+        "text": [
+          {
+            "content": "多民族国家——秦",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 31,
+        "text": [
+          {
+            "content": "朝。\n公元前22",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 32,
+        "text": [
+          {
+            "content": "1年，秦统一六国",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 33,
+        "text": [
+          {
+            "content": "之后，秦王嬴政认",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 34,
+        "text": [
+          {
+            "content": "为自己“德兼三皇",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 35,
+        "text": [
+          {
+            "content": "，功过五帝”，遂",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 36,
+        "text": [
+          {
+            "content": "采用三皇之“皇”",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 37,
+        "text": [
+          {
+            "content": "、五帝之“帝”构",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 38,
+        "text": [
+          {
+            "content": "成“皇帝”的称号",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 39,
+        "text": [
+          {
+            "content": "， 是中国历史上",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 40,
+        "text": [
+          {
+            "content": "第一个使用“皇帝",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 41,
+        "text": [
+          {
+            "content": "”称号的君主，所",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 42,
+        "text": [
+          {
+            "content": "以自称“始皇帝”",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 43,
+        "text": [
+          {
+            "content": "。同时在中央实行",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 44,
+        "text": [
+          {
+            "content": "三公九卿，管理国",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 45,
+        "text": [
+          {
+            "content": "家大事；地方上废",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 46,
+        "text": [
+          {
+            "content": "除分封制，代以郡",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 47,
+        "text": [
+          {
+            "content": "县制；同时书同文",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 48,
+        "text": [
+          {
+            "content": "，车同轨，统一货",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 49,
+        "text": [
+          {
+            "content": "币、度量衡。对外",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 50,
+        "text": [
+          {
+            "content": "北击匈奴，南征百",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 51,
+        "text": [
+          {
+            "content": "越，修筑万里长城",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 52,
+        "text": [
+          {
+            "content": "；修筑灵渠，沟通",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 53,
+        "text": [
+          {
+            "content": "长江和珠江水系。",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 54,
+        "text": [
+          {
+            "content": "但是到了晚年，秦",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 55,
+        "text": [
+          {
+            "content": "始皇求仙梦想长生",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 56,
+        "text": [
+          {
+            "content": "，苛政虐民，扼杀",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 57,
+        "text": [
+          {
+            "content": "民智，动摇了秦朝",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 58,
+        "text": [
+          {
+            "content": "统治的根基。前2",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 59,
+        "text": [
+          {
+            "content": "10年，秦始皇东",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 60,
+        "text": [
+          {
+            "content": "巡途中驾崩于邢台",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 61,
+        "text": [
+          {
+            "content": "沙丘。 \n秦始皇",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 62,
+        "text": [
+          {
+            "content": "奠定中国两千余年",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 63,
+        "text": [
+          {
+            "content": "政治制度基本格局",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 64,
+        "text": [
+          {
+            "content": "  ，被明代思想",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 65,
+        "text": [
+          {
+            "content": "家李贽誉为“千古",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 1
+    },
+    "payload": {
+      "choices": {
+        "status": 1,
+        "seq": 66,
+        "text": [
+          {
+            "content": "一帝”。",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "header": {
+      "code": 0,
+      "message": "Success",
+      "sid": "cht000b3274@dx18a0684e038b8f2541",
+      "status": 2
+    },
+    "payload": {
+      "choices": {
+        "status": 2,
+        "seq": 67,
+        "text": [
+          {
+            "content": "",
+            "role": "assistant",
+            "index": 0
+          }
+        ]
+      },
+      "usage": {
+        "text": {
+          "question_tokens": 6,
+          "prompt_tokens": 23,
+          "completion_tokens": 445,
+          "total_tokens": 468
+        }
+      }
+    }
+  }
+]

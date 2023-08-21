@@ -65,6 +65,11 @@ export default defineConfig({
       component: './scaffold',
     },
     {
+      name: '讯飞大模型',
+      path: '/aigc_code',
+      component: './aigc_code',
+    },
+    {
       name: '项目配置',
       path: '/config',
       component: './config',
