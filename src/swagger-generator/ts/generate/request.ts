@@ -146,8 +146,9 @@ import { http } from '${join(...Array(deeps - 1).fill('..'), 'base_http')}';
 \n`;
 
     const { params, desc } = this.getParams(value.parameters);
-    const returnType = this.getReturnType(value.responses, method);
+    let returnType = this.getReturnType(value.responses, method);
     const functionArgs = this.getFunctionArgs(key, method, value.parameters);
+    if (returnType.startsWith('PaginationResponse')) returnType = `models.${returnType}`;
     const functionDesc = `
 /** 
  * @description: ${value.summary}${value.description ? `\n * ${value.description}` : ''}${value.operationId ? `\n * @operationID: ${value.operationId}` : ''}
@@ -182,11 +183,16 @@ export async function ${methodName}(${params}): Promise<${returnType}> {
   }
 
   getReturnType(responses: Responses, method: Method) {
-    let resClass: string | undefined;
+    let resClass: string | undefined, isPagination = false;
     if (responses && responses['200'] && responses['200'].schema) {
       const schema = responses['200'].schema;
       if (schema.type === 'object' && schema.properties && Object.keys(schema.properties).includes('data')) {
         let rawData: SwaggerPropertyDefinition | undefined = schema.properties['data'];
+
+        if (rawData.properties && Object.keys(rawData.properties).includes('list') && rawData.properties['list'].type === 'array') {
+          rawData = rawData['properties']['list'];
+          isPagination = true;
+        }
         if (rawData['anyOf'])
           rawData = find(rawData['anyOf'], item => item.type !== 'null');
         resClass = rawData ? getTsSchemaType(rawData) : undefined;
@@ -196,9 +202,13 @@ export async function ${methodName}(${params}): Promise<${returnType}> {
     }
     if (resClass?.endsWith('[]')) {
       const subType = resClass.substring(0, resClass.length - 2);
-      resClass = BASE_TYPE.includes(subType) ? resClass : `models.${subType}[]`;
+      resClass = BASE_TYPE.includes(subType) ? `${resClass}[]` : `models.${subType}[]`;
     } else if (resClass) {
       resClass = BASE_TYPE.includes(resClass) ? resClass : `models.${resClass}`;
+    }
+    if (isPagination && resClass !== undefined) {
+      var subClass = resClass.substring(0, resClass.length - 2);
+      return `PaginationResponse<${subClass}>`;
     }
 
     return resClass !== undefined ? `${resClass}` : 'void';
@@ -304,14 +314,19 @@ export async function ${methodName}(${params}): Promise<${returnType}> {
   getReturnContent(responses: SwaggerHttpEndpoint['responses'], method: Method) {
     const returnType = this.getReturnType(responses, method);
     if (returnType === 'void') return '';
+    if (returnType.startsWith('PaginationResponse')) {
+      var subType = returnType.substring(19, returnType.length - 1);
+      return `\n${INDENT}return { ...res.data, list: res.data.list ? ${BASE_TYPE.includes(subType) ? 'res.data.list' : `(res.data.list as any[]).map<${subType}>((v: any) => ${subType}.fromJson(v))`} : [] };`;
+    }
     if (returnType.endsWith('[]')) {
       var subType = returnType.substring(0, returnType.length - 2);
       return `\n${INDENT}return res.data ? ${BASE_TYPE.includes(subType) ? 'res.data' : `(res.data as any[]).map<${subType}>((v: any) => ${subType}.fromJson(v))`} : [];`;
-    } else if (!BASE_TYPE.includes(returnType)) {
-      return `\n${INDENT}return ${returnType}.fromJson(res.data);`;
-    } else {
-      return `\n${INDENT}return res.data;`;
     }
+    if (!BASE_TYPE.includes(returnType))
+      return `\n${INDENT}return ${returnType}.fromJson(res.data);`;
+
+    return `\n${INDENT}return res.data;`;
+
   }
 }
 

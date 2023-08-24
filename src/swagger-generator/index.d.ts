@@ -52,7 +52,7 @@ export interface SwaggerSchemaProperties {
     [propertyName: string]: SwaggerPropertyDefinition;
 }
 
-export interface SwaggerPropertyDefinition extends Schema {
+export interface SwaggerPropertyDefinition extends SwaggerSchema {
     description?: string;
     title?: string;
     maxLength?: number;
@@ -61,11 +61,13 @@ export interface SwaggerPropertyDefinition extends Schema {
     minimum?: number;
     format?: string;
     pattern?: string;
-    items?: SwaggerSchema;
+    items: SwaggerSchema;
     schema?: SwaggerSchema | string // swagger3
     readonly?: boolean;
     enum?: string[];
     anyOf?: SwaggerPropertyDefinition[]
+    "x-apifox-refs"?: Record<string, any>
+    "x-apifox-orders"?: string[]
 }
 
 

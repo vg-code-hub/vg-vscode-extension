@@ -71,7 +71,19 @@ export function getTsSchemaType(property: SwaggerPropertyDefinition): string | u
         case 'file':
             return 'File';
         case 'object':
-            return 'Record<string, any>';
+            {
+                if (property['x-apifox-refs'] && property['x-apifox-orders']) {
+                    let key = first(property['x-apifox-orders']);
+                    const ref = property['x-apifox-refs'][key as keyof typeof property['x-apifox-refs']]['$ref'];
+                    if (ref) {
+                        const parts = ref.split('/');
+                        const typeName = parts[parts.length - 1];
+                        return pascalCase(typeName);
+                    }
+                }
+
+                return 'Record<string, any>';
+            }
         case 'array':
             const items = property['items'];
             if (items) {

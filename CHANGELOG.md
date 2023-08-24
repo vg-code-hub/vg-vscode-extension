@@ -8,6 +8,12 @@
 -->
 # Release Notes
 
+### 2.4.1
+
+- feat: 适配 apifox Pagination
+### 2.4.0
+
+- add xinghuo ai
 ### 2.3.0
 
 - refactor[swagger2dart]: request class

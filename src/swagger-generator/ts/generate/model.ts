@@ -44,6 +44,12 @@ class ModelGenerate {
           'utf-8',
         );
     }
+    str = `${str}
+
+export interface PaginationResponse<T> {
+  list: T[];
+  total: number;
+}`;
     // 内容写入 index.ts
     if (!existsSync(join(modelsDir, 'index.ts')))
       writeFileSync(
