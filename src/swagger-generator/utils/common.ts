@@ -8,15 +8,18 @@
  * @Description: 
  */
 import { SwaggerConfig } from ".";
-import { SwaggerHttpEndpoint, SwaggerPropertyDefinition } from "../index.d";
+import { SwaggerHttpEndpoint, SwaggerPropertyDefinition, SwaggerSchema } from "../index.d";
 import { exchangeZhToEn } from "./helper";
 import { first, join, snakeCase, pascalCase } from "@root/utils";
 
 /** tab 空格数 */
 export const INDENT = '  ';
 
-export const BASE_TYPE = ['int', 'double', 'number', 'boolean', 'File', 'string', 'String', 'DateTime', 'bool', 'Record<string, any>', 'Map<String, dynamic>'];
+export const BASE_TYPE = ['dynamic', 'any', 'int', 'double', 'number', 'boolean', 'File', 'string', 'String', 'DateTime', 'bool', 'Record<string, any>', 'Map<String, dynamic>'];
 
+export const DART_TYPE = [...BASE_TYPE, 'dynamic'];
+
+export const TS_TYPE = [...BASE_TYPE, 'any'];
 
 export function getTsType(key: string, property: SwaggerPropertyDefinition, addException = false): string {
     const type = Array.isArray(property.type) ? first(property.type) : property.type;
@@ -107,7 +110,8 @@ export function getTsSchemaType(property: SwaggerPropertyDefinition): string | u
 
 export function getTsParamType(param: SwaggerHttpEndpoint['parameters'][0], swaggerVersion = 2): string | undefined {
     // TODO: fix swagger3 bug 
-    const type = swaggerVersion === 2 ? (param.type ?? param.schema?.type ?? param.schema?.$ref) : (param.schema ? (typeof param.schema === 'string' ? param.schema : param.schema.type) : 'object');
+    const schema = param.schema as SwaggerSchema;
+    const type = swaggerVersion === 2 ? (param.type ?? schema?.type ?? schema?.$ref) : (schema ? (typeof schema === 'string' ? schema : schema.type) : 'object');
     const format = param.format;
 
     switch (type) {
@@ -123,14 +127,14 @@ export function getTsParamType(param: SwaggerHttpEndpoint['parameters'][0], swag
         case 'object':
             return 'Record<string, any>';
         case 'array':
-            const items = swaggerVersion === 2 ? (param.schema?.type ? param['schema']['items'] : param['items']) : param['schema'];
+            const items = swaggerVersion === 2 ? (schema?.type ? schema['items'] : param['items']) : schema;
             if (items) {
                 var itemType = getDartSchemaType(items);
                 return itemType ? `${pascalCase(itemType)}[]` : 'any[]';
             }
             break;
         default:
-            const ref = swaggerVersion === 2 ? param['schema']?.['$ref'] : type;
+            const ref = swaggerVersion === 2 ? schema?.['$ref'] : type;
             if (ref) {
                 const parts = ref.split('/');
                 const typeName = parts[parts.length - 1];
@@ -183,7 +187,7 @@ export function getDartType(key: string, property: SwaggerPropertyDefinition, ad
             if (ref) {
                 const parts = ref.split('/');
                 const typeName = parts[parts.length - 1];
-                return typeName;
+                return pascalCase(typeName);
             }
     }
     console.error(key, property, 'getDartType');
@@ -238,7 +242,8 @@ export function getDartSchemaType(property: SwaggerPropertyDefinition): string |
 
 export function getDartParamType(param: SwaggerHttpEndpoint['parameters'][0], swaggerVersion = 2): string | undefined {
     // TODO: fix swagger3 bug 
-    const type = swaggerVersion === 2 ? (param.type ?? param.schema?.type ?? param.schema?.$ref) : (param.schema ? (typeof param.schema === 'string' ? param.schema : param.schema.type) : 'object');
+    const schema = param.schema as SwaggerSchema;
+    const type = swaggerVersion === 2 ? (param.type ?? schema?.type ?? schema?.$ref) : (schema ? (typeof schema === 'string' ? schema : schema.type) : 'object');
     const format = param.format;
 
     switch (type) {
@@ -262,14 +267,14 @@ export function getDartParamType(param: SwaggerHttpEndpoint['parameters'][0], sw
         case 'file':
             return 'File';
         case 'array':
-            const items = swaggerVersion === 2 ? (param.schema?.type ? param['schema']['items'] : param['items']) : param['schema'];
+            const items = swaggerVersion === 2 ? (schema?.type ? schema['items'] : param['items']) : schema;
             if (items) {
                 var itemType = getDartSchemaType(items);
                 return itemType ? `List<${pascalCase(itemType)}>` : 'List';
             }
             break;
         default:
-            const ref = swaggerVersion === 2 ? param['schema']?.['$ref'] : type;
+            const ref = swaggerVersion === 2 ? schema?.['$ref'] : type;
             if (ref) {
                 const parts = ref.split('/');
                 const typeName = parts[parts.length - 1];
@@ -286,11 +291,11 @@ export const getDirPath = (folder: string | undefined, type: 'entitys' | 'reques
     let dirPath: string, deeps = 1, className: string;
     if (folder) {
         const { str: path } = exchangeZhToEn(folder, translationObj);
-        dirPath = join(rootPath, type, path.split('/').map(e => snakeCase(e)).join('/'));
+        dirPath = join(rootPath, path.split('/').map(e => snakeCase(e)).join('/'));
         deeps += path.split('/').length;
         className = pascalCase(path.split('/').map(e => snakeCase(e)).join('_') + '_request');
     } else {
-        dirPath = join(rootPath, type);
+        dirPath = join(rootPath);
         className = pascalCase('request');
     }
     if (type === 'entitys') return dirPath;

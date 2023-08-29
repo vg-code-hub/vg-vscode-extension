@@ -6,7 +6,6 @@
  * @FilePath: /vg-vscode-extension/src/swagger-generator/utils/config.ts
  * @Description: 
  */
-import { commands } from "vscode";
 import { existsSync, getConfig, isRegExp, join, readFileSyncToObj, rmSync, writeFileSync } from "@root/utils";
 import { baiduTranslationHandle, zhiyiTranslationHandle } from '../translation';
 import { getRegExp } from "./helper";

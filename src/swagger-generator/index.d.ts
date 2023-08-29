@@ -80,14 +80,14 @@ export interface SwaggerHttpEndpoint {
     produces: Producers[];
     parameters: {
         name: string;
-        in: 'path' | 'query' | 'body' | 'formData';
+        in: 'path' | 'query' | 'body' | 'formData' | 'header';
         contentType: 'multipart/form-data' | 'application/json';
         required: boolean;
         description?: string;
         type?: string;
         format?: string;
         items?: SwaggerSchema;
-        schema?: SwaggerSchema;
+        schema?: SwaggerSchema | string;
         maxLength?: number;
         minLength?: number;
     }[];

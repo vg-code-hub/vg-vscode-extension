@@ -9,6 +9,7 @@
 import axios from "axios";
 
 import { Swagger } from "../index.d";
+import { pascalCase } from "@root/utils";
 
 export async function getSimpleData(url: string): Promise<Swagger> {
   try {
@@ -39,6 +40,11 @@ export const swagger3to2 = (data: any) => {
   if (schemas)
     for (let key in schemas) {
       const properties = schemas[key].properties;
+      const className = pascalCase(key);
+      if (className !== key) {
+        schemas[className] = Object.assign({}, schemas[key]);
+        delete schemas[key];
+      }
       if (properties)
         for (let key2 in properties) {
           if (properties[key2].$ref)
@@ -54,9 +60,7 @@ export const swagger3to2 = (data: any) => {
               /components\/schemas/g,
               "definitions"
             );
-
         }
-
     }
 
   data.definitions = schemas;

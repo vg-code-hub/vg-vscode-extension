@@ -8,6 +8,9 @@
 -->
 # Release Notes
 
+### 2.5.0
+
+- refactor: 完善 swagger2dart 生成功能
 ### 2.4.1
 
 - feat: 适配 apifox Pagination
