@@ -174,11 +174,7 @@ class ${className} {\n`;
     let returnType = this.getReturnType(value.responses, method);
     if (returnType.includes('Map<String, dynamic>'))
       returnType = returnType.replace('Map<String, dynamic>', _name + 'Resp');
-    if (key === '/project/finish') {
-      console.log(returnType);
-      console.log(returnType);
 
-    }
     const functionArgs = this.getFunctionArgs(key, method, value.parameters);
     const functionDesc = `
   /// ${value.summary}${value.description ? `\n${INDENT}/// ${value.description}` : ''}${value.operationId ? `\n${INDENT}/// Operation ID: ${value.operationId}` : ''}${desc}`;
@@ -306,9 +302,9 @@ class ${className} {\n`;
     pathParams.forEach(p => {
       const name = camelCase(p.name);
       if (reqPath.includes(`{${p.name}}`))
-        reqPath = reqPath.replace(`{${p.name}}`, `\${${name}}`);
+        reqPath = reqPath.replace(`{${p.name}}`, `\$${name}`);
       else
-        reqPath += reqPath.endsWith('/') ? `\${${name}}` : `/\${${name}}`;
+        reqPath += reqPath.endsWith('/') ? `\$${name}` : `/\$${name}`;
     });
     str += `'${reqPath}'`;
     if (bodyParams.length > 0 && ['put', 'post'].includes(method)) {

@@ -9,7 +9,7 @@
  */
 import { find, pascalCase } from "@root/utils";
 import type { SwaggerPropertyDefinition, SwaggerHttpEndpoint, Responses } from "../../index.d";
-import { BASE_TYPE, getDartParamType, getDartSchemaType } from "../../utils";
+import { BASE_TYPE, SwaggerConfig, getDartParamType, getDartSchemaType } from "../../utils";
 import ModelGenerate from "./model";
 
 
@@ -87,7 +87,7 @@ function getReturnTypeContent(responses: Responses, content: string, name: strin
   try {
     content = MM.gen.generateModel(pascalCase(resClass), content, _val) ?? '';
   } catch (error) {
-    console.log({ resClass, _val });
+    SwaggerConfig.addException(`error: [class ${resClass}] generate error, please check orginal swagger.json`);
   }
 
   return content;

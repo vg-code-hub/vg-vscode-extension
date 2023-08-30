@@ -8,6 +8,9 @@
 -->
 # Release Notes
 
+### 2.5.1
+
+- fix: dart gen property.allOf
 ### 2.5.0
 
 - refactor: 完善 swagger2dart 生成功能

@@ -151,6 +151,9 @@ export function getDartType(key: string, property: SwaggerPropertyDefinition, ad
     const format = property.format;
     const subClass = pascalCase(key);
 
+    if (property.allOf && property.allOf.length === 1)
+        return getDartType(key, property.allOf[0]);
+
     switch (type) {
         case 'integer':
             if (format === 'int32') return 'int';
@@ -192,7 +195,7 @@ export function getDartType(key: string, property: SwaggerPropertyDefinition, ad
     }
     console.error(key, property, 'getDartType');
 
-    throw Error('Unsupported type: $type');
+    throw Error(`Unsupported type: ${type}`);
 }
 
 export function getDartSchemaType(property: SwaggerPropertyDefinition): string | undefined {
@@ -237,7 +240,7 @@ export function getDartSchemaType(property: SwaggerPropertyDefinition): string |
     }
     console.error(property, 'getDartSchemaType');
 
-    throw Error('Unsupported type: $type');
+    throw Error(`Unsupported type: ${type}`);
 }
 
 export function getDartParamType(param: SwaggerHttpEndpoint['parameters'][0], swaggerVersion = 2): string | undefined {

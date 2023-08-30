@@ -56,12 +56,13 @@ async function generateCode(jsonUrl: string, targetDirectory: string) {
   // 拿到所有中英文映射对象
   let translateJson = await SwaggerConfig.instance.getTranslateInfo(chineseList, translationPath);
 
-  // 把翻译的内容写入
-  writeFile(
-    translationPath,
-    JSON.stringify(translateJson, null, 4),
-    'utf-8',
-  );
+  if (Object.keys(translateJson).length > 0)
+    // 把翻译的内容写入
+    writeFile(
+      translationPath,
+      JSON.stringify(translateJson, null, 4),
+      'utf-8',
+    );
 
   SwaggerConfig.instance.addConfig({ rootPath: targetDirectory, swaggerVersion: Math.floor(values.swagger) as 2 | 3 });
 

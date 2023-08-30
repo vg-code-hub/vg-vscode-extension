@@ -24,11 +24,6 @@ class ModelGenerate {
     const value = _value ?? this.data[className];
     this.content = content;
     if (!value) return content;
-    if (className === 'ProjectsFinishRequest') {
-      console.log(className);
-      console.log(this.content);
-    }
-
     if (this.content.includes(`class ${className} `)) {
       SwaggerConfig.addException(`warn: [class ${className}] already exists, please check orginal swagger.json`);
       return this.content;
