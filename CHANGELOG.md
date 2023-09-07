@@ -1,12 +1,16 @@
 <!--
  * @Author: zdd
  * @Date: 2023-05-30 17:42:04
- * @LastEditors: zdd
- * @LastEditTime: 2023-06-19 18:47:44
+ * @LastEditors: jimmyZhao
+ * @LastEditTime: 2023-09-07 14:35:12
  * @FilePath: /vg-vscode-extension/CHANGELOG.md
  * @Description: 
 -->
 # Release Notes
+
+### 2.5.2
+
+- refactor: dart and ts swagger2api
 
 ### 2.5.1
 

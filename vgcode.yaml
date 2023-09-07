@@ -1,5 +1,0 @@
-type: dart
-swagger:
-  jsonUrl: http://127.0.0.1:4523/export/openapi?projectId=xxx&version=3.0
-  outputDir: api
-  overwrite: true
