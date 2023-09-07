@@ -20,7 +20,6 @@ interface Config {
   customModelFolder?: Record<string, string>
   translationObj?: Record<string, string>
   rootPath: string
-  swaggerVersion: 2 | 3
 }
 
 class SwaggerConfig {
@@ -69,7 +68,7 @@ class SwaggerConfig {
         customPathFolder.set(_key, element);
       }
 
-    this._config = { ...data, outputDir: data.outputDir ?? 'api', rootPath, swaggerVersion: 3, folderFilter, customPathFolder };
+    this._config = { ...data, outputDir: data.outputDir ?? 'api', rootPath, folderFilter, customPathFolder };
     return this.config;
   }
 
@@ -114,15 +113,16 @@ class SwaggerConfig {
     this.exceptionString += `${e}\n`;
   }
 
-  static writeExceptionToFile(modelsDir: string) {
+  static writeExceptionToFile(dir: string) {
+    const path = join(dir, 'exception.text');
     if (this.exceptionString)
       writeFileSync(
-        join(modelsDir, 'exception.text'),
+        path,
         this.exceptionString,
         'utf-8',
       );
-    else
-      rmSync(join(modelsDir, 'exception.text'));
+    else if (existsSync(path))
+      rmSync(path);
     this.exceptionString = '';
   }
 }

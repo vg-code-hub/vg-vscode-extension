@@ -1,8 +1,8 @@
 /*
  * @Author: zdd
  * @Date: 2023-06-01 16:31:38
- * @LastEditors: zdd
- * @LastEditTime: 2023-06-01 17:52:58
+ * @LastEditors: jimmyZhao
+ * @LastEditTime: 2023-09-07 10:37:58
  * @FilePath: /vg-vscode-extension/src/swagger-generator/http/index.ts
  * @Description: 
  */
@@ -19,7 +19,6 @@ export async function getSimpleData(url: string): Promise<Swagger> {
 
     return {
       jsonUrl: url,
-      swagger: data.swagger || "2.0",
       info: data.info,
       tags: data.tags,
       paths: data.paths,
@@ -39,85 +38,47 @@ export const swagger3to2 = (data: any) => {
 
   if (schemas)
     for (let key in schemas) {
-      const properties = schemas[key].properties;
       const className = pascalCase(key);
+      delete schemas[key]['x-apifox-orders'];
+      delete schemas[key]['x-apifox-ignore-properties'];
       if (className !== key) {
         schemas[className] = Object.assign({}, schemas[key]);
         delete schemas[key];
       }
-      if (properties)
-        for (let key2 in properties) {
-          if (properties[key2].$ref)
-            properties[key2].$ref = properties[key2].$ref.replace(
-              /components\/schemas/g,
-              "definitions"
-            );
-
-          if (properties[key2]?.items?.$ref)
-            properties[key2].items.$ref = properties[
-              key2
-            ].items.$ref.replace(
-              /components\/schemas/g,
-              "definitions"
-            );
-        }
     }
 
   data.definitions = schemas;
-  data.swagger = 3;
   if (paths)
     for (let key in paths) {
-      let path = paths[key];
-      for (let key2 in path) {
-        let methodData = path[key2];
-        methodData.consumes = [];
+      let pathData = paths[key];
+      for (let method in pathData) {
+        let methodData = pathData[method];
         methodData.parameters = methodData.parameters || [];
         if (methodData.requestBody) {
           const { content } = methodData.requestBody;
-
-          for (let key in content) {
-            methodData.consumes.push(key);
-            methodData.parameters.push({
-              in: "body",
-              name: "",
-              contentType: key,
-              required: true,
-              schema:
-                content[key].schema?.$ref?.replace(
-                  /components\/schemas/g,
-                  "definitions"
-                ) || null,
-            });
-          }
+          for (let contentType in content)
+            if (contentType === 'application/json')
+              methodData.parameters.push({
+                in: "body",
+                contentType,
+                required: true,
+                schema: content[contentType].schema,
+              });
+            else if (contentType === 'multipart/form-data')
+              methodData.parameters.push({
+                in: "formData",
+                contentType,
+                required: true,
+                schema: content[contentType].schema,
+              });
         }
         if (methodData.responses) {
-          let keys = Object.keys(
-            methodData.responses["200"]?.content || {}
-          );
-          if (keys.length > 0) {
-            let obj =
-              methodData.responses["200"].content?.[keys[0]];
-            methodData.responses["200"] = obj;
-            if (methodData.responses["200"].schema?.$ref)
-              methodData.responses["200"].schema.$ref =
-                methodData.responses[
-                  "200"
-                ].schema?.$ref?.replace(
-                  /components\/schemas/g,
-                  "definitions"
-                ) || null;
-
-            if (methodData.responses["200"].schema?.items?.$ref)
-              methodData.responses["200"].schema.items.$ref =
-                methodData.responses[
-                  "200"
-                ].schema.items.$ref?.replace(
-                  /components\/schemas/g,
-                  "definitions"
-                ) || null;
-
-
-            delete methodData.responses["200"].content;
+          let keys = Object.keys(methodData.responses["200"]?.content || {});
+          if (keys.includes('application/json')) {
+            methodData.successResponse = methodData.responses["200"]?.content['application/json'].schema;
+            delete methodData.responses;
+            delete methodData.successResponse['x-apifox-orders'];
+            delete methodData.successResponse['x-apifox-ignore-properties'];
           }
         }
       }

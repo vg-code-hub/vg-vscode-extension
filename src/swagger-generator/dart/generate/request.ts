@@ -1,7 +1,7 @@
-import { find, first, join, mkdirpSync, existsSync, writeFileSync, writeFile, snakeCase, camelCase, isRegExp, upperFirst } from "@root/utils";
-import type { SwaggerPropertyDefinition, SwaggerPath, Method, SwaggerHttpEndpoint, Responses } from "../../index.d";
-import { BASE_TYPE, INDENT, SwaggerConfig, getDartParamType, getDartSchemaType, getDirPath } from "../../utils";
-import { getModelClassContent } from "./model_tool";
+import { find, first, join, mkdirpSync, existsSync, writeFileSync, writeFile, camelCase, isRegExp, upperFirst } from "@root/utils";
+import type {  SwaggerPath, Method, SwaggerHttpEndpoint, JSONSchema } from "../../index.d";
+import { DART_TYPE, INDENT, SwaggerConfig, filterPathName, getClassName, getDartType, getDirPath, getParamObj, isPaginationResponse, isStandardResponse } from "../../utils";
+import { arrayClass, getModelClassContent } from "./model_tool";
 
 const METHOD_MAP = {
   get: 'get',
@@ -11,6 +11,15 @@ const METHOD_MAP = {
 };
 
 const rootName = 'requests';
+
+const getReturnType = (resClass?: string, isPagination = false) => {
+    if (!resClass) return undefined;
+    if (resClass.startsWith('List<')) {
+        const subType = arrayClass(resClass);
+        return isPagination ? `PageResp<${subType}>` : resClass;
+    }
+    return resClass;
+};
 
 class RequestGenerate {
   paths: SwaggerPath;
@@ -86,6 +95,7 @@ class RequestGenerate {
   put(path, body) {}
   delete(path, {query}) {}
 }
+abstract class FormData {}
 
 class BaseProvider extends GetConnect {}
 
@@ -156,24 +166,17 @@ class ${className} {\n`;
       this.filesMap[dirPath] = [apiHeader, modelHeader];
     }
 
-    // const _temp = key.split('/').map(e => camelCase(e)).filter(e => !['create', 'delete', 'update', 'v1'].includes(e));
-    let _name = '';
-    if (_temp.length === 1) {
-      _name = upperFirst(_temp[0]);
-    } else {
-      const last = _temp[_temp.length - 1];
-      const last1 = _temp[_temp.length - 2];
-      if (last.includes(last1))
-        _name = upperFirst(last);
-      else
-        _name = upperFirst(last1) + upperFirst(last);
-    }
-    this.filesMap[dirPath][1] = getModelClassContent(_name, value, this.filesMap[dirPath][1]);
+    var _name = filterPathName(_temp);
 
-    const { params, desc } = this.getParams(value.parameters);
-    let returnType = this.getReturnType(value.responses, method);
-    if (returnType.includes('Map<String, dynamic>'))
-      returnType = returnType.replace('Map<String, dynamic>', _name + 'Resp');
+    // if (key === '/v1/app/base/confirmLogin') {
+    //   console.log(key);
+    //   console.log(key);
+    // }
+    this.filesMap[dirPath][1] = getModelClassContent(_name, value, this.filesMap[dirPath][1]);
+    const reqClassName = getClassName(_name);
+
+    const { params, desc } = this.getParams(value.parameters, reqClassName);
+    let returnType = this.getReturnType(value.successResponse, getClassName(_name, false));
 
     const functionArgs = this.getFunctionArgs(key, method, value.parameters);
     const functionDesc = `
@@ -181,77 +184,42 @@ class ${className} {\n`;
     // 写入请求
     this.filesMap[dirPath][0] += `${functionDesc}
   static Future<${returnType}> ${methodName}(${params}) async {
-    ${returnType !== 'void' ? 'final res = ' : ''}await httpInstance.${method.toLowerCase()}(${functionArgs});${this.getReturnContent(value.responses, method)}
+    ${returnType !== 'void' ? 'final res = ' : ''}await httpInstance.${method.toLowerCase()}(${functionArgs});${this.getReturnContent(value.successResponse, getClassName(_name, false))}
   }
 `;
   }
 
-  getParamObj(parameters: SwaggerHttpEndpoint['parameters']) {
-    if (!parameters) return undefined;
-    const pathParams =
-      parameters.filter((p) => p['in'] === 'path');
-    const queryParams =
-      parameters.filter((p) => p['in'] === 'query');
-    const formDataParams =
-      parameters.filter((p) => p['in'] === 'body' && p['contentType'] === 'multipart/form-data');
-    const bodyParams =
-      parameters.filter((p) => p['in'] === 'body' && p['contentType'] !== 'multipart/form-data');
-
-    return {
-      pathParams,
-      queryParams,
-      formDataParams,
-      bodyParams
-    };
-  }
-
-  getReturnType(responses: Responses, method: Method) {
-    let resClass: string | undefined, isPageResp = false;
-    if (responses && responses['200'] && responses['200'].schema) {
-      const schema = responses['200'].schema;
-
-      if (schema.type === 'object' && schema.properties && Object.keys(schema.properties).includes('data')) {
-        // 普通对象返回值
-        let rawData: SwaggerPropertyDefinition | undefined = schema.properties['data'];
-        if (rawData['anyOf'])
-          rawData = find(rawData['anyOf'], item => item.type !== 'null');
-        resClass = rawData ? getDartSchemaType(rawData) : undefined;
-      } else if (schema.allOf && schema.allOf.length > 1 && schema.allOf[0].$ref?.includes('utils.Result')) {
-        // 包装对象返回值
-        let rawData: SwaggerPropertyDefinition | undefined = schema.allOf[1].properties['data'];
-        if (rawData.allOf && rawData.allOf.length > 1 && rawData.allOf[0].$ref?.includes('utils.PageData')) {
-          // 包装分页对象返回值
-          rawData = rawData.allOf[1].properties['data'];
-          if (rawData.type === 'array')
-            rawData = rawData.items;
-
-          isPageResp = true;
-        }
-
-        if (rawData['anyOf'])
-          rawData = find(rawData['anyOf'], item => item.type !== 'null');
-
-        if (rawData && !Array.isArray(rawData))
-          resClass = getDartSchemaType(rawData);
-
-        if (isPageResp)
-          resClass = `PageResp<${resClass}>`;
+  getReturnType(responses: JSONSchema | undefined, resClassName: string) {
+    if (!responses) return 'any';
+    let resClass: string | undefined, isPagination = false;
+    let standardRes: JSONSchema | undefined = isStandardResponse(responses);
+    if (standardRes) {
+      const pageData = isPaginationResponse(standardRes);
+      if (pageData) {
+        standardRes = pageData;
+        isPagination = true;
       }
+      if (standardRes['anyOf'])
+        standardRes = find(standardRes['anyOf'], item => item.type !== 'null');
+      resClass = standardRes ? getDartType({ property: standardRes, key: resClassName }) : undefined;
+    } else {
+      resClass = 'dynamic';
     }
-    return resClass !== undefined ? resClass : 'void';
+    resClass = getReturnType(resClass, isPagination);
+    return resClass !== undefined ? `${resClass}` : 'void';
   }
 
-  getParams(parameters: SwaggerHttpEndpoint['parameters']) {
-    const data = this.getParamObj(parameters);
+  getParams(parameters: SwaggerHttpEndpoint['parameters'], reqClassName: string) {
+    const data = getParamObj(parameters);
     if (!data) return { params: '', desc: '' };
     const { pathParams, queryParams, formDataParams, bodyParams } = data;
-    const swaggerVersion = SwaggerConfig.config.swaggerVersion;
+
     let str = '';
     let desc = `\n${INDENT}///\n${INDENT}/// parameters`;
 
     pathParams.forEach(p => {
       const name = camelCase(p.name);
-      const type = getDartParamType(p, swaggerVersion);
+      const type = getDartType({ param: p });
       str += `${type} ${name}, `;
 
       const description = p?.description;
@@ -261,7 +229,7 @@ class ${className} {\n`;
 
     queryParams.forEach(p => {
       const name = camelCase(p.name);
-      const type = getDartParamType(p, swaggerVersion);
+      const type = getDartType({ param: p });
       const require = p['required'];
       str += `${INDENT}${INDENT}${require ? 'required ' : ''}${type}${require ? '' : '?'} ${name},\n`;
 
@@ -271,7 +239,7 @@ class ${className} {\n`;
 
     if (formDataParams.length > 0) {
       if (!str.includes('{')) str += '{\n';
-      str += `${INDENT}${INDENT}required dynamic body,\n`;
+      str += `${INDENT}${INDENT}required FormData body,\n`;
 
       const description = formDataParams[0]?.description;
       desc += `\n${INDENT}/// [formDataParam] FormData body: ${description ?? ''}`;
@@ -279,7 +247,7 @@ class ${className} {\n`;
     if (bodyParams.length > 0) {
       if (!str.includes('{\n')) str += '{\n';
       const p = first(bodyParams)!;
-      const type = getDartParamType(p, swaggerVersion);
+      const type = getDartType({ param: p, key: reqClassName });
       const require = p['required'];
       str += `${INDENT}${INDENT}${require ? 'required ' : ''}${type}${require ? '' : '?'} body,\n`;
 
@@ -293,11 +261,10 @@ class ${className} {\n`;
   }
 
   getFunctionArgs(key: string, method: Method, parameters: SwaggerHttpEndpoint['parameters']) {
-    const data = this.getParamObj(parameters);
+    const data = getParamObj(parameters);
     if (!data) return `'${key}'`;
     let str = '', reqPath = key, queryStr = '';
     const { pathParams, queryParams, formDataParams, bodyParams } = data;
-    const swaggerVersion = SwaggerConfig.config.swaggerVersion;
 
     pathParams.forEach(p => {
       const name = camelCase(p.name);
@@ -309,11 +276,11 @@ class ${className} {\n`;
     str += `'${reqPath}'`;
     if (bodyParams.length > 0 && ['put', 'post'].includes(method)) {
       const p = first(bodyParams)!;
-      const type = getDartParamType(p, swaggerVersion);
+      const type = getDartType({ param: p });
       const require = p['required'];
 
       var suffix = '';
-      if (type && !BASE_TYPE.includes(type)) suffix = `.toJson()`;
+      if (type && !DART_TYPE.includes(type)) suffix = `.toJson()`;
       else if (type && ['int', 'double'].includes(type)) suffix = `.toString()`;
 
       str += `, body${require || !suffix ? '' : '?'}${suffix}`;
@@ -323,25 +290,28 @@ class ${className} {\n`;
     if (queryParams.length > 0) {
       queryStr += '{';
       queryParams.forEach(p => {
-        const type = getDartParamType(p, swaggerVersion);
+        const type = getDartType({ param: p });
         const name = camelCase(p.name);
         const require = p['required'];
         var suffix = '';
-        if (type && !BASE_TYPE.includes(type)) suffix = `.toJson()`;
+        if (type && !DART_TYPE.includes(type)) suffix = `.toJson()`;
         else if (type && ['int', 'double'].includes(type)) suffix = `.toString()`;
         queryStr += `\'${p.name}\': ${name}${require || !suffix ? '' : '?'}${suffix}, `;
       });
       queryStr += '}';
     }
     if (queryStr.length !== 0) str += `, query: ${queryStr}`;
+    if (!str.includes(',') && ['put', 'post'].includes(method)) str += ', {}';
     return str;
   }
 
-  getReturnContent(responses: SwaggerHttpEndpoint['responses'], method: Method) {
-    const returnType = this.getReturnType(responses, method);
+  getReturnContent(responses: JSONSchema | undefined, resClassName: string) {
+    const returnType = this.getReturnType(responses, resClassName);
     if (returnType === 'void') return '';
+    if (!isStandardResponse(responses)) return `\n${INDENT}${INDENT}return res;`;
+
     let type = returnType;
-    if (BASE_TYPE.includes(type) || type === 'List<Map<String, dynamic>>' || type === 'Map<String, dynamic>') {
+    if (DART_TYPE.includes(type) || type === 'List<Map<String, dynamic>>') {
       return `\n${INDENT}${INDENT}return res.body['data'];`;
     } else if (type.startsWith('List')) {
       const subType = type.substring(5, type.length - 1);

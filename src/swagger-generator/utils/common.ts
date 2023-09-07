@@ -2,30 +2,83 @@
 /*
  * @Author: zdd
  * @Date: 2023-06-01 16:59:31
- * @LastEditors: zdd
- * @LastEditTime: 2023-06-09 17:04:31
+ * @LastEditors: jimmyZhao
+ * @LastEditTime: 2023-09-07 14:31:14
  * @FilePath: /vg-vscode-extension/src/swagger-generator/utils/common.ts
  * @Description: 
  */
-import { SwaggerConfig } from ".";
-import { SwaggerHttpEndpoint, SwaggerPropertyDefinition, SwaggerSchema } from "../index.d";
+import { JSONSchema, SwaggerHttpEndpoint, SwaggerParameter } from "../index.d";
 import { exchangeZhToEn } from "./helper";
-import { first, join, snakeCase, pascalCase } from "@root/utils";
+import { first, join, snakeCase, pascalCase, camelCase } from "@root/utils";
 
 /** tab 空格数 */
 export const INDENT = '  ';
 
-export const BASE_TYPE = ['dynamic', 'any', 'int', 'double', 'number', 'boolean', 'File', 'string', 'String', 'DateTime', 'bool', 'Record<string, any>', 'Map<String, dynamic>'];
+export const DART_TYPE = ['String', 'int', 'double', 'bool', 'num', 'DateTime', 'dynamic', 'Map<String, dynamic>', 'List'];
+export const TS_TYPE = ['string', 'number', 'boolean', 'null', 'undefined', 'File', 'Record<string, any>', 'any', 'any[]'];
 
-export const DART_TYPE = [...BASE_TYPE, 'dynamic'];
+interface TypeParam {
+    key?: string
+    property?: JSONSchema
+    param?: SwaggerParameter
+}
 
-export const TS_TYPE = [...BASE_TYPE, 'any'];
+export function getClassName(name: string, isReq = true) {
+    return pascalCase(name + (isReq ? '_req' : '_res'));
+}
 
-export function getTsType(key: string, property: SwaggerPropertyDefinition, addException = false): string {
-    const type = Array.isArray(property.type) ? first(property.type) : property.type;
-    const format = property.format;
-    const subClass = pascalCase(key);
+export function filterPathName(strs: string[]) {
+    let res: string = '';
+    for (let i = strs.length - 1; i >= 0; i--) {
+        if (res.includes(camelCase(strs[i]))) continue;
+        res = camelCase(strs[i]) + '_' + res;
+    }
 
+    return pascalCase(res);
+}
+
+
+
+function getRef({ property, param }: TypeParam) {
+    let ref: string | undefined = '';
+    if (property && property['$ref']) ref = property['$ref'];
+    if (param && param.schema && Object.prototype.hasOwnProperty.call(param.schema, '$ref')) ref = (param.schema as JSONSchema)['$ref'];
+    
+    if (ref) {
+        const parts = ref.split('/');
+        const typeName = parts[parts.length - 1];
+        return pascalCase(typeName);
+    }
+    return undefined;
+}
+
+function calcTypeParam({ key, property, param }: TypeParam) {
+    const subClass = key ? pascalCase(key) : undefined;
+    function getCuncrrentType(type: JSONSchema['type']) {
+        if (!type) return undefined;
+        return Array.isArray(type) ? first(type) : type;
+    }
+
+    let type: string | undefined;
+    if (property) {
+        //TODO: allOf property 获取第一项
+        if (property.allOf) property = property.allOf[0];
+        type = getCuncrrentType(property.type);
+    } else if (param) {
+        const schema = param.schema;
+        if (param.type)
+            type = getCuncrrentType(param.type);
+        else if (!schema)
+            type = '';
+        else
+            type = typeof schema === 'string' ? schema : getCuncrrentType(schema.type);
+    }
+    return { type, property, subClass };
+}
+
+export function getTsType({ key, property, param }: TypeParam): string {
+    const { type, property: _property, subClass } = calcTypeParam({ key, property, param });
+    property = _property;
     switch (type) {
         case 'integer':
         case 'number':
@@ -37,258 +90,57 @@ export function getTsType(key: string, property: SwaggerPropertyDefinition, addE
         case 'file':
             return 'File';
         case 'object':
-            if (addException) SwaggerConfig.addException(`info: auto create [class ${subClass}] in some object propertys`);
+            if (!subClass) return 'any';
             return subClass;
         case 'array':
-            const items = property['items'];
-            if (items) {
-                var itemType = getTsType(key, items, addException);
-                return `${itemType}[]`;
-            }
-            break;
+            const items = property!['items'];
+            if (!items) return 'any[]';
+            let item = items;
+            //TODO: 目前仅支持单一类型
+            if (Array.isArray(items) && items.length > 0) item = items[0];
+            var itemType = getTsType({ key: key, property: item as JSONSchema });
+            return `${itemType}[]`;
         default:
-            const ref = property['$ref'];
-            if (ref) {
-                const parts = ref.split('/');
-                const typeName = parts[parts.length - 1];
-                return typeName;
-            }
+            const ref = getRef({ param, property });
+            if (ref) return ref;
     }
-    console.error(key, property, 'getTsType');
 
-    throw Error('Unsupported type: $type');
+    return 'any';
 }
 
-
-export function getTsSchemaType(property: SwaggerPropertyDefinition): string | undefined {
-    const type = Array.isArray(property.type) ? first(property.type) : property.type || ((typeof property.schema === 'string') ? property.schema : property.schema?.type);
+export function getDartType({ key, property, param }: TypeParam): string {
+    const { type, property: _property, subClass } = calcTypeParam({ key, property, param });
+    property = _property;
 
     switch (type) {
         case 'integer':
+            return 'int';
         case 'number':
-            return 'number';
+            return 'num';
         case 'string':
-            return 'string';
-        case 'boolean':
-            return 'boolean';
-        case 'file':
-            return 'File';
-        case 'object':
-            {
-                if (property['x-apifox-refs'] && property['x-apifox-orders']) {
-                    let key = first(property['x-apifox-orders']);
-                    const ref = property['x-apifox-refs'][key as keyof typeof property['x-apifox-refs']]['$ref'];
-                    if (ref) {
-                        const parts = ref.split('/');
-                        const typeName = parts[parts.length - 1];
-                        return pascalCase(typeName);
-                    }
-                }
-
-                return 'Record<string, any>';
-            }
-        case 'array':
-            const items = property['items'];
-            if (items) {
-                var itemType = getTsSchemaType(items)!;
-                itemType = itemType === 'Record<string, any>' ? itemType : pascalCase(itemType);
-                return itemType ? `${itemType}[]` : 'any[]';
-            }
-            break;
-        default:
-            const ref = property['$ref'];
-            if (ref) {
-                const parts = ref.split('/');
-                const typeName = parts[parts.length - 1];
-                return pascalCase(typeName);
-            }
-    }
-    console.error(property, 'getDartSchemaType');
-
-    throw Error('Unsupported type: $type');
-}
-
-export function getTsParamType(param: SwaggerHttpEndpoint['parameters'][0], swaggerVersion = 2): string | undefined {
-    // TODO: fix swagger3 bug 
-    const schema = param.schema as SwaggerSchema;
-    const type = swaggerVersion === 2 ? (param.type ?? schema?.type ?? schema?.$ref) : (schema ? (typeof schema === 'string' ? schema : schema.type) : 'object');
-    const format = param.format;
-
-    switch (type) {
-        case 'integer':
-        case 'number':
-            return 'number';
-        case 'string':
-            return 'string';
-        case 'boolean':
-            return 'boolean';
-        case 'file':
-            return 'File';
-        case 'object':
-            return 'Record<string, any>';
-        case 'array':
-            const items = swaggerVersion === 2 ? (schema?.type ? schema['items'] : param['items']) : schema;
-            if (items) {
-                var itemType = getDartSchemaType(items);
-                return itemType ? `${pascalCase(itemType)}[]` : 'any[]';
-            }
-            break;
-        default:
-            const ref = swaggerVersion === 2 ? schema?.['$ref'] : type;
-            if (ref) {
-                const parts = ref.split('/');
-                const typeName = parts[parts.length - 1];
-                return pascalCase(typeName);
-            }
-    }
-    console.error(param, swaggerVersion, 'getDartParamType');
-
-    throw Error('Unsupported type: $type');
-}
-
-export function getDartType(key: string, property: SwaggerPropertyDefinition, addException = false): string {
-    const type = Array.isArray(property.type) ? first(property.type) : property.type;
-    const format = property.format;
-    const subClass = pascalCase(key);
-
-    if (property.allOf && property.allOf.length === 1)
-        return getDartType(key, property.allOf[0]);
-
-    switch (type) {
-        case 'integer':
-            if (format === 'int32') return 'int';
-            else if (format === 'int64') return 'int';
-            else return 'int';
-
-        case 'number':
-            if (format === 'float') return 'double';
-            else if (format === 'double') return 'double';
-            else return 'double';
-
-        case 'string':
-            if (format === 'date-time')
-                return 'DateTime';
-            else
-                return 'String';
-
+            return 'String';
         case 'boolean':
             return 'bool';
         case 'file':
             return 'File';
         case 'object':
-            if (addException) SwaggerConfig.addException(`info: auto create [class ${subClass}] in some object propertys`);
+            if (!subClass) return 'dynamic';
             return subClass;
         case 'array':
-            const items = property['items'];
-            if (items) {
-                var itemType = getDartType(key, items, addException);
-                return `List<${itemType}>`;
-            }
-            break;
+            const items = property!['items'];
+            if (!items) return 'List';
+            let item = items;
+            /// 目前仅支持单一类型
+            if (Array.isArray(items) && items.length > 0) item = items[0];
+            var itemType = getDartType({ key: key, property: item as JSONSchema });
+            return `List<${itemType}>`;
         default:
-            const ref = property['$ref'];
-            if (ref) {
-                const parts = ref.split('/');
-                const typeName = parts[parts.length - 1];
-                return pascalCase(typeName);
-            }
+            const ref = getRef({ param, property });
+            if (ref) return ref;
     }
-    console.error(key, property, 'getDartType');
 
-    throw Error(`Unsupported type: ${type}`);
+    return 'dynamic';
 }
-
-export function getDartSchemaType(property: SwaggerPropertyDefinition): string | undefined {
-    const type = Array.isArray(property.type) ? first(property.type) : property.type || ((typeof property.schema === 'string') ? property.schema : property.schema?.type);
-    const format = property.format;
-
-    switch (type) {
-        case 'integer':
-            if (format === 'int32') return 'int';
-            else if (format === 'int64') return 'int';
-            else return 'int';
-        case 'number':
-            if (format === 'float') return 'double';
-            else if (format === 'double') return 'double';
-            else return 'double';
-        case 'string':
-            if (format === 'date-time')
-                return 'DateTime';
-            else
-                return 'String';
-        case 'boolean':
-            return 'bool';
-        case 'object':
-            return 'Map<String, dynamic>';
-        case 'file':
-            return 'File';
-        case 'array':
-            const items = property['items'];
-            if (items) {
-                var itemType = getDartSchemaType(items)!;
-                itemType = itemType === 'Map<String, dynamic>' ? itemType : pascalCase(itemType);
-                return itemType ? `List<${itemType}>` : 'List';
-            }
-            break;
-        default:
-            const ref = property['$ref'];
-            if (ref) {
-                const parts = ref.split('/');
-                const typeName = parts[parts.length - 1];
-                return pascalCase(typeName);
-            }
-    }
-    console.error(property, 'getDartSchemaType');
-
-    throw Error(`Unsupported type: ${type}`);
-}
-
-export function getDartParamType(param: SwaggerHttpEndpoint['parameters'][0], swaggerVersion = 2): string | undefined {
-    // TODO: fix swagger3 bug 
-    const schema = param.schema as SwaggerSchema;
-    const type = swaggerVersion === 2 ? (param.type ?? schema?.type ?? schema?.$ref) : (schema ? (typeof schema === 'string' ? schema : schema.type) : 'object');
-    const format = param.format;
-
-    switch (type) {
-        case 'integer':
-            if (format === 'int32') return 'int';
-            else if (format === 'int64') return 'int';
-            else return 'int';
-        case 'number':
-            if (format === 'float') return 'double';
-            else if (format === 'double') return 'double';
-            else return 'double';
-        case 'string':
-            if (format === 'date-time')
-                return 'DateTime';
-            else
-                return 'String';
-        case 'boolean':
-            return 'bool';
-        case 'object':
-            return 'Map<String, dynamic>';
-        case 'file':
-            return 'File';
-        case 'array':
-            const items = swaggerVersion === 2 ? (schema?.type ? schema['items'] : param['items']) : schema;
-            if (items) {
-                var itemType = getDartSchemaType(items);
-                return itemType ? `List<${pascalCase(itemType)}>` : 'List';
-            }
-            break;
-        default:
-            const ref = swaggerVersion === 2 ? schema?.['$ref'] : type;
-            if (ref) {
-                const parts = ref.split('/');
-                const typeName = parts[parts.length - 1];
-                return pascalCase(typeName);
-            }
-    }
-    console.error(param, swaggerVersion, 'getDartParamType');
-
-    throw Error('Unsupported type: $type');
-}
-
 
 export const getDirPath = (folder: string | undefined, type: 'entitys' | 'requests', { translationObj, rootPath }: any) => {
     let dirPath: string, deeps = 1, className: string;
@@ -309,3 +161,42 @@ export const getDirPath = (folder: string | undefined, type: 'entitys' | 'reques
             deeps
         };
 };
+
+export const isStandardResponse = (response?: JSONSchema) => {
+    if (typeof response !== 'object') return undefined;
+    if (response.allOf && response.allOf.length > 1 && response.allOf[0].$ref?.endsWith('utils.Result')) return response.allOf[1].properties!['data'];
+    if (typeof response === 'object' && response.type === 'object' && response.properties && Object.keys(response.properties).includes('data')) return response.properties!['data'];
+    return undefined;
+};
+
+export const isPaginationResponse = (standardResponse: JSONSchema) => {
+    if (standardResponse.properties && Object.keys(standardResponse.properties).includes('list') && standardResponse.properties['list'].type === 'array')
+        return standardResponse!['properties']!['list'];
+    if (standardResponse.allOf && standardResponse.allOf.length > 1 && standardResponse.allOf[0].$ref?.endsWith('utils.PageData')) return standardResponse.allOf[1].properties!['data'];
+    return undefined;
+};
+
+export function getParamObj(parameters: SwaggerHttpEndpoint['parameters']) {
+    if (!parameters) return undefined;
+    const pathParams =
+        parameters.filter((p) => p['in'] === 'path');
+    const queryParams =
+        parameters.filter((p) => p['in'] === 'query');
+    const formDataParams =
+        parameters.filter((p) => p['in'] === 'formData');
+    const bodyParams =
+        parameters.filter((p) => p['in'] === 'body');
+
+    return {
+        pathParams,
+        queryParams,
+        formDataParams,
+        bodyParams
+    };
+}
+
+export function getResSchema(schema: JSONSchema) {
+    let _val = (schema as JSONSchema).properties?.data;
+    if (_val && _val.type === 'array') _val = _val.items;
+    return _val;
+}

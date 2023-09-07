@@ -1,8 +1,8 @@
 /*
  * @Author: zdd
  * @Date: 2023-06-01 15:12:03
- * @LastEditors: zdd
- * @LastEditTime: 2023-06-19 14:54:20
+ * @LastEditors: jimmyZhao
+ * @LastEditTime: 2023-09-07 10:41:52
  * @FilePath: /vg-vscode-extension/src/swagger-generator/dart/index.ts
  * @Description: 
  */
@@ -64,7 +64,7 @@ async function generateCode(jsonUrl: string, targetDirectory: string) {
       'utf-8',
     );
 
-  SwaggerConfig.instance.addConfig({ rootPath: targetDirectory, swaggerVersion: Math.floor(values.swagger) as 2 | 3 });
+  SwaggerConfig.instance.addConfig({ rootPath: targetDirectory });
 
   // 生成 model
   // await new ModelGenerate(values.data).generateAllModel();

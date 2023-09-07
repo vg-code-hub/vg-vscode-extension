@@ -11,8 +11,9 @@ import { Uri, window } from "vscode";
 import { join, mkdirp, getRootPath, existsSync, writeFile } from "@root/utils";
 import { getSimpleData } from "../http";
 import { SwaggerConfig, collectChinese } from "../utils";
-import ModelGenerate from "./generate/model";
 import RequestGenerate from "./generate/request";
+import ModelGenerate from "./generate/model";
+import { MM } from "./generate/model_tool";
 
 export const genWebapiForTypescript = async (uri: Uri) => {
   try {
@@ -61,9 +62,10 @@ async function generateCode(jsonUrl: string, targetDirectory: string) {
     'utf-8',
   );
 
-  SwaggerConfig.instance.addConfig({ rootPath: targetDirectory, swaggerVersion: Math.floor(values.swagger) as 2 | 3 });
+  SwaggerConfig.instance.addConfig({ rootPath: targetDirectory });
 
   // 生成 model
-  await new ModelGenerate(values.data).generateAllModel();
+  // await new ModelGenerate(values.data).generateAllModel();
+  MM.gen = new ModelGenerate(values.data);
   await new RequestGenerate(values.paths).generateAllRequest();
 }
