@@ -4,9 +4,9 @@
  * @LastEditors: zdd
  * @LastEditTime: 2023-06-05 15:58:31
  * @FilePath: /vg-vscode-extension/src/type.d.ts
- * @Description: 
+ * @Description:
  */
 export type PageType = 'normal' | 'refresh list' | 'form';
 declare interface gradlejs {
-  parseFile: (path: string) => Promise<object>
+  parseFile: (path: string) => Promise<object>;
 }

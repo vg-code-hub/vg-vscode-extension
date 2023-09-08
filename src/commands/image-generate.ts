@@ -1,11 +1,7 @@
-
-import * as path from "path";
-import Jimp from "jimp";
-import { Uri, window } from "vscode";
-import {
-  mkdirpSync, readdirSync, statSync, existsSync,
-  readdir, stat, appendFileSync, rmSync, camelCase,
-} from "@root/utils";
+import * as path from 'path';
+import Jimp from 'jimp';
+import { Uri, window } from 'vscode';
+import { mkdirpSync, readdirSync, statSync, existsSync, readdir, stat, appendFileSync, rmSync, camelCase } from '@root/utils';
 
 export const imageGenerate = async (uri: Uri) => {
   let targetDirectory = uri.fsPath;
@@ -29,47 +25,33 @@ function imagesGen(targetDirectory: string) {
     var imgPath = path.parse(filePath);
     let lowExt = imgPath.ext.toLowerCase();
     if (
-      lowExt !== ".jpeg" &&
-      lowExt !== ".jpg" &&
-      lowExt !== ".png"
+      lowExt !== '.jpeg' &&
+      lowExt !== '.jpg' &&
+      lowExt !== '.png'
       // imgPath.dir.toLowerCase().indexOf("3.0x") === -1
     )
       return;
 
-
     let dirPath = imgPath.dir.toLowerCase();
-    let find3x = dirPath.indexOf("3.0x");
-    if (find3x === -1)
-      return;
+    let find3x = dirPath.indexOf('3.0x');
+    if (find3x === -1) return;
 
-
-    let workDir = path.resolve(imgPath.dir, ".."); // 上一级目录
+    let workDir = path.resolve(imgPath.dir, '..'); // 上一级目录
 
     // 创建 2.0x 1.0x
-    if (!existsSync(`${workDir}/2.0x`))
-      mkdirpSync(`${workDir}/2.0x`);
+    if (!existsSync(`${workDir}/2.0x`)) mkdirpSync(`${workDir}/2.0x`);
 
-    if (!existsSync(`${workDir}/${imgPath.base}`))
-      await scaleImage(`${workDir}/${imgPath.base}`, filePath, 3);
+    if (!existsSync(`${workDir}/${imgPath.base}`)) await scaleImage(`${workDir}/${imgPath.base}`, filePath, 3);
 
-    if (!existsSync(`${workDir}/2.0x/${imgPath.base}`))
-      await scaleImage(`${workDir}/2.0x/${imgPath.base}`, filePath, 2);
-
+    if (!existsSync(`${workDir}/2.0x/${imgPath.base}`)) await scaleImage(`${workDir}/2.0x/${imgPath.base}`, filePath, 2);
 
     // 删除文件
     if (isFirst === true) {
       isFirst = false;
-      if (existsSync(`${workDir}/files.txt`))
-        rmSync(`${workDir}/files.txt`);
-
+      if (existsSync(`${workDir}/files.txt`)) rmSync(`${workDir}/files.txt`);
     }
     // 写入列表
-    appendFileSync(
-      `${workDir}/files.txt`,
-      `static const ${camelCase(imgPath.base)} = 'assets/images/${imgPath.base
-      }';\r\n`,
-      "utf8"
-    );
+    appendFileSync(`${workDir}/files.txt`, `static const ${camelCase(imgPath.base)} = 'assets/images/${imgPath.base}';\r\n`, 'utf8');
   });
 }
 
@@ -78,56 +60,42 @@ function svgsGen(targetDirectory: string) {
   walkSync(targetDirectory, async (filePath: string, stat: object) => {
     var imgPath = path.parse(filePath);
     let lowExt = imgPath.ext.toLowerCase();
-    if (lowExt !== ".svg")
-      return;
-
+    if (lowExt !== '.svg') return;
 
     let workDir = imgPath.dir;
 
     // 删除文件
     if (isFirst === true) {
       isFirst = false;
-      if (existsSync(`${workDir}/files.txt`))
-        rmSync(`${workDir}/files.txt`);
-
+      if (existsSync(`${workDir}/files.txt`)) rmSync(`${workDir}/files.txt`);
     }
     // 写入列表
-    appendFileSync(
-      `${workDir}/files.txt`,
-      `static const ${camelCase(imgPath.base)} = 'assets/svgs/${imgPath.base
-      }';\r\n`,
-      "utf8"
-    );
+    appendFileSync(`${workDir}/files.txt`, `static const ${camelCase(imgPath.base)} = 'assets/svgs/${imgPath.base}';\r\n`, 'utf8');
   });
 }
 
 function fileDisplay(filePath: string, fileList: string[]) {
   //根据文件路径读取文件，返回文件列表
   readdir(filePath, function (err, files) {
-    if (err)
-      console.warn(err);
+    if (err) console.warn(err);
+    //遍历读取到的文件列表
     else
-      //遍历读取到的文件列表
       files.forEach(function (filename) {
         //获取当前文件的绝对路径
         var filedir = path.join(filePath, filename);
         //根据文件路径获取文件信息，返回一个fs.Stats对象
         stat(filedir, function (eror, stats) {
           if (eror) {
-            console.warn("获取文件stats失败");
+            console.warn('获取文件stats失败');
           } else {
             var isFile = stats.isFile(); //是文件
             var isDir = stats.isDirectory(); //是文件夹
-            if (isFile)
-              fileList.push(filedir);
+            if (isFile) fileList.push(filedir);
 
-            if (isDir)
-              fileDisplay(filedir, fileList); //递归，如果是文件夹，就继续遍历该文件夹下面的文件
-
+            if (isDir) fileDisplay(filedir, fileList); //递归，如果是文件夹，就继续遍历该文件夹下面的文件
           }
         });
       });
-
   });
 }
 
@@ -135,20 +103,12 @@ function walkSync(currentDirPath: string, callback: Function) {
   readdirSync(currentDirPath).forEach(function (name) {
     var filePath = path.join(currentDirPath, name);
     var stat = statSync(filePath);
-    if (stat.isFile())
-      callback(filePath, stat);
-    else if (stat.isDirectory())
-      walkSync(filePath, callback);
-
+    if (stat.isFile()) callback(filePath, stat);
+    else if (stat.isDirectory()) walkSync(filePath, callback);
   });
 }
 
-
-const scaleImage = (
-  destinationImagePath: string,
-  imagePath: string,
-  scale: number
-) => {
+const scaleImage = (destinationImagePath: string, imagePath: string, scale: number) => {
   return new Promise<void>((resolve, reject) => {
     Jimp.read(imagePath, (error, image) => {
       if (error) {

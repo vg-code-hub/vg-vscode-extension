@@ -4,16 +4,16 @@
  * @LastEditors: jimmyZhao
  * @LastEditTime: 2023-09-07 10:41:52
  * @FilePath: /vg-vscode-extension/src/swagger-generator/dart/index.ts
- * @Description: 
+ * @Description:
  */
 
-import { Uri, window } from "vscode";
-import { join, mkdirp, getRootPath, existsSync, writeFile } from "@root/utils";
-import { getSimpleData } from "../http";
-import { SwaggerConfig, collectChinese } from "../utils";
-import ModelGenerate from "./generate/model";
-import RequestGenerate from "./generate/request";
-import { MM } from "./generate/model_tool";
+import { Uri, window } from 'vscode';
+import { join, mkdirp, getRootPath, existsSync, writeFile } from '@root/utils';
+import { getSimpleData } from '../http';
+import { SwaggerConfig, collectChinese } from '../utils';
+import ModelGenerate from './generate/model';
+import RequestGenerate from './generate/request';
+import { MM } from './generate/model_tool';
 
 export const genWebapiForDart = async (uri: Uri) => {
   try {
@@ -26,9 +26,7 @@ export const genWebapiForDart = async (uri: Uri) => {
     const absPath = outputDir.startsWith('/') ? join(rootPath, outputDir) : join(rootPath, 'lib', outputDir);
 
     await generateCode(jsonUrl, absPath);
-    window.showInformationMessage(
-      `Successfully Generated api directory`
-    );
+    window.showInformationMessage(`Successfully Generated api directory`);
   } catch (error) {
     console.error(error);
     window.showErrorMessage(
@@ -43,11 +41,7 @@ async function generateCode(jsonUrl: string, targetDirectory: string) {
 
   const values = await getSimpleData(jsonUrl);
 
-  writeFile(
-    targetDirectory.concat(`/swagger.json`),
-    JSON.stringify(values, null, 4),
-    'utf-8',
-  );
+  writeFile(targetDirectory.concat(`/swagger.json`), JSON.stringify(values, null, 4), 'utf-8');
 
   //收集所有中文
   let chineseList = collectChinese(values);
@@ -58,11 +52,7 @@ async function generateCode(jsonUrl: string, targetDirectory: string) {
 
   if (Object.keys(translateJson).length > 0)
     // 把翻译的内容写入
-    writeFile(
-      translationPath,
-      JSON.stringify(translateJson, null, 4),
-      'utf-8',
-    );
+    writeFile(translationPath, JSON.stringify(translateJson, null, 4), 'utf-8');
 
   SwaggerConfig.instance.addConfig({ rootPath: targetDirectory });
 

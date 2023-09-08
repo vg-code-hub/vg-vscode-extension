@@ -4,15 +4,11 @@
  * @LastEditors: zdd
  * @LastEditTime: 2023-07-21 16:44:30
  * @FilePath: /vg-vscode-extension/src/webview/controllers/material.ts
- * @Description: 
+ * @Description:
  */
 
 import { existsSync } from '@root/utils';
-import {
-  copyMaterialsFromTemp,
-  downloadMaterialsFromGit,
-  downloadMaterialsFromNpm,
-} from '../../utils/download';
+import { copyMaterialsFromTemp, downloadMaterialsFromGit, downloadMaterialsFromNpm } from '../../utils/download';
 import { tempGlobalDir } from '../../utils/env';
 import { deleteMaterialTemplate, getLocalMaterials } from '../../utils/materials';
 import { materialsPath } from '../../utils/vscodeEnv';
@@ -29,13 +25,9 @@ const material = {
     return data;
   },
 
-  downloadMaterials: async (
-    message: IMessage<{ type: 'git' | 'npm'; url: string }>,
-  ) => {
-    if (message.data.type === 'npm')
-      await downloadMaterialsFromNpm(message.data.url);
-    else
-      downloadMaterialsFromGit(message.data.url);
+  downloadMaterials: async (message: IMessage<{ type: 'git' | 'npm'; url: string }>) => {
+    if (message.data.type === 'npm') await downloadMaterialsFromNpm(message.data.url);
+    else downloadMaterialsFromGit(message.data.url);
 
     const materials = {
       blocks: getLocalMaterials('blocks', tempGlobalDir.blockMaterials),
@@ -44,9 +36,7 @@ const material = {
     return materials;
   },
 
-  saveDownloadMaterials: async (
-    message: IMessage<{ blocks: string[]; snippets: string[] }>,
-  ) => {
+  saveDownloadMaterials: async (message: IMessage<{ blocks: string[]; snippets: string[] }>) => {
     copyMaterialsFromTemp(message.data, materialsPath);
   },
 
@@ -54,7 +44,7 @@ const material = {
     message: IMessage<{
       name: string;
       type: 'schema2code' | 'blocks' | 'snippets';
-    }>,
+    }>
   ) => {
     return deleteMaterialTemplate(message.data);
   },

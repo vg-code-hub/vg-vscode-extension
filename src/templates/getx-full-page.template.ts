@@ -1,6 +1,5 @@
-import { pascalCase, snakeCase, writeFileSync } from "../utils";
-import { findCodeTemplate } from "./utils";
-
+import { pascalCase, snakeCase, writeFileSync } from '../utils';
+import { findCodeTemplate } from './utils';
 
 export function bindingsTemplate(pageName: string, targetDirectory: string) {
   const pascalCaseName = pascalCase(pageName);
@@ -20,7 +19,7 @@ class ${pascalCaseName}Binding implements Bindings {
 
   return new Promise(async (resolve, reject) => {
     try {
-      writeFileSync(targetPath, template, "utf8");
+      writeFileSync(targetPath, template, 'utf8');
       resolve('success');
     } catch (error) {
       reject(error);
@@ -35,14 +34,13 @@ export function controllerTemplate(pageName: string, targetDirectory: string) {
 
   return new Promise(async (resolve, reject) => {
     try {
-      writeFileSync(targetPath, template, "utf8");
+      writeFileSync(targetPath, template, 'utf8');
       resolve('success');
     } catch (error) {
       reject(error);
     }
   });
 }
-
 
 export function viewTemplate(pageName: string, targetDirectory: string) {
   const snakeCaseName = snakeCase(pageName);
@@ -54,7 +52,7 @@ export function viewTemplate(pageName: string, targetDirectory: string) {
 
   return new Promise(async (resolve, reject) => {
     try {
-      writeFileSync(targetPath, template, "utf8");
+      writeFileSync(targetPath, template, 'utf8');
       resolve('success');
     } catch (error) {
       reject(error);

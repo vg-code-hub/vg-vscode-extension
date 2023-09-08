@@ -4,7 +4,7 @@
  * @LastEditors: zdd
  * @LastEditTime: 2023-07-05 10:53:36
  * @FilePath: /vg-vscode-extension/src/utils/vscodeEnv.ts
- * @Description: 
+ * @Description:
  */
 import * as path from 'path';
 import { workspace } from 'vscode';
@@ -28,7 +28,5 @@ export const getEnv = () => ({
 });
 
 export const checkRootPath = () => {
-  if (!rootPath)
-    throw new Error('请打开工作目录');
-
+  if (!rootPath) throw new Error('请打开工作目录');
 };

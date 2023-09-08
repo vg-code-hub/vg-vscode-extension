@@ -19,12 +19,12 @@ export interface IGetLocalMaterialsResult {
     img?: string | string[];
     category?: string[];
     schema?: 'form-render' | 'formily' | 'amis';
-    scripts?: [{ method: string; remark: string; }];
-    notShowInintellisense?: boolean
-    notShowInCommand?: boolean
+    scripts?: [{ method: string; remark: string }];
+    notShowInintellisense?: boolean;
+    notShowInCommand?: boolean;
   };
   template: string;
-  type?: string
+  type?: string;
 }
 
 /**
@@ -32,10 +32,7 @@ export interface IGetLocalMaterialsResult {
  *
  * @param {(IMaterialType)} type
  */
-export const getLocalMaterials = (
-  type: IMaterialType,
-  materialsFullPath: string,
-) => {
+export const getLocalMaterials = (type: IMaterialType, materialsFullPath: string) => {
   let materials: IGetLocalMaterialsResult[] = [];
   try {
     materials = fs.readdirSync(materialsFullPath).map((s) => {
@@ -46,21 +43,20 @@ export const getLocalMaterials = (
       let template = '';
       try {
         model = JSON.parse(getFileContent(path.join(fullPath, 'config', 'model.json'), true));
-      } catch { }
+      } catch {}
       try {
         schema = JSON.parse(getFileContent(path.join(fullPath, 'config', 'schema.json'), true));
-      } catch { }
+      } catch {}
       try {
         preview = JSON.parse(getFileContent(path.join(fullPath, 'config', 'preview.json'), true));
-      } catch { }
+      } catch {}
       if (type !== 'blocks')
         try {
           template = getFileContent(path.join(fullPath, 'src', type === 'schema2code' ? 'template' : 'template.ejs'), true);
-        } catch { }
+        } catch {}
 
       if (schema.formSchema) {
-        if (schema.formSchema.formData)
-          model = schema.formSchema.formData;
+        if (schema.formSchema.formData) model = schema.formSchema.formData;
 
         schema = schema.formSchema.schema;
       }
@@ -71,13 +67,10 @@ export const getLocalMaterials = (
           schema.body.forEach((s: Record<string, unknown>) => {
             if (s.type === 'form') {
               s.name = 'form';
-              if (s.data && Object.keys(model).length === 0)
-                model = s.data;
-              else if (!s.data && Object.keys(model).length > 0)
-                s.data = model;
+              if (s.data && Object.keys(model).length === 0) model = s.data;
+              else if (!s.data && Object.keys(model).length > 0) s.data = model;
             }
           });
-
       }
 
       return {
@@ -89,7 +82,7 @@ export const getLocalMaterials = (
         template,
       };
     });
-  } catch { }
+  } catch {}
   return materials.filter((s) => s.name !== '.DS_Store');
 };
 
@@ -98,9 +91,7 @@ export const getCodeTemplateListFromFiles = () => {
   const templateFullPath = path.join(rootPath, getTemplateFilePath());
 
   try {
-    const templateFiles = fs
-      .readdirSync(templateFullPath)
-      .filter((s) => s.indexOf('.ejs') > -1);
+    const templateFiles = fs.readdirSync(templateFullPath).filter((s) => s.indexOf('.ejs') > -1);
     templateFiles.map((s) => {
       const fileBuffer = fs.readFileSync(path.join(templateFullPath, s));
       const fileContent = fileBuffer.toString();
@@ -110,7 +101,7 @@ export const getCodeTemplateListFromFiles = () => {
         type: 'ejs',
       });
     });
-  } catch (error) { }
+  } catch (error) {}
   return list;
 };
 
@@ -137,10 +128,7 @@ export function getSnippets() {
   return templates.concat(getLocalMaterials('snippets', snippetMaterialsPath));
 }
 
-export const deleteMaterialTemplate = (data: {
-  name: string;
-  type: 'schema2code' | 'blocks' | 'snippets';
-}) => {
+export const deleteMaterialTemplate = (data: { name: string; type: 'schema2code' | 'blocks' | 'snippets' }) => {
   const snippetPath = path.join(tempGlobalDir.materials, materialsDir, data.type, data.name);
   execa.execaSync('rm', ['-rf', snippetPath]);
   return '删除成功';

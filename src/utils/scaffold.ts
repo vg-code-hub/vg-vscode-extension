@@ -4,7 +4,7 @@
  * @LastEditors: zdd
  * @LastEditTime: 2023-07-05 14:12:13
  * @FilePath: /vg-vscode-extension/src/utils/scaffold.ts
- * @Description: 
+ * @Description:
  */
 import * as path from 'path';
 import * as fs from 'fs-extra';
@@ -15,7 +15,6 @@ import { renderEjsTemplates } from './ejs';
 import { tempGlobalDir } from './env';
 import { rootPath } from './vscodeEnv';
 import { camelCase, snakeCase } from './tools';
-
 
 export const downloadScaffoldFromGit = async (remote: string, tag?: string) => {
   fs.removeSync(tempGlobalDir.scaffold);
@@ -47,57 +46,41 @@ export const downloadScaffoldFromGit = async (remote: string, tag?: string) => {
   }
 
   if (fs.existsSync(path.join(tempGlobalDir.scaffold, 'lowcode.scaffold.config.json')))
-    return fs.readJSONSync(
-      path.join(tempGlobalDir.scaffold, 'lowcode.scaffold.config.json'),
-    );
+    return fs.readJSONSync(path.join(tempGlobalDir.scaffold, 'lowcode.scaffold.config.json'));
 
   return {};
 };
 
 export const copyLocalScaffoldToTemp = (localScaffoldPath?: string) => {
-  if (!localScaffoldPath)
-    localScaffoldPath = rootPath;
+  if (!localScaffoldPath) localScaffoldPath = rootPath;
 
-  if (!localScaffoldPath)
-    throw new Error('当前没有打开项目，请选择本地项目');
+  if (!localScaffoldPath) throw new Error('当前没有打开项目，请选择本地项目');
 
   fs.removeSync(tempGlobalDir.scaffold);
   fs.copySync(localScaffoldPath, tempGlobalDir.scaffold, {
     filter: (src: string, dest: string) => {
-      if (src.includes('.git') || src.includes('node_modules'))
-        return false;
+      if (src.includes('.git') || src.includes('node_modules')) return false;
 
       return true;
     },
   });
   fs.removeSync(path.join(tempGlobalDir.scaffold, '.git'));
-  if (
-    fs.existsSync(path.join(tempGlobalDir.scaffold, 'lowcode.scaffold.config.json'))
-  )
-    return fs.readJSONSync(
-      path.join(tempGlobalDir.scaffold, 'lowcode.scaffold.config.json'),
-    );
+  if (fs.existsSync(path.join(tempGlobalDir.scaffold, 'lowcode.scaffold.config.json')))
+    return fs.readJSONSync(path.join(tempGlobalDir.scaffold, 'lowcode.scaffold.config.json'));
 
   return {};
 };
 
 export const compileScaffold = async (model: any, createDir: string) => {
   if (fs.existsSync(path.join(tempGlobalDir.scaffold, 'lowcode.scaffold.config.json'))) {
-    const config = fs.readJSONSync(
-      path.join(tempGlobalDir.scaffold, 'lowcode.scaffold.config.json'),
-    );
+    const config = fs.readJSONSync(path.join(tempGlobalDir.scaffold, 'lowcode.scaffold.config.json'));
     const excludeCompile: string[] = config.excludeCompile || [];
     if (config.conditionFiles)
       Object.keys(model).map((key) => {
-        if (
-          config.conditionFiles[key] &&
-          config.conditionFiles[key].value === model[key] &&
-          Array.isArray(config.conditionFiles[key].exclude)
-        )
+        if (config.conditionFiles[key] && config.conditionFiles[key].value === model[key] && Array.isArray(config.conditionFiles[key].exclude))
           config.conditionFiles[key].exclude.map((exclude: string) => {
             fs.removeSync(path.join(tempGlobalDir.scaffold, exclude));
           });
-
       });
 
     await renderEjsTemplates(model, tempGlobalDir.scaffold, excludeCompile);
@@ -124,9 +107,16 @@ export const compileScaffold = async (model: any, createDir: string) => {
     const { android } = await g2js.parseFile(path.join(lastDir, 'android/app/build.gradle'));
     const [_, groupName] = cleanGStr(android.namespace).split('.');
 
-    const arrSnake = ['README.md', 'pubspec.yaml', '.vscode/launch.json', 'test/widget_test.dart',
-      `android/app/src/main/java/com/${groupName}/${name}/MyApplication.java`, 'android/app/build.gradle',
-      `android/app/src/main/java/com/${groupName}/${name}/MapActivity.java`, 'android/app/src/main/AndroidManifest.xml'];
+    const arrSnake = [
+      'README.md',
+      'pubspec.yaml',
+      '.vscode/launch.json',
+      'test/widget_test.dart',
+      `android/app/src/main/java/com/${groupName}/${name}/MyApplication.java`,
+      'android/app/build.gradle',
+      `android/app/src/main/java/com/${groupName}/${name}/MapActivity.java`,
+      'android/app/src/main/AndroidManifest.xml',
+    ];
     const camelArr = ['ios/Runner/Info.plist', 'ios/Runner.xcodeproj/project.pbxproj'];
 
     arrSnake.forEach((item) => {
@@ -140,7 +130,10 @@ export const compileScaffold = async (model: any, createDir: string) => {
       fs.writeFileSync(path.join(lastDir, item), content);
     });
 
-    fs.copySync(path.join(lastDir, `android/app/src/main/java/com/${groupName}/${name}`), path.join(lastDir, `android/app/src/main/java/com/${groupName}/${snakeName}`));
+    fs.copySync(
+      path.join(lastDir, `android/app/src/main/java/com/${groupName}/${name}`),
+      path.join(lastDir, `android/app/src/main/java/com/${groupName}/${snakeName}`)
+    );
     fs.removeSync(path.join(lastDir, `android/app/src/main/java/com/${groupName}/${name}`));
     execa.execaSync('flutter', ['pub', 'get'], { cwd: lastDir });
   }

@@ -4,7 +4,7 @@
  * @LastEditors: zdd
  * @LastEditTime: 2023-06-17 09:42:45
  * @FilePath: /vg-vscode-extension/src/swagger-generator/index.ts
- * @Description: 
+ * @Description:
  */
-export * from "./dart";
-export * from "./ts";
+export * from './dart';
+export * from './ts';

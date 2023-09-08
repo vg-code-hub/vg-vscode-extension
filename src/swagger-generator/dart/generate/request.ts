@@ -1,7 +1,18 @@
-import { find, first, join, mkdirpSync, existsSync, writeFileSync, writeFile, camelCase, isRegExp, upperFirst } from "@root/utils";
-import type {  SwaggerPath, Method, SwaggerHttpEndpoint, JSONSchema } from "../../index.d";
-import { DART_TYPE, INDENT, SwaggerConfig, filterPathName, getClassName, getDartType, getDirPath, getParamObj, isPaginationResponse, isStandardResponse } from "../../utils";
-import { arrayClass, getModelClassContent } from "./model_tool";
+import { find, first, join, mkdirpSync, existsSync, writeFileSync, writeFile, camelCase, isRegExp, upperFirst } from '@root/utils';
+import type { SwaggerPath, Method, SwaggerHttpEndpoint, JSONSchema } from '../../index.d';
+import {
+  DART_TYPE,
+  INDENT,
+  SwaggerConfig,
+  filterPathName,
+  getClassName,
+  getDartType,
+  getDirPath,
+  getParamObj,
+  isPaginationResponse,
+  isStandardResponse,
+} from '../../utils';
+import { arrayClass, getModelClassContent } from './model_tool';
 
 const METHOD_MAP = {
   get: 'get',
@@ -13,12 +24,12 @@ const METHOD_MAP = {
 const rootName = 'requests';
 
 const getReturnType = (resClass?: string, isPagination = false) => {
-    if (!resClass) return undefined;
-    if (resClass.startsWith('List<')) {
-        const subType = arrayClass(resClass);
-        return isPagination ? `PageResp<${subType}>` : resClass;
-    }
-    return resClass;
+  if (!resClass) return undefined;
+  if (resClass.startsWith('List<')) {
+    const subType = arrayClass(resClass);
+    return isPagination ? `PageResp<${subType}>` : resClass;
+  }
+  return resClass;
 };
 
 class RequestGenerate {
@@ -31,9 +42,7 @@ class RequestGenerate {
   }
 
   async generateAllRequest() {
-    for (let key in this.paths)
-      for (let method in this.paths[key])
-        this.generateRequest(key, method as Method, this.paths[key][method as Method]) + "\n";
+    for (let key in this.paths) for (let method in this.paths[key]) this.generateRequest(key, method as Method, this.paths[key][method as Method]) + '\n';
 
     let str = `library ${rootName};\n\n`;
     const requestsDir = join(SwaggerConfig.config.rootPath);
@@ -45,45 +54,20 @@ class RequestGenerate {
       str += `export '.${key.replace(requestsDir, '')}/request.g.dart';\n`;
       const [apiContent, modelContent] = this.filesMap[key];
       if (!overwrite) {
-        writeFile(
-          join(key, 'request.g.vg'),
-          apiContent + '}',
-          'utf-8',
-        );
-        writeFile(
-          join(key, 'model.g.vg'),
-          modelContent,
-          'utf-8',
-        );
+        writeFile(join(key, 'request.g.vg'), apiContent + '}', 'utf-8');
+        writeFile(join(key, 'model.g.vg'), modelContent, 'utf-8');
       }
       if (!existsSync(join(key, 'request.g.dart')) || overwrite) {
-        writeFile(
-          join(key, 'request.g.dart'),
-          apiContent + '}',
-          'utf-8',
-        );
-        writeFile(
-          join(key, 'model.g.dart'),
-          modelContent,
-          'utf-8',
-        );
+        writeFile(join(key, 'request.g.dart'), apiContent + '}', 'utf-8');
+        writeFile(join(key, 'model.g.dart'), modelContent, 'utf-8');
       }
     }
 
     // 内容写入 index.dart
-    if (!existsSync(join(requestsDir, 'index.dart')))
-      writeFileSync(
-        join(requestsDir, 'index.dart'),
-        str,
-        'utf-8',
-      );
-    writeFileSync(
-      join(requestsDir, 'index.text'),
-      str,
-      'utf-8',
-    );
+    if (!existsSync(join(requestsDir, 'index.dart'))) writeFileSync(join(requestsDir, 'index.dart'), str, 'utf-8');
+    writeFileSync(join(requestsDir, 'index.text'), str, 'utf-8');
 
-    // 内容写入 base_connect.dart  
+    // 内容写入 base_connect.dart
     if (!existsSync(join(requestsDir, 'base_connect.dart')))
       writeFileSync(
         join(requestsDir, 'base_connect.dart'),
@@ -114,7 +98,7 @@ class PageResp<T> {
   });
 }
 `,
-        'utf-8',
+        'utf-8'
       );
     SwaggerConfig.writeExceptionToFile(requestsDir);
   }
@@ -133,7 +117,7 @@ class PageResp<T> {
         }
 
     if (!folder) {
-      folder = value["x-apifox-folder"];
+      folder = value['x-apifox-folder'];
       if (!folder && value.tags && value.tags.length > 0) folder = value.tags[0];
       if (!SwaggerConfig.testFolder(folder ?? '')) return;
       folder = SwaggerConfig.exchangeConfigMap(folder);
@@ -141,12 +125,15 @@ class PageResp<T> {
 
     const translationObj = SwaggerConfig.translationObj;
     let { dirPath, deeps, className } = getDirPath(folder, rootName, { translationObj, rootPath }) as {
-      className: string,
-      dirPath: string,
-      deeps: number
+      className: string;
+      dirPath: string;
+      deeps: number;
     };
     if (!existsSync(dirPath)) mkdirpSync(dirPath);
-    const _temp = key.split('/').map(e => camelCase(e)).filter(e => !['create', 'delete', 'update', 'v1', ''].includes(e));
+    const _temp = key
+      .split('/')
+      .map((e) => camelCase(e))
+      .filter((e) => !['create', 'delete', 'update', 'v1', ''].includes(e));
     const keyLast = _temp.join('_');
     if (!keyLast) return;
 
@@ -156,7 +143,11 @@ class PageResp<T> {
     // 写入 class 头
     if (!this.filesMap[dirPath]) {
       const modelHeader = `// This file is generated by the VG SwaggerGenerator.
-// ${overwrite ? 'Do not edit, next time generation will overwrite it!' : 'Next time generation will not overwrite it, but instead generate a suffix of (.vg) file with the same name.'}`;
+// ${
+        overwrite
+          ? 'Do not edit, next time generation will overwrite it!'
+          : 'Next time generation will not overwrite it, but instead generate a suffix of (.vg) file with the same name.'
+      }`;
       const apiHeader = `${modelHeader}
 import '${join(...Array(deeps - 1).fill('..'), 'base_connect.dart')}';
 import 'model.g.dart';
@@ -180,18 +171,24 @@ class ${className} {\n`;
 
     const functionArgs = this.getFunctionArgs(key, method, value.parameters);
     const functionDesc = `
-  /// ${value.summary}${value.description ? `\n${INDENT}/// ${value.description}` : ''}${value.operationId ? `\n${INDENT}/// Operation ID: ${value.operationId}` : ''}${desc}`;
+  /// ${value.summary}${value.description ? `\n${INDENT}/// ${value.description}` : ''}${
+      value.operationId ? `\n${INDENT}/// Operation ID: ${value.operationId}` : ''
+    }${desc}`;
     // 写入请求
     this.filesMap[dirPath][0] += `${functionDesc}
   static Future<${returnType}> ${methodName}(${params}) async {
-    ${returnType !== 'void' ? 'final res = ' : ''}await httpInstance.${method.toLowerCase()}(${functionArgs});${this.getReturnContent(value.successResponse, getClassName(_name, false))}
+    ${returnType !== 'void' ? 'final res = ' : ''}await httpInstance.${method.toLowerCase()}(${functionArgs});${this.getReturnContent(
+      value.successResponse,
+      getClassName(_name, false)
+    )}
   }
 `;
   }
 
   getReturnType(responses: JSONSchema | undefined, resClassName: string) {
     if (!responses) return 'any';
-    let resClass: string | undefined, isPagination = false;
+    let resClass: string | undefined,
+      isPagination = false;
     let standardRes: JSONSchema | undefined = isStandardResponse(responses);
     if (standardRes) {
       const pageData = isPaginationResponse(standardRes);
@@ -199,8 +196,7 @@ class ${className} {\n`;
         standardRes = pageData;
         isPagination = true;
       }
-      if (standardRes['anyOf'])
-        standardRes = find(standardRes['anyOf'], item => item.type !== 'null');
+      if (standardRes['anyOf']) standardRes = find(standardRes['anyOf'], (item) => item.type !== 'null');
       resClass = standardRes ? getDartType({ property: standardRes, key: resClassName }) : undefined;
     } else {
       resClass = 'dynamic';
@@ -217,7 +213,7 @@ class ${className} {\n`;
     let str = '';
     let desc = `\n${INDENT}///\n${INDENT}/// parameters`;
 
-    pathParams.forEach(p => {
+    pathParams.forEach((p) => {
       const name = camelCase(p.name);
       const type = getDartType({ param: p });
       str += `${type} ${name}, `;
@@ -227,7 +223,7 @@ class ${className} {\n`;
     });
     if (queryParams.length > 0) str += '{\n';
 
-    queryParams.forEach(p => {
+    queryParams.forEach((p) => {
       const name = camelCase(p.name);
       const type = getDartType({ param: p });
       const require = p['required'];
@@ -263,15 +259,15 @@ class ${className} {\n`;
   getFunctionArgs(key: string, method: Method, parameters: SwaggerHttpEndpoint['parameters']) {
     const data = getParamObj(parameters);
     if (!data) return `'${key}'`;
-    let str = '', reqPath = key, queryStr = '';
+    let str = '',
+      reqPath = key,
+      queryStr = '';
     const { pathParams, queryParams, formDataParams, bodyParams } = data;
 
-    pathParams.forEach(p => {
+    pathParams.forEach((p) => {
       const name = camelCase(p.name);
-      if (reqPath.includes(`{${p.name}}`))
-        reqPath = reqPath.replace(`{${p.name}}`, `\$${name}`);
-      else
-        reqPath += reqPath.endsWith('/') ? `\$${name}` : `/\$${name}`;
+      if (reqPath.includes(`{${p.name}}`)) reqPath = reqPath.replace(`{${p.name}}`, `\$${name}`);
+      else reqPath += reqPath.endsWith('/') ? `\$${name}` : `/\$${name}`;
     });
     str += `'${reqPath}'`;
     if (bodyParams.length > 0 && ['put', 'post'].includes(method)) {
@@ -289,7 +285,7 @@ class ${className} {\n`;
 
     if (queryParams.length > 0) {
       queryStr += '{';
-      queryParams.forEach(p => {
+      queryParams.forEach((p) => {
         const type = getDartType({ param: p });
         const name = camelCase(p.name);
         const require = p['required'];

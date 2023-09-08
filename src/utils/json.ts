@@ -10,8 +10,7 @@ const GenerateSchema = require('generate-schema');
 const strip = require('strip-comments');
 
 export const jsonIsValid = (jsonString: string) => {
-  if (typeof jsonString !== 'string')
-    return false;
+  if (typeof jsonString !== 'string') return false;
 
   try {
     const result = JSON.parse(jsonString);
@@ -23,17 +22,12 @@ export const jsonIsValid = (jsonString: string) => {
 };
 
 export const jsonParse = (clipboardText: string) => {
-  if (typeof clipboardText !== 'string')
-    return '';
+  if (typeof clipboardText !== 'string') return '';
 
   let func: any = function () {
     return '';
   };
-  if (
-    clipboardText.startsWith('var') ||
-    clipboardText.startsWith('let') ||
-    clipboardText.startsWith('const')
-  )
+  if (clipboardText.startsWith('var') || clipboardText.startsWith('let') || clipboardText.startsWith('const'))
     clipboardText = clipboardText.replace(/(var|let|const).*=/, '');
 
   try {
@@ -57,8 +51,7 @@ export const mockFromSchema = (schema: any) => {
         if (typeof mockKeyWordEqualConfig[i].value === 'string') {
           const array = mockKeyWordEqualConfig[i].value.split('&&');
           if (array.length > 1) {
-            if (type === array[1])
-              return array[0];
+            if (type === array[1]) return array[0];
 
             return value;
           }
@@ -68,22 +61,17 @@ export const mockFromSchema = (schema: any) => {
 
     const mockKeyWordLikeConfig = mockConfig?.mockKeyWordLike || [];
     for (let i = 0; i < mockKeyWordLikeConfig.length; i++)
-      if (
-        key.toUpperCase().indexOf(mockKeyWordLikeConfig[i].key.toUpperCase()) >
-        -1
-      ) {
+      if (key.toUpperCase().indexOf(mockKeyWordLikeConfig[i].key.toUpperCase()) > -1) {
         if (typeof mockKeyWordLikeConfig[i].value === 'string') {
           const array = mockKeyWordLikeConfig[i].value.split('&&');
           if (array.length > 1) {
-            if (type === array[1])
-              return array[0];
+            if (type === array[1]) return array[0];
 
             return value;
           }
         }
         return mockKeyWordLikeConfig[i].value;
       }
-
 
     return value;
   };
@@ -95,10 +83,7 @@ export const mockFromSchema = (schema: any) => {
       jsonStr += `${key ? `${key}: {` : ''}`;
       Object.keys(property.properties).map((childPropertyKey) => {
         const childProperty = property.properties[childPropertyKey];
-        const { jsonStr: childJsonStr, listStr: childListStr } = formatProperty(
-          childProperty,
-          childPropertyKey,
-        );
+        const { jsonStr: childJsonStr, listStr: childListStr } = formatProperty(childProperty, childPropertyKey);
         jsonStr += childJsonStr;
         listStr = listStr.concat(childListStr);
       });
@@ -116,24 +101,14 @@ export const mockFromSchema = (schema: any) => {
           itemStr += '{';
           Object.keys(property.items.properties).map((itemPropertyKey) => {
             const itemProperty = property.items.properties[itemPropertyKey];
-            const { jsonStr: itemJsonStr, listStr: itemListStr } =
-              formatProperty(itemProperty, itemPropertyKey);
+            const { jsonStr: itemJsonStr, listStr: itemListStr } = formatProperty(itemProperty, itemPropertyKey);
             itemStr += itemJsonStr;
             listStr = listStr.concat(itemListStr);
           });
           itemStr += `})}`;
         } else {
-          if (property.items.type === 'string')
-            itemStr += getMockValue(
-              key,
-              mockConfig?.mockString || '',
-              'string',
-            );
-          else
-            itemStr += getMockValue(
-              key,
-              mockConfig?.mockNumber || 'Random.natural(1000,1000)',
-            );
+          if (property.items.type === 'string') itemStr += getMockValue(key, mockConfig?.mockString || '', 'string');
+          else itemStr += getMockValue(key, mockConfig?.mockNumber || 'Random.natural(1000,1000)');
 
           itemStr += `)}`;
         }
@@ -143,22 +118,11 @@ export const mockFromSchema = (schema: any) => {
         jsonStr += `${key}: [],`;
       }
     } else if (property.type === 'number') {
-      jsonStr += `${key}: ${getMockValue(
-        key,
-        mockConfig?.mockNumber || 'Random.natural(1000,1000)',
-      )},`;
+      jsonStr += `${key}: ${getMockValue(key, mockConfig?.mockNumber || 'Random.natural(1000,1000)')},`;
     } else if (property.type === 'boolean') {
-      jsonStr += `${key}: ${getMockValue(
-        key,
-        mockConfig?.mockBoolean || 'false',
-        'boolean',
-      )},`;
+      jsonStr += `${key}: ${getMockValue(key, mockConfig?.mockBoolean || 'false', 'boolean')},`;
     } else if (property.type === 'string') {
-      jsonStr += `${key}: ${getMockValue(
-        key,
-        mockConfig?.mockString || 'Random.cword(5, 7)',
-        'string',
-      )},`;
+      jsonStr += `${key}: ${getMockValue(key, mockConfig?.mockString || 'Random.cword(5, 7)', 'string')},`;
     }
     return {
       jsonStr,
@@ -176,13 +140,10 @@ export const typescriptToJson = (oriType: string) => {
   let type = oriType;
   const tempDir = path.join(os.homedir(), '.vgcode/temp');
   const filePath = path.join(tempDir, 'ts.ts');
-  if (!fs.existsSync(filePath))
-    fs.createFileSync(filePath);
-
+  if (!fs.existsSync(filePath)) fs.createFileSync(filePath);
 
   // 处理最外层是数组类型的场景
-  if (!type.trim().endsWith('}'))
-    type = `{ result: ${type} }`;
+  if (!type.trim().endsWith('}')) type = `{ result: ${type} }`;
 
   fs.writeFileSync(filePath, `export interface TempType ${type}`, {
     encoding: 'utf-8',
@@ -190,8 +151,7 @@ export const typescriptToJson = (oriType: string) => {
 
   const program = TJS.getProgramFromFiles([filePath]);
   const schema = TJS.generateSchema(program, 'TempType') as any;
-  if (schema === null)
-    throw new Error('根据TS类型生成JSON Schema失败');
+  if (schema === null) throw new Error('根据TS类型生成JSON Schema失败');
 
   const { mockCode, mockData } = mockFromSchema(schema);
   return {

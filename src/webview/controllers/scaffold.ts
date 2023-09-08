@@ -4,13 +4,10 @@
  * @LastEditors: zdd
  * @LastEditTime: 2023-07-05 16:10:35
  * @FilePath: /vg-vscode-extension/src/webview/controllers/scaffold.ts
- * @Description: 
+ * @Description:
  */
 import { commands, Uri } from 'vscode';
-import {
-  selectDirectory as openSelectDirectory, fetchScaffolds, compileScaffold,
-  copyLocalScaffoldToTemp, downloadScaffoldFromGit,
-} from '@root/utils';
+import { selectDirectory as openSelectDirectory, fetchScaffolds, compileScaffold, copyLocalScaffoldToTemp, downloadScaffoldFromGit } from '@root/utils';
 import { IMessage } from '../type';
 
 export const getScaffolds = async (message: IMessage<{ url: string }>) => {
@@ -23,7 +20,7 @@ export const downloadScaffold = (
     type: 'git' | 'npm';
     repository: string;
     tag?: string;
-  }>,
+  }>
 ) => {
   if (message.data.type === 'git') {
     const config = downloadScaffoldFromGit(message.data.repository, message.data.tag);
@@ -41,15 +38,10 @@ export const createProject = async (
     model: any;
     createDir: string;
     immediateOpen: boolean;
-  }>,
+  }>
 ) => {
   await compileScaffold(message.data.model, message.data.createDir);
-  if (message.data.immediateOpen)
-    commands.executeCommand(
-      'vscode.openFolder',
-      Uri.file(message.data.createDir),
-      true,
-    );
+  if (message.data.immediateOpen) commands.executeCommand('vscode.openFolder', Uri.file(message.data.createDir), true);
 
   return '创建项目成功';
 };
@@ -57,7 +49,7 @@ export const createProject = async (
 export const useLocalScaffold = (
   message: IMessage<{
     localPath?: string;
-  }>,
+  }>
 ) => {
   const config = copyLocalScaffoldToTemp(message.data.localPath);
   return config;

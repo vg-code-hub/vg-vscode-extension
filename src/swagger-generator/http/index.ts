@@ -2,27 +2,27 @@
  * @Author: zdd
  * @Date: 2023-06-01 16:31:38
  * @LastEditors: jimmyZhao
- * @LastEditTime: 2023-09-07 10:37:58
+ * @LastEditTime: 2023-09-08 21:57:26
  * @FilePath: /vg-vscode-extension/src/swagger-generator/http/index.ts
- * @Description: 
+ * @Description:
  */
-import axios from "axios";
+import axios from 'axios';
 
-import { Swagger } from "../index.d";
-import { pascalCase } from "@root/utils";
+import { Swagger } from '../index.d';
+import { pascalCase } from '@root/utils';
+import { getModelName } from '../utils';
 
 export async function getSimpleData(url: string): Promise<Swagger> {
   try {
     const { data } = await axios.get(url);
-    if (data.swagger?.split(".")[0] - 0 !== 2)
-      swagger3to2(data);
+    if (data.swagger?.split('.')[0] - 0 !== 2) swagger3to2(data);
 
     return {
       jsonUrl: url,
       info: data.info,
       tags: data.tags,
       paths: data.paths,
-      data: data.definitions
+      data: data.definitions,
     };
   } catch (error) {
     const info = `服务地址可能错误，导致未能正确获取信息。（${url}）`;
@@ -31,14 +31,13 @@ export async function getSimpleData(url: string): Promise<Swagger> {
   }
 }
 
-
 export const swagger3to2 = (data: any) => {
   let schemas = data.components.schemas;
   let paths = data.paths;
 
   if (schemas)
     for (let key in schemas) {
-      const className = pascalCase(key);
+      let className = getModelName(key);
       delete schemas[key]['x-apifox-orders'];
       delete schemas[key]['x-apifox-ignore-properties'];
       if (className !== key) {
@@ -59,23 +58,23 @@ export const swagger3to2 = (data: any) => {
           for (let contentType in content)
             if (contentType === 'application/json')
               methodData.parameters.push({
-                in: "body",
+                in: 'body',
                 contentType,
                 required: true,
                 schema: content[contentType].schema,
               });
             else if (contentType === 'multipart/form-data')
               methodData.parameters.push({
-                in: "formData",
+                in: 'formData',
                 contentType,
                 required: true,
                 schema: content[contentType].schema,
               });
         }
         if (methodData.responses) {
-          let keys = Object.keys(methodData.responses["200"]?.content || {});
+          let keys = Object.keys(methodData.responses['200']?.content || {});
           if (keys.includes('application/json')) {
-            methodData.successResponse = methodData.responses["200"]?.content['application/json'].schema;
+            methodData.successResponse = methodData.responses['200']?.content['application/json'].schema;
             delete methodData.responses;
             delete methodData.successResponse['x-apifox-orders'];
             delete methodData.successResponse['x-apifox-ignore-properties'];

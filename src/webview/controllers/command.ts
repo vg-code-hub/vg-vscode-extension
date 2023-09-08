@@ -4,7 +4,7 @@
  * @LastEditors: zdd
  * @LastEditTime: 2023-06-17 17:54:59
  * @FilePath: /vg-vscode-extension/src/webview/controllers/command.ts
- * @Description: 
+ * @Description:
  */
 import { commands } from 'vscode';
 import { IMessage } from '../type';

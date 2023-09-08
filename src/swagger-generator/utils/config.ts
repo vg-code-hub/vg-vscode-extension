@@ -4,22 +4,22 @@
  * @LastEditors: zdd
  * @LastEditTime: 2023-06-19 14:55:00
  * @FilePath: /vg-vscode-extension/src/swagger-generator/utils/config.ts
- * @Description: 
+ * @Description:
  */
-import { existsSync, getConfig, isRegExp, join, readFileSyncToObj, rmSync, writeFileSync } from "@root/utils";
+import { existsSync, getConfig, isRegExp, join, readFileSyncToObj, rmSync, writeFileSync } from '@root/utils';
 import { baiduTranslationHandle, zhiyiTranslationHandle } from '../translation';
-import { getRegExp } from "./helper";
+import { getRegExp } from './helper';
 
 interface Config {
-  jsonUrl: string,
-  outputDir: string,
-  overwrite?: boolean,
-  folderFilter?: (string | RegExp)[],
-  folderMap?: Record<string, string>
-  customPathFolder?: Map<string | RegExp, string>
-  customModelFolder?: Record<string, string>
-  translationObj?: Record<string, string>
-  rootPath: string
+  jsonUrl: string;
+  outputDir: string;
+  overwrite?: boolean;
+  folderFilter?: (string | RegExp)[];
+  folderMap?: Record<string, string>;
+  customPathFolder?: Map<string | RegExp, string>;
+  customModelFolder?: Record<string, string>;
+  translationObj?: Record<string, string>;
+  rootPath: string;
 }
 
 class SwaggerConfig {
@@ -32,7 +32,7 @@ class SwaggerConfig {
   /*
     单例模式，仅允许通过 RemoteOption.instance 获取全局唯一实例
   */
-  private constructor() { }
+  private constructor() {}
 
   private _config?: Config;
 
@@ -49,7 +49,7 @@ class SwaggerConfig {
   get config() {
     if (!this._config) throw Error('config not init');
     return this._config;
-  };
+  }
 
   async getConfig(rootPath: string) {
     if (!existsSync(rootPath.concat(`/vgcode.yaml`))) throw Error('config your vgcode.yaml then  try again');
@@ -94,7 +94,7 @@ class SwaggerConfig {
   static testFolder(folder?: string) {
     const folderFilter = this.config.folderFilter;
     if (!folderFilter || !folder || folderFilter.length === 0) return true;
-    return folderFilter.some((item) => isRegExp(item) ? (item as RegExp).test(folder) : folder.startsWith(item as string));
+    return folderFilter.some((item) => (isRegExp(item) ? (item as RegExp).test(folder) : folder.startsWith(item as string)));
   }
 
   static exchangeConfigMap(folder?: string) {
@@ -115,14 +115,8 @@ class SwaggerConfig {
 
   static writeExceptionToFile(dir: string) {
     const path = join(dir, 'exception.text');
-    if (this.exceptionString)
-      writeFileSync(
-        path,
-        this.exceptionString,
-        'utf-8',
-      );
-    else if (existsSync(path))
-      rmSync(path);
+    if (this.exceptionString) writeFileSync(path, this.exceptionString, 'utf-8');
+    else if (existsSync(path)) rmSync(path);
     this.exceptionString = '';
   }
 }

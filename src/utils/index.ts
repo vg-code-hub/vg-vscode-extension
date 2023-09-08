@@ -4,7 +4,7 @@
  * @LastEditors: zdd
  * @LastEditTime: 2023-06-17 18:09:49
  * @FilePath: /vg-vscode-extension/src/utils/index.ts
- * @Description: 
+ * @Description:
  */
 export * from './env';
 export * from './ejs';

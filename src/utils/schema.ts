@@ -4,7 +4,7 @@
  * @LastEditors: zdd
  * @LastEditTime: 2023-07-20 11:50:23
  * @FilePath: /vg-vscode-extension/src/utils/schema.ts
- * @Description: 
+ * @Description:
  */
 import * as path from 'path';
 import * as fs from 'fs';
@@ -36,7 +36,7 @@ export const getLocalSchemas = async (targetDirectory: string) => {
       if (customModelFolder && customModelFolder[className]) {
         folder = customModelFolder[className];
       } else {
-        folder = value["x-apifox-folder"];
+        folder = value['x-apifox-folder'];
         if (!SwaggerConfig.testFolder(folder ?? '')) continue;
         folder = SwaggerConfig.exchangeConfigMap(folder);
       }

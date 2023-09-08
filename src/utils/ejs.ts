@@ -37,14 +37,9 @@ export type Model = {
   createBlockPath?: string; // 创建区块的目录
 };
 
-export const compile = (templateString: string, model: Model) =>
-  ejs.render(templateString, model);
+export const compile = (templateString: string, model: Model) => ejs.render(templateString, model);
 
-export async function renderEjsTemplates(
-  templateData: object,
-  templateDir: string,
-  exclude: string[] = [],
-) {
+export async function renderEjsTemplates(templateData: object, templateDir: string, exclude: string[] = []) {
   return new Promise<void>((resolve, reject) => {
     glob(
       '**',
@@ -55,19 +50,15 @@ export async function renderEjsTemplates(
         dot: true,
       },
       (err, files) => {
-        if (err)
-          return reject(err);
+        if (err) return reject(err);
 
         const templateFiles = files.filter((s) => {
           let valid = true;
-          if (s.indexOf('.ejs') < 0)
-            valid = false;
+          if (s.indexOf('.ejs') < 0) valid = false;
 
           if (exclude && exclude.length > 0)
             exclude.map((e) => {
-              if (s.startsWith(e))
-                valid = false;
-
+              if (s.startsWith(e)) valid = false;
             });
 
           return valid;
@@ -76,29 +67,24 @@ export async function renderEjsTemplates(
           templateFiles.map((file) => {
             const filepath = path.join(templateDir, file);
             return renderFile(filepath, templateData);
-          }),
+          })
         )
           .then(() => resolve())
           .catch(reject);
-      },
+      }
     );
   });
 }
 
 async function renderFile(templateFilepath: string, data: ejs.Data) {
   let content = await ejs.renderFile(templateFilepath, data);
-  const targetFilePath = templateFilepath
-    .replace(/\.ejs$/, '')
-    .replace(
-      /\$\{.+?\}/gi,
-      (match) => data[match.replace(/\$|\{|\}/g, '')] || '',
-    );
+  const targetFilePath = templateFilepath.replace(/\.ejs$/, '').replace(/\$\{.+?\}/gi, (match) => data[match.replace(/\$|\{|\}/g, '')] || '');
   try {
     content = prettier.format(content, {
       singleQuote: true,
       filepath: targetFilePath,
     });
-  } catch { }
+  } catch {}
   await fse.rename(templateFilepath, targetFilePath);
   await fse.writeFile(targetFilePath, content);
 }

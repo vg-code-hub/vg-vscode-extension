@@ -4,20 +4,20 @@
  * @LastEditors: zdd
  * @LastEditTime: 2023-07-05 16:33:51
  * @FilePath: /vg-vscode-extension/src/utils/config.ts
- * @Description: 
+ * @Description:
  */
 import * as path from 'path';
 import * as fs from 'fs-extra';
-import { Uri, WorkspaceConfiguration, commands, window, workspace } from "vscode";
+import { Uri, WorkspaceConfiguration, commands, window, workspace } from 'vscode';
 
-import { existsSync, getRootPath, readFileSync } from "@root/utils";
+import { existsSync, getRootPath, readFileSync } from '@root/utils';
 import { parse, stringify } from 'yaml';
 import { rootPath } from './vscodeEnv';
 
-const defaultScaffoldJson = "https://raw.githubusercontent.com/JimmyZDD/vg-materials/main/scaffold/index.json";
+const defaultScaffoldJson = 'https://raw.githubusercontent.com/JimmyZDD/vg-materials/main/scaffold/index.json';
 
 const defaultConfig: Config = {
-  type: "dart",
+  type: 'dart',
   swagger: {
     jsonUrl: 'http://127.0.0.1:4523/export/openapi?projectId=xxx&version=3.0',
     outputDir: 'api',
@@ -26,7 +26,7 @@ const defaultConfig: Config = {
 };
 
 export type Config = {
-  type: "dart" | "typescript"
+  type: 'dart' | 'typescript';
   swagger: {
     jsonUrl: string;
     outputDir: string;
@@ -55,27 +55,25 @@ export type Config = {
 export const getConfig: () => Config = () => {
   if (fs.existsSync(rootPath.concat(`/vgcode.yaml`))) {
     const file = readFileSync(rootPath.concat(`/vgcode.yaml`), 'utf8');
-    if (parse(file).yapi) window.showErrorMessage('发现旧版 vgcode.yaml 立即迁移配置', '确定').then((res) => {
-      if (res) {
-        fs.copySync(rootPath.concat(`/vgcode.yaml`), rootPath.concat(`/vgcode.yaml.old`));
-        fs.rmSync(rootPath.concat(`/vgcode.yaml`));
-        commands.executeCommand('extension.vgcode-config-init');
-      }
-    });
+    if (parse(file).yapi)
+      window.showErrorMessage('发现旧版 vgcode.yaml 立即迁移配置', '确定').then((res) => {
+        if (res) {
+          fs.copySync(rootPath.concat(`/vgcode.yaml`), rootPath.concat(`/vgcode.yaml.old`));
+          fs.rmSync(rootPath.concat(`/vgcode.yaml`));
+          commands.executeCommand('extension.vgcode-config-init');
+        }
+      });
     return parse(file);
   }
-  if (!existsSync(rootPath.concat(`/vgcode.yaml`))) window.showInformationMessage('初始化 vgcode.yaml', '确定').then((res) => {
-    if (res) commands.executeCommand('extension.vgcode-config-init');
-  });
+  if (!existsSync(rootPath.concat(`/vgcode.yaml`)))
+    window.showInformationMessage('初始化 vgcode.yaml', '确定').then((res) => {
+      if (res) commands.executeCommand('extension.vgcode-config-init');
+    });
   return defaultConfig;
 };
 
 export const saveConfig = (config: Config) => {
-  fs.writeFileSync(
-    path.join(rootPath, 'vgcode.yaml'),
-    stringify(config, null, 2),
-    'utf-8',
-  );
+  fs.writeFileSync(path.join(rootPath, 'vgcode.yaml'), stringify(config, null, 2), 'utf-8');
 };
 
 /**
@@ -84,7 +82,6 @@ export const saveConfig = (config: Config) => {
  * @returns
  */
 export const getTemplateFilePath = () => 'codeTemplate';
-
 
 const values = `# swagger 配置文件
 # http://127.0.0.1:4523/export/openapi?projectId=2540665&version=2.0
@@ -123,9 +120,7 @@ export const genVgcodeConfig = async (uri: Uri) => {
 
     if (!existsSync(rootPath.concat(`/vgcode.yaml`))) {
       saveConfig(defaultConfig);
-      window.showInformationMessage(
-        `Successfully Generated api yaml`
-      );
+      window.showInformationMessage(`Successfully Generated api yaml`);
     } else {
       window.showWarningMessage('已存在vgcode.yaml');
     }
@@ -139,14 +134,11 @@ export const genVgcodeConfig = async (uri: Uri) => {
 
 export function getScaffoldJsonUrl(fsPath?: string): string {
   if (!fsPath) return workspace.getConfiguration().get('vgcode.scaffoldJson') || defaultScaffoldJson;
-  return getSetting(fsPath, "scaffoldJson") || defaultScaffoldJson;
+  return getSetting(fsPath, 'scaffoldJson') || defaultScaffoldJson;
 }
 
 function getSetting(fsPath: string, configKey: string): any {
   const uri = Uri.file(fsPath);
-  const workspaceConfiguration: WorkspaceConfiguration = workspace.getConfiguration(
-    "vgcode",
-    uri,
-  );
+  const workspaceConfiguration: WorkspaceConfiguration = workspace.getConfiguration('vgcode', uri);
   if (workspaceConfiguration.has(configKey)) return workspaceConfiguration.get(configKey);
 }

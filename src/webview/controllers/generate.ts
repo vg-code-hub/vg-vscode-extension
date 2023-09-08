@@ -4,7 +4,7 @@
  * @LastEditors: zdd
  * @LastEditTime: 2023-07-05 11:18:12
  * @FilePath: /vg-vscode-extension/src/webview/controllers/generate.ts
- * @Description: 
+ * @Description:
  */
 import { genTemplateModelByYapi as modelByYapi } from '../../genCode/genCodeByYapi';
 import { genCodeByBlock, genCodeBySnippet } from '../../utils/generate';
@@ -17,15 +17,9 @@ export const genTemplateModelByYapi = async (
     token: string;
     typeName?: string;
     funName?: string;
-  }>,
+  }>
 ) => {
-  const model = await modelByYapi(
-    message.data.domain,
-    message.data.id,
-    message.data.token,
-    message.data.typeName,
-    message.data.funName,
-  );
+  const model = await modelByYapi(message.data.domain, message.data.id, message.data.token, message.data.typeName, message.data.funName);
   return model;
 };
 export const genCodeByBlockMaterial = async (
@@ -34,14 +28,12 @@ export const genCodeByBlockMaterial = async (
     model: object;
     path: string;
     createPath: string[];
-  }>,
+  }>
 ) => {
   await genCodeByBlock(message.data);
   return '生成成功';
 };
-export const genCodeBySnippetMaterial = async (
-  message: IMessage<{ model: any; template: string; name: string }>,
-) => {
+export const genCodeBySnippetMaterial = async (message: IMessage<{ model: any; template: string; name: string }>) => {
   await genCodeBySnippet(message.data);
   return '生成成功';
 };

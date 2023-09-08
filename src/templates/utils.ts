@@ -11,18 +11,16 @@ export function findCodeTemplate(arr: string[], snakeCaseName: string) {
     camelClassName: camelCaseName,
     snakeName: snakeCaseName,
     dataClass: pascalName + 'Model',
-    properties: []
+    properties: [],
   });
 
   if (arr.includes('item')) return content;
 
   ['detail', 'list', 'create'].forEach((item) => {
     ['Page', 'Controller'].forEach((item2) => {
-      if (arr.includes(item))
-        content = content.replaceAll(pascalName + upperFirst(item) + item2, pascalName + item2);
+      if (arr.includes(item)) content = content.replaceAll(pascalName + upperFirst(item) + item2, pascalName + item2);
     });
-    if (arr.includes('page'))
-      content = content.replaceAll(`_${item}.dart`, '.dart');
+    if (arr.includes('page')) content = content.replaceAll(`_${item}.dart`, '.dart');
   });
 
   return content;

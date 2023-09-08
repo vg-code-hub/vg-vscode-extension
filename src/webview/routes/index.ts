@@ -4,7 +4,7 @@
  * @LastEditors: zdd
  * @LastEditTime: 2023-07-20 11:47:16
  * @FilePath: /vg-vscode-extension/src/webview/routes/index.ts
- * @Description: 
+ * @Description:
  */
 import alert from '../controllers/alert';
 import material from '../controllers/material';

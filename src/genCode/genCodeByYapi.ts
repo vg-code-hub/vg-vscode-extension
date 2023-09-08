@@ -11,10 +11,7 @@ const strip = require('strip-comments');
 const stripJsonComments = require('strip-json-comments');
 const generateSchema = require('generate-schema');
 
-export const genCodeByYapi = async (
-  yapiId: string,
-  rawClipboardText: string,
-) => {
+export const genCodeByYapi = async (yapiId: string, rawClipboardText: string) => {
   const domain = getConfig().swagger?.jsonUrl || '';
   if (!domain.trim()) {
     window.showErrorMessage('请配置yapi域名');
@@ -31,35 +28,23 @@ export const genCodeByYapi = async (
     return;
   }
   const selectInfo = getFuncNameAndTypeName();
-  const requestBodyTypeName =
-    selectInfo.funcName.slice(0, 1).toUpperCase() +
-    selectInfo.funcName.slice(1);
+  const requestBodyTypeName = selectInfo.funcName.slice(0, 1).toUpperCase() + selectInfo.funcName.slice(1);
   const result = await window.showQuickPick(
     projectList.map((s) => s.name),
-    { placeHolder: '请选择项目' },
+    { placeHolder: '请选择项目' }
   );
-  if (!result)
-    return;
-
+  if (!result) return;
 
   const templateResult = await window.showQuickPick(
     templateList.map((s) => s.name),
-    { placeHolder: '请选择YAPI相关模板' },
+    { placeHolder: '请选择YAPI相关模板' }
   );
-  if (!templateResult)
-    return;
-
+  if (!templateResult) return;
 
   const project = projectList.find((s) => s.name === result);
   const template = templateList.find((s) => s.name === templateResult);
   try {
-    const model = await genTemplateModelByYapi(
-      project?.domain || domain,
-      yapiId,
-      project!.token,
-      selectInfo.typeName,
-      selectInfo.funcName,
-    );
+    const model = await genTemplateModelByYapi(project?.domain || domain, yapiId, project!.token, selectInfo.typeName, selectInfo.funcName);
     model.inputValues = selectInfo.inputValues;
     model.rawSelectedText = selectInfo.rawSelectedText;
     model.rawClipboardText = rawClipboardText;
@@ -75,11 +60,10 @@ export const genTemplateModelByYapi = async (
   yapiId: string,
   token: string,
   typeName: string = 'IYapiRequestResult',
-  funcName: string = 'fetch',
+  funcName: string = 'fetch'
 ) => {
   const res = await fetchApiDetailInfo(domain, yapiId, token);
-  const requestBodyTypeName =
-    funcName.slice(0, 1).toUpperCase() + funcName.slice(1);
+  const requestBodyTypeName = funcName.slice(0, 1).toUpperCase() + funcName.slice(1);
   if (res.data.data.res_body_type === 'json') {
     const schema = JSON.parse(stripJsonComments(res.data.data.res_body));
     delete schema.title;
@@ -90,17 +74,11 @@ export const genTemplateModelByYapi = async (
     const { mockCode, mockData } = mockFromSchema(schema);
     let requestBodyType = '';
     if (res.data.data.req_body_other) {
-      const reqBodyScheme = JSON.parse(
-        stripJsonComments(res.data.data.req_body_other),
-      );
+      const reqBodyScheme = JSON.parse(stripJsonComments(res.data.data.req_body_other));
       delete reqBodyScheme.title;
-      requestBodyType = await compile(
-        reqBodyScheme,
-        `I${requestBodyTypeName}Data`,
-        {
-          bannerComment: '',
-        },
-      );
+      requestBodyType = await compile(reqBodyScheme, `I${requestBodyTypeName}Data`, {
+        bannerComment: '',
+      });
     }
     const model: Model = {
       type: ts,
@@ -127,17 +105,11 @@ export const genTemplateModelByYapi = async (
   const { mockCode, mockData } = mockFromSchema(schema);
   let requestBodyType = '';
   if (res.data.data.req_body_other) {
-    const reqBodyScheme = JSON.parse(
-      stripJsonComments(res.data.data.req_body_other),
-    );
+    const reqBodyScheme = JSON.parse(stripJsonComments(res.data.data.req_body_other));
     delete reqBodyScheme.title;
-    requestBodyType = await compile(
-      reqBodyScheme,
-      `I${requestBodyTypeName}Data`,
-      {
-        bannerComment: '',
-      },
-    );
+    requestBodyType = await compile(reqBodyScheme, `I${requestBodyTypeName}Data`, {
+      bannerComment: '',
+    });
   }
   const model: Model = {
     type: ts,

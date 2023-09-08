@@ -4,7 +4,7 @@
  * @LastEditors: zdd
  * @LastEditTime: 2023-06-17 18:08:07
  * @FilePath: /vg-vscode-extension/src/utils/editor.ts
- * @Description: 
+ * @Description:
  */
 import * as copyPaste from 'copy-paste';
 import { OpenDialogOptions, Range, SnippetString, window } from 'vscode';
@@ -19,33 +19,21 @@ export const getSelectedText = () => {
 
 export const pasteToEditor = (content: string, isInsertSnippet = true) => {
   // vscode 本身代码片段语法
-  if (isInsertSnippet)
-    return insertSnippet(content);
+  if (isInsertSnippet) return insertSnippet(content);
 
   const activeTextEditor = getLastAcitveTextEditor();
-  if (activeTextEditor === undefined)
-    throw new Error('无打开文件');
+  if (activeTextEditor === undefined) throw new Error('无打开文件');
 
   return activeTextEditor?.edit((editBuilder) => {
     // editBuilder.replace(activeTextEditor.selection, content);
-    if (activeTextEditor.selection.isEmpty)
-      editBuilder.insert(activeTextEditor.selection.start, content);
-    else
-      editBuilder.replace(
-        new Range(
-          activeTextEditor.selection.start,
-          activeTextEditor.selection.end,
-        ),
-        content,
-      );
-
+    if (activeTextEditor.selection.isEmpty) editBuilder.insert(activeTextEditor.selection.start, content);
+    else editBuilder.replace(new Range(activeTextEditor.selection.start, activeTextEditor.selection.end), content);
   });
 };
 
 export const insertSnippet = (content: string) => {
   const activeTextEditor = getLastAcitveTextEditor();
-  if (activeTextEditor === undefined)
-    throw new Error('无打开文件');
+  if (activeTextEditor === undefined) throw new Error('无打开文件');
 
   return activeTextEditor.insertSnippet(new SnippetString(content));
 };
@@ -58,12 +46,8 @@ export const getFuncNameAndTypeName = () => {
   if (selectedText) {
     const splitValue = selectedText.split(' ');
     funcName = splitValue[0] || funcName;
-    if (splitValue.length > 1 && splitValue[1])
-      typeName = splitValue[1];
-    else
-      typeName = `I${funcName.charAt(0).toUpperCase() + funcName.slice(1)
-        }Result`;
-
+    if (splitValue.length > 1 && splitValue[1]) typeName = splitValue[1];
+    else typeName = `I${funcName.charAt(0).toUpperCase() + funcName.slice(1)}Result`;
   }
   return {
     funcName,
@@ -81,7 +65,5 @@ export const selectDirectory = async () => {
     openLabel: 'Open',
   };
   const selectFolderUri = await window.showOpenDialog(options);
-  if (selectFolderUri && selectFolderUri.length > 0)
-    return selectFolderUri[0].fsPath;
-
+  if (selectFolderUri && selectFolderUri.length > 0) return selectFolderUri[0].fsPath;
 };

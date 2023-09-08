@@ -4,7 +4,7 @@
  * @LastEditors: zdd
  * @LastEditTime: 2023-07-05 16:09:39
  * @FilePath: /vg-vscode-extension/src/utils/request.ts
- * @Description: 
+ * @Description:
  */
 import axios from 'axios';
 const https = require('https');
@@ -35,14 +35,8 @@ interface IApiDetailInfo {
   };
 }
 
-export const fetchApiDetailInfo = (
-  domain: string,
-  id: string,
-  token: string,
-) => {
-  const url = domain.endsWith('/')
-    ? `${domain}api/interface/get?id=${id}&token=${token}`
-    : `${domain}/api/interface/get?id=${id}&token=${token}`;
+export const fetchApiDetailInfo = (domain: string, id: string, token: string) => {
+  const url = domain.endsWith('/') ? `${domain}api/interface/get?id=${id}&token=${token}` : `${domain}/api/interface/get?id=${id}&token=${token}`;
   return axios.get<IApiDetailInfo>(url, { httpsAgent: agent });
 };
 

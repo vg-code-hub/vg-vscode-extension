@@ -4,7 +4,7 @@
  * @LastEditors: zdd
  * @LastEditTime: 2023-06-17 18:11:07
  * @FilePath: /vg-vscode-extension/src/webview/controllers/yapi.ts
- * @Description: 
+ * @Description:
  */
 import { getConfig } from '@root/utils';
 

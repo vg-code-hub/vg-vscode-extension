@@ -2,7 +2,7 @@
   "name": "vg-vscode-extension",
   "displayName": "Frontend Code Generator - VG",
   "description": "It supports effective creation of business modules for frontend applications.",
-  "version": "2.5.2",
+  "version": "2.5.3",
   "engines": {
     "vscode": "^1.69.0"
   },
@@ -195,6 +195,7 @@
     "watch-tests": "tsc -p . -w --outDir out",
     "pretest": "pnpm run compile-tests && pnpm run compile && pnpm run lint",
     "lint": "eslint src --ext ts",
+    "format": "prettier --loglevel warn --write \"src/**/*.{jsx,js,ts}\"",
     "test": "node ./out/test/runTest.js"
   },
   "dependencies": {

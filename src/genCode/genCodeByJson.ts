@@ -4,7 +4,7 @@
  * @LastEditors: zdd
  * @LastEditTime: 2023-07-05 16:36:12
  * @FilePath: /vg-vscode-extension/src/genCode/genCodeByJson.ts
- * @Description: 
+ * @Description:
  */
 import { window } from 'vscode';
 import { compile } from 'json-schema-to-typescript';
@@ -16,10 +16,7 @@ import { mockFromSchema } from '../utils/json';
 const generateSchema = require('generate-schema');
 const strip = require('strip-comments');
 
-export const genCodeByJson = async (
-  jsonString: string,
-  rawClipboardText: string,
-) => {
+export const genCodeByJson = async (jsonString: string, rawClipboardText: string) => {
   const templateList = getSnippets().filter((s) => !s.preview.notShowInCommand);
   if (templateList.length === 0) {
     window.showErrorMessage('请配置模板');
@@ -29,10 +26,9 @@ export const genCodeByJson = async (
 
   const templateResult = await window.showQuickPick(
     templateList.map((s) => s.name),
-    { placeHolder: '请选择JSON相关模板' },
+    { placeHolder: '请选择JSON相关模板' }
   );
-  if (!templateResult)
-    return;
+  if (!templateResult) return;
 
   const template = templateList.find((s) => s.name === templateResult);
   try {

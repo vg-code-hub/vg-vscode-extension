@@ -4,7 +4,7 @@
  * @LastEditors: zdd
  * @LastEditTime: 2023-07-06 14:51:42
  * @FilePath: /vg-vscode-extension/src/commands/registerCompletion.ts
- * @Description: 
+ * @Description:
  */
 import * as vscode from 'vscode';
 import { compile as compileEjs, getLocalMaterials, tempGlobalDir } from '../utils';
@@ -12,16 +12,11 @@ import { compile as compileEjs, getLocalMaterials, tempGlobalDir } from '../util
 let provider: vscode.Disposable;
 
 export const registerCompletion = (context: vscode.ExtensionContext) => {
-  if (!vscode.workspace.rootPath)
-    return;
+  if (!vscode.workspace.rootPath) return;
 
-  if (provider)
-    provider.dispose();
+  if (provider) provider.dispose();
 
-
-  const snippets = getLocalMaterials('snippets', tempGlobalDir.snippetMaterials).filter(
-    (s) => !s.preview.notShowInintellisense,
-  );
+  const snippets = getLocalMaterials('snippets', tempGlobalDir.snippetMaterials).filter((s) => !s.preview.notShowInintellisense);
   provider = vscode.languages.registerCompletionItemProvider(
     { pattern: '**', scheme: 'file' },
     {
@@ -49,7 +44,7 @@ export const registerCompletion = (context: vscode.ExtensionContext) => {
         });
         return completionItems;
       },
-    },
+    }
   );
   context.subscriptions.push(provider);
 };

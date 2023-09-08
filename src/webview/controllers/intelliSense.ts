@@ -4,7 +4,7 @@
  * @LastEditors: zdd
  * @LastEditTime: 2023-06-17 18:01:41
  * @FilePath: /vg-vscode-extension/src/webview/controllers/intelliSense.ts
- * @Description: 
+ * @Description:
  */
 import { registerCompletion } from '@root/commands/registerCompletion';
 import { getExtensionContext } from '../../context';

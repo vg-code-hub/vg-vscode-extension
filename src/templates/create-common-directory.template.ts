@@ -4,9 +4,9 @@
  * @LastEditors: zdd
  * @LastEditTime: 2023-06-05 17:17:26
  * @FilePath: /vg-vscode-extension/src/templates/create-common-directory.template.ts
- * @Description: 
+ * @Description:
  */
-import { snakeCase, writeFileSync } from "../utils";
+import { snakeCase, writeFileSync } from '../utils';
 
 // index
 export function indexTemplate(pageName: string, targetDirectory: string) {
@@ -19,7 +19,7 @@ export function indexTemplate(pageName: string, targetDirectory: string) {
 
   return new Promise(async (resolve, reject) => {
     try {
-      writeFileSync(targetPath, template, "utf8");
+      writeFileSync(targetPath, template, 'utf8');
       resolve('success');
     } catch (error) {
       reject(error);
@@ -45,7 +45,7 @@ export 'values/index.dart';
 
   return new Promise(async (resolve, reject) => {
     try {
-      writeFileSync(targetPath, template, "utf8");
+      writeFileSync(targetPath, template, 'utf8');
       resolve('success');
     } catch (error) {
       reject(error);
@@ -66,7 +66,7 @@ export 'widgets/index.dart';
 
   return new Promise(async (resolve, reject) => {
     try {
-      writeFileSync(targetPath, template, "utf8");
+      writeFileSync(targetPath, template, 'utf8');
       resolve('success');
     } catch (error) {
       reject(error);

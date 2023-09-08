@@ -4,18 +4,18 @@
  * @LastEditors: zdd
  * @LastEditTime: 2023-06-17 09:42:18
  * @FilePath: /vg-vscode-extension/src/commands/new-getx-stateful-getbuilder-page.ts
- * @Description: 
+ * @Description:
  */
 
-import { Uri, window } from "vscode";
-import { controllerTemplate, viewTemplate } from "../templates/getx-stateful-getbuilder-page.template";
-import { mkdirp, existsSync, isNil, promptForPageTypePick, promptForPageName, pascalCase, snakeCase } from "../utils";
-import type { PageType } from "@root/type.d";
+import { Uri, window } from 'vscode';
+import { controllerTemplate, viewTemplate } from '../templates/getx-stateful-getbuilder-page.template';
+import { mkdirp, existsSync, isNil, promptForPageTypePick, promptForPageName, pascalCase, snakeCase } from '../utils';
+import type { PageType } from '@root/type.d';
 
 export const newGetxStatefulWidgetGetBuilderPage = async (uri: Uri) => {
   const pageName = await promptForPageName();
-  if (isNil(pageName) || pageName.trim() === "") {
-    window.showErrorMessage("The name must not be empty");
+  if (isNil(pageName) || pageName.trim() === '') {
+    window.showErrorMessage('The name must not be empty');
     return;
   }
   const pascalCasepageName = pascalCase(pageName);
@@ -23,9 +23,7 @@ export const newGetxStatefulWidgetGetBuilderPage = async (uri: Uri) => {
   let targetDirectory = uri.fsPath;
   try {
     await generateCode(pageName, targetDirectory, pageType);
-    window.showInformationMessage(
-      `Successfully Generated ${pascalCasepageName} Getx Page`
-    );
+    window.showInformationMessage(`Successfully Generated ${pascalCasepageName} Getx Page`);
   } catch (error) {
     window.showErrorMessage(
       `Error:
@@ -38,15 +36,14 @@ async function generateCode(pageName: string, targetDirectory: string, pageType:
   const snakeCaseName = snakeCase(pageName);
   const pageFile = `${targetDirectory}/${snakeCaseName}_page.dart`;
   if (!existsSync(pageFile)) {
-    await Promise.all((pageType === 'refresh list' ? ['controllers', 'widgets'] : ['controllers']).map(async item => {
-      const directoryPath = `${targetDirectory}/${item}`;
-      if (!existsSync(directoryPath)) await mkdirp(directoryPath);
-    }));
+    await Promise.all(
+      (pageType === 'refresh list' ? ['controllers', 'widgets'] : ['controllers']).map(async (item) => {
+        const directoryPath = `${targetDirectory}/${item}`;
+        if (!existsSync(directoryPath)) await mkdirp(directoryPath);
+      })
+    );
 
-    await Promise.all([
-      controllerTemplate(pageName, targetDirectory, pageType),
-      viewTemplate(pageName, targetDirectory, pageType),
-    ]);
+    await Promise.all([controllerTemplate(pageName, targetDirectory, pageType), viewTemplate(pageName, targetDirectory, pageType)]);
   } else {
     throw Error(` ${pageFile} already exists`);
   }

@@ -1,10 +1,6 @@
 import * as vscode from 'vscode';
 
-export function invokeCallback<T = any>(
-  webview: vscode.Webview,
-  cbid: string,
-  res: T,
-) {
+export function invokeCallback<T = any>(webview: vscode.Webview, cbid: string, res: T) {
   webview.postMessage({
     cmd: 'vscodeCallback',
     cbid,
@@ -13,11 +9,7 @@ export function invokeCallback<T = any>(
   });
 }
 
-export function invokeErrorCallback(
-  webview: vscode.Webview,
-  cbid: string,
-  res: any,
-) {
+export function invokeErrorCallback(webview: vscode.Webview, cbid: string, res: any) {
   webview.postMessage({
     cmd: 'vscodeCallback',
     cbid,

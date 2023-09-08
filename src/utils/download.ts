@@ -4,7 +4,7 @@
  * @LastEditors: zdd
  * @LastEditTime: 2023-07-05 11:33:36
  * @FilePath: /vg-vscode-extension/src/utils/download.ts
- * @Description: 
+ * @Description:
  */
 import axios from 'axios';
 import * as path from 'path';
@@ -45,8 +45,7 @@ export const downloadMaterialsFromNpm = async (packageName: string) => {
   const tarball = result.stdout;
   fs.removeSync(tempGlobalDir.materials);
   await download(tarball, tempGlobalDir.temp, `temp.tgz`);
-  if (!fs.existsSync(tempGlobalDir.materials))
-    fs.mkdirSync(tempGlobalDir.materials);
+  if (!fs.existsSync(tempGlobalDir.materials)) fs.mkdirSync(tempGlobalDir.materials);
 
   await tar.x({
     file: path.join(tempGlobalDir.temp, `temp.tgz`),
@@ -61,24 +60,17 @@ export const downloadMaterialsFromGit = (remote: string) => {
   execa.execaSync('git', ['clone', ...remote.split(' '), tempGlobalDir.materials]);
 };
 
-export const copyMaterialsFromTemp = (
-  from: { blocks: string[]; snippets: string[] },
-  to: string,
-) => {
+export const copyMaterialsFromTemp = (from: { blocks: string[]; snippets: string[] }, to: string) => {
   from.blocks.map((s) => {
     fs.copySync(
       path.join(tempGlobalDir.blockMaterials, s),
-      fs.existsSync(path.join(to, 'blocks', s))
-        ? path.join(to, 'blocks', `${s} copy`)
-        : path.join(to, 'blocks', s),
+      fs.existsSync(path.join(to, 'blocks', s)) ? path.join(to, 'blocks', `${s} copy`) : path.join(to, 'blocks', s)
     );
   });
   from.snippets.map((s) => {
     fs.copySync(
       path.join(tempGlobalDir.snippetMaterials, s),
-      fs.existsSync(path.join(to, 'snippets', s))
-        ? path.join(to, 'snippets', `${s} copy`)
-        : path.join(to, 'snippets', s),
+      fs.existsSync(path.join(to, 'snippets', s)) ? path.join(to, 'snippets', `${s} copy`) : path.join(to, 'snippets', s)
     );
   });
 

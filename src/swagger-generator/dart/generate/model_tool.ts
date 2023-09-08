@@ -1,17 +1,15 @@
-
 /*
  * @Author: zdd
  * @Date: 2023-05-31 22:05:06
  * @LastEditors: jimmyZhao
  * @LastEditTime: 2023-09-07 11:35:03
  * @FilePath: /vg-vscode-extension/src/swagger-generator/dart/generate/model_tool.ts
- * @Description: 
+ * @Description:
  */
-import { find, pascalCase } from "@root/utils";
-import type { SwaggerHttpEndpoint, JSONSchema } from "../../index.d";
-import { DART_TYPE, getClassName, getDartType, getResSchema, isPaginationResponse, isStandardResponse } from "../../utils";
-import ModelGenerate from "./model";
-
+import { find, pascalCase } from '@root/utils';
+import type { SwaggerHttpEndpoint, JSONSchema } from '../../index.d';
+import { DART_TYPE, getClassName, getDartType, getResSchema, isPaginationResponse, isStandardResponse } from '../../utils';
+import ModelGenerate from './model';
 
 export class MM {
   static gen: ModelGenerate;
@@ -45,7 +43,8 @@ function getParamContent(parameters: SwaggerHttpEndpoint['parameters'], content:
 function getReturnTypeContent(responses: JSONSchema | undefined, content: string, name: string) {
   if (!responses) return content;
 
-  let resClass: string | undefined, isPagination = false;
+  let resClass: string | undefined,
+    isPagination = false;
   const schema = responses!;
   let standardRes: JSONSchema | undefined = isStandardResponse(responses);
   if (standardRes) {
@@ -55,8 +54,7 @@ function getReturnTypeContent(responses: JSONSchema | undefined, content: string
       isPagination = true;
     }
 
-    if (standardRes['anyOf'])
-      standardRes = find(standardRes['anyOf'], item => item.type !== 'null');
+    if (standardRes['anyOf']) standardRes = find(standardRes['anyOf'], (item) => item.type !== 'null');
     resClass = standardRes ? getDartType({ property: standardRes, key: name }) : undefined;
   } else {
     resClass = 'any';

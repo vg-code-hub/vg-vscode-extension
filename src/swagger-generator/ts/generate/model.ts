@@ -1,15 +1,14 @@
-
 /*
  * @Author: zdd
  * @Date: 2023-05-31 22:05:06
  * @LastEditors: jimmyZhao
  * @LastEditTime: 2023-09-07 14:20:54
  * @FilePath: /vg-vscode-extension/src/swagger-generator/ts/generate/model.ts
- * @Description: 
+ * @Description:
  */
-import { find, camelCase } from "@root/utils";
-import type { JSONSchema } from "../../index.d";
-import { TS_TYPE, INDENT, SwaggerConfig, getTsType } from "../../utils";
+import { find, camelCase } from '@root/utils';
+import type { JSONSchema } from '../../index.d';
+import { TS_TYPE, INDENT, SwaggerConfig, getTsType } from '../../utils';
 
 class ModelGenerate {
   data: Record<string, JSONSchema>;
@@ -23,10 +22,9 @@ class ModelGenerate {
   generateModel(className: string, content: string, _value?: JSONSchema) {
     const value = this.data[className] ?? _value;
     this.content = content;
-    
+
     if (!value) return content;
-    if (!this.data[className] && _value) 
-      SwaggerConfig.addException(`info: auto create [class ${className}] in some object propertys`);
+    if (!this.data[className] && _value) SwaggerConfig.addException(`info: auto create [class ${className}] in some object propertys`);
     if (this.content.includes(`class ${className} `)) {
       SwaggerConfig.addException(`warn: [class ${className}] already exists, please check orginal swagger.json`);
       return this.content;
@@ -91,7 +89,7 @@ export class ${className} {
 
       let require = required?.includes(propertyName) ?? false;
       // nullable swagger 3+
-      const nullable = Array.isArray(property.type) && find(property.type, e => e.toString().includes('null'));
+      const nullable = Array.isArray(property.type) && find(property.type, (e) => e.toString().includes('null'));
       if (nullable && require) require = false;
 
       if (property.title || property.description) str += `${INDENT}/** ${property.title || property.description} */\n`;
@@ -120,15 +118,19 @@ export class ${className} {
 
       let require = required?.includes(propertyName) ?? false;
       // nullable swagger 3+
-      const nullable = Array.isArray(property.type) && find(property.type, e => e.toString().includes('null'));
+      const nullable = Array.isArray(property.type) && find(property.type, (e) => e.toString().includes('null'));
       if (nullable && require && !propType.endsWith('[]')) require = false;
 
       str += `${INDENT}${INDENT}${INDENT}${camelPropertyName}: `;
       if (propType.endsWith('[]')) {
         const subType = propType.substring(0, propType.length - 2);
-        str += `json["${propertyName}"] != null ? ${TS_TYPE.includes(subType) ? `json["${propertyName}"]` : `(json["${propertyName}"] as any[]).map<${subType}>((v: any) => ${subType}.fromJson(v))`} : [],\n`;
+        str += `json["${propertyName}"] != null ? ${
+          TS_TYPE.includes(subType) ? `json["${propertyName}"]` : `(json["${propertyName}"] as any[]).map<${subType}>((v: any) => ${subType}.fromJson(v))`
+        } : [],\n`;
       } else if (!TS_TYPE.includes(propType)) {
-        str += require ? `${propType}.fromJson(json["${propertyName}"]),\n` : `json["${propertyName}"] != null ? ${propType}.fromJson(json["${propertyName}"]) : undefined,\n`;
+        str += require
+          ? `${propType}.fromJson(json["${propertyName}"]),\n`
+          : `json["${propertyName}"] != null ? ${propType}.fromJson(json["${propertyName}"]) : undefined,\n`;
       } else {
         str += `json["${propertyName}"],\n`;
       }
@@ -146,23 +148,21 @@ export class ${className} {
 
       let require = required?.includes(propertyName) ?? false;
       // nullable swagger 3+
-      const nullable = Array.isArray(property.type) && find(property.type, e => e.toString().includes('null'));
+      const nullable = Array.isArray(property.type) && find(property.type, (e) => e.toString().includes('null'));
       if (nullable && require) require = false;
 
       str += `${INDENT}${INDENT}${INDENT}"${propertyName}": `;
 
       if (propType.endsWith('[]')) {
         const subType = propType.substring(0, propType.length - 2);
-        if (require)
-          str += `this.${TS_TYPE.includes(subType) ? camelPropertyName : `${camelPropertyName}.map((e: ${subType}) => e.toJson())`},\n`;
+        if (require) str += `this.${TS_TYPE.includes(subType) ? camelPropertyName : `${camelPropertyName}.map((e: ${subType}) => e.toJson())`},\n`;
         else
-          str += `this.${camelPropertyName} != null ? ${TS_TYPE.includes(subType) ? `this.${camelPropertyName}` : `this.${camelPropertyName}.map((e: ${subType}) => e.toJson())`} : undefined,\n`;
+          str += `this.${camelPropertyName} != null ? ${
+            TS_TYPE.includes(subType) ? `this.${camelPropertyName}` : `this.${camelPropertyName}.map((e: ${subType}) => e.toJson())`
+          } : undefined,\n`;
       } else if (!TS_TYPE.includes(propType)) {
-        if (require)
-          str += `this.${camelPropertyName}.toJson(),\n`;
-        else
-          str += `this.${camelPropertyName} != null ? this.${camelPropertyName}!.toJson() : undefined,\n`;
-
+        if (require) str += `this.${camelPropertyName}.toJson(),\n`;
+        else str += `this.${camelPropertyName} != null ? this.${camelPropertyName}!.toJson() : undefined,\n`;
       } else {
         str += `this.${camelPropertyName},\n`;
       }

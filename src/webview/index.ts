@@ -5,7 +5,7 @@ import { window } from 'vscode';
 import { getExtensionPath, setLastActiveTextEditorId } from '../context';
 import { routes } from './routes';
 import { invokeCallback, invokeErrorCallback } from './callback';
-import util from "../util";
+import util from '../util';
 
 const fs = require('fs');
 
@@ -20,12 +20,8 @@ let webviewPanels: {
 }[] = [];
 
 const getHtmlForWebview = (webview: vscode.Webview) => {
-  const mainScriptPathOnDisk = vscode.Uri.file(
-    path.join(getExtensionPath(), 'webview-dist', 'umi.js'),
-  );
-  const vendorsScriptPathOnDisk = vscode.Uri.file(
-    path.join(getExtensionPath(), 'webview-dist', 'vendors.js'),
-  );
+  const mainScriptPathOnDisk = vscode.Uri.file(path.join(getExtensionPath(), 'webview-dist', 'umi.js'));
+  const vendorsScriptPathOnDisk = vscode.Uri.file(path.join(getExtensionPath(), 'webview-dist', 'vendors.js'));
   // const mianScriptUri = 'http://localhost:8000/umi.js';
   // const vendorsScriptUri = 'http://localhost:8000/vendors.js';
   const mianScriptUri = webview.asWebviewUri(mainScriptPathOnDisk);
@@ -70,12 +66,15 @@ function getWebViewContent(context: vscode.ExtensionContext, panel: vscode.Webvi
   return html;
 }
 
-export const showWebView = (context: vscode.ExtensionContext, options: {
-  key: WebViewKeys;
-  title?: string;
-  viewColumn?: vscode.ViewColumn;
-  task?: { task: Tasks; data?: any }; // webview 打开后执行命令，比如转到指定路由
-}) => {
+export const showWebView = (
+  context: vscode.ExtensionContext,
+  options: {
+    key: WebViewKeys;
+    title?: string;
+    viewColumn?: vscode.ViewColumn;
+    task?: { task: Tasks; data?: any }; // webview 打开后执行命令，比如转到指定路由
+  }
+) => {
   const webview = webviewPanels.find((s) => s.key === options.key);
   if (webview) {
     webview.panel.reveal();
@@ -85,11 +84,9 @@ export const showWebView = (context: vscode.ExtensionContext, options: {
         task: options.task.task,
         data: options.task.data,
       });
-
   } else {
     // 创建 webview 的时候，设置之前 focus 的 activeTextEditor
-    if (vscode.window.activeTextEditor)
-      setLastActiveTextEditorId((vscode.window.activeTextEditor as any).id);
+    if (vscode.window.activeTextEditor) setLastActiveTextEditorId((vscode.window.activeTextEditor as any).id);
 
     const panel = vscode.window.createWebviewPanel(
       'vgcode',
@@ -100,23 +97,16 @@ export const showWebView = (context: vscode.ExtensionContext, options: {
       },
       {
         enableScripts: true,
-        localResourceRoots: [
-          vscode.Uri.file(path.join(getExtensionPath(), 'webview-dist')),
-        ],
+        localResourceRoots: [vscode.Uri.file(path.join(getExtensionPath(), 'webview-dist'))],
         retainContextWhenHidden: true, // webview被隐藏时保持状态，避免被重置
-      },
+      }
     );
     // panel.webview.html = getWebViewContent(context, panel, 'webview-dist/index.html');
 
     panel.webview.html = getHtmlForWebview(panel.webview);
     const disposables: vscode.Disposable[] = [];
     panel.webview.onDidReceiveMessage(
-      async (message: {
-        cmd: string;
-        cbid: string;
-        data: any;
-        skipError?: boolean;
-      }) => {
+      async (message: { cmd: string; cbid: string; data: any; skipError?: boolean }) => {
         if (routes[message.cmd]) {
           try {
             const res = await routes[message.cmd](message, {
@@ -126,38 +116,29 @@ export const showWebView = (context: vscode.ExtensionContext, options: {
             });
             invokeCallback(panel.webview, message.cbid, res);
           } catch (ex: any) {
-            if (!message.skipError)
-              window.showErrorMessage(ex.toString());
+            if (!message.skipError) window.showErrorMessage(ex.toString());
 
             invokeErrorCallback(panel.webview, message.cbid, ex);
           }
         } else {
-          invokeErrorCallback(
-            panel.webview,
-            message.cbid,
-            `未找到名为 ${message.cmd} 回调方法!`,
-          );
-          vscode.window.showWarningMessage(
-            `未找到名为 ${message.cmd} 回调方法!`,
-          );
+          invokeErrorCallback(panel.webview, message.cbid, `未找到名为 ${message.cmd} 回调方法!`);
+          vscode.window.showWarningMessage(`未找到名为 ${message.cmd} 回调方法!`);
         }
       },
       null,
-      disposables,
+      disposables
     );
     panel.onDidDispose(
       () => {
         panel.dispose();
         while (disposables.length) {
           const x = disposables.pop();
-          if (x)
-            x.dispose();
-
+          if (x) x.dispose();
         }
         webviewPanels = webviewPanels.filter((s) => s.key !== options.key);
       },
       null,
-      disposables,
+      disposables
     );
     webviewPanels.push({
       key: options.key,

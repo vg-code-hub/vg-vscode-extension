@@ -4,7 +4,7 @@
  * @LastEditors: zdd
  * @LastEditTime: 2023-06-05 11:34:27
  * @FilePath: /vg-vscode-extension/src/swagger-generator/utils/index.ts
- * @Description: 
+ * @Description:
  */
 export * from './common';
 export * from './helper';

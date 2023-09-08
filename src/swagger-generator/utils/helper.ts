@@ -1,7 +1,6 @@
 //类型
-import type { Swagger } from "../index.d";
-import { resolve, existsSync, readdirSync, statSync, unlinkSync, rmdirSync } from "@root/utils";
-
+import type { Swagger } from '../index.d';
+import { resolve, existsSync, readdirSync, statSync, unlinkSync, rmdirSync } from '@root/utils';
 
 /**
  * 删除文件
@@ -10,10 +9,7 @@ import { resolve, existsSync, readdirSync, statSync, unlinkSync, rmdirSync } fro
  * @param options.ignore 不删除某些文件或者文件夹
  */
 
-export const delDir = (
-  path: string,
-  options?: { deleteCurrPath: boolean; ignore: Array<string> }
-) => {
+export const delDir = (path: string, options?: { deleteCurrPath: boolean; ignore: Array<string> }) => {
   let files = [];
   if (existsSync(path)) {
     files = readdirSync(path);
@@ -35,34 +31,28 @@ export const delDir = (
  * @param key 含有处理特殊字符«» 【】 {} [] () （），如a«b«c»» 转换成a_b_c;
  */
 export const handleSpecialSymbol = (key: string | any) => {
-  return typeof key !== "string"
+  return typeof key !== 'string'
     ? key
     : key
-      .replace(/[\«|\(|\（|\【|\[|\{]/g, "_")
-      .replace(/[\»|\)|\）|\】|\]|\}]/g, "")
-      .replace(
-        /[\?|\？|\,|\，|\.|\。|\-|\/|\、|\=|\'|\"|\’|\‘|\“|\”|\s]/g,
-        ""
-      );
+        .replace(/[\«|\(|\（|\【|\[|\{]/g, '_')
+        .replace(/[\»|\)|\）|\】|\]|\}]/g, '')
+        .replace(/[\?|\？|\,|\，|\.|\。|\-|\/|\、|\=|\'|\"|\’|\‘|\“|\”|\s]/g, '');
 };
 
 // 处理后端内置得特殊情况
 export const builtInDataHandle = (str: string): string => {
-  if (typeof str !== "string") return "";
-  let left = str.indexOf("«");
-  let right = str.lastIndexOf("»");
-  if (left > -1 && right > -1)
-    return `${str.slice(0, left)}«${builtInDataHandle(
-      str.slice(left + 1, right)
-    )}»${str.slice(right + 1)}`;
+  if (typeof str !== 'string') return '';
+  let left = str.indexOf('«');
+  let right = str.lastIndexOf('»');
+  if (left > -1 && right > -1) return `${str.slice(0, left)}«${builtInDataHandle(str.slice(left + 1, right))}»${str.slice(right + 1)}`;
 
   return handleSpecialSymbol(str);
 };
 // 处理 #/definitions/XXX 这种情况后面的数据
 
 export const defHandle = (str: string): string => {
-  if (typeof str !== "string") return "";
-  let value = str.replace("#/definitions/", "");
+  if (typeof str !== 'string') return '';
+  let value = str.replace('#/definitions/', '');
   value = builtInDataHandle(value);
 
   // return "#/definitions/" + exchangeZhToEn(value).str;
@@ -75,29 +65,24 @@ export const defHandle = (str: string): string => {
 export const collectChinese = (values: Swagger): Array<string> => {
   let chineseSet = new Set();
   for (let key in values.data) {
-    const folder = values.data[key]["x-apifox-folder"];
+    const folder = values.data[key]['x-apifox-folder'];
     if (folder) {
       const paths = folder.split('/');
-      paths.forEach(path => {
-        (handleSpecialSymbol(path).match(/[\u4e00-\u9fa5]+/g) || []).map(
-          (el: any) => chineseSet.add(el)
-        );
+      paths.forEach((path) => {
+        (handleSpecialSymbol(path).match(/[\u4e00-\u9fa5]+/g) || []).map((el: any) => chineseSet.add(el));
       });
     }
   }
 
-  values.tags.forEach(({ name }: Swagger["tags"][0]) => {
+  values.tags.forEach(({ name }: Swagger['tags'][0]) => {
     const paths = name.split('/');
-    paths.forEach(path => {
-      (handleSpecialSymbol(path).match(/[\u4e00-\u9fa5]+/g) || []).map(
-        (el: any) => chineseSet.add(el)
-      );
+    paths.forEach((path) => {
+      (handleSpecialSymbol(path).match(/[\u4e00-\u9fa5]+/g) || []).map((el: any) => chineseSet.add(el));
     });
   });
 
   return Array.from(chineseSet.values()) as Array<string>;
 };
-
 
 /**
  * 根据中英文映射对象，替换掉中文部分，返回新的字符串
@@ -105,10 +90,10 @@ export const collectChinese = (values: Swagger): Array<string> => {
  * @param zhToEnMap 中英文映射对象
  */
 export const exchangeZhToEn = (str: string, zhToEnMap: Record<string, string>) => {
-  if (typeof str !== "string")
+  if (typeof str !== 'string')
     return {
       hasZh: false,
-      str: "",
+      str: '',
     };
   let hasZh = false;
   str.split('/').map((el) => {

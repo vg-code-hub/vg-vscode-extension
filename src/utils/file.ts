@@ -8,6 +8,6 @@ export const getFileContent = (filePath: string, fullPath = false) => {
   try {
     const fileBuffer = fs.readFileSync(fileFullPath);
     fileContent = fileBuffer.toString();
-  } catch (error) { }
+  } catch (error) {}
   return fileContent;
 };

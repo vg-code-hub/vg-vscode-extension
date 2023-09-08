@@ -4,7 +4,7 @@
  * @LastEditors: zdd
  * @LastEditTime: 2023-06-17 17:34:27
  * @FilePath: /vg-vscode-extension/src/context.ts
- * @Description: 
+ * @Description:
  */
 import { ExtensionContext, window } from 'vscode';
 
@@ -41,25 +41,16 @@ export const setLastActiveTextEditorId = (activeTextEditorId: string) => {
 
 export const getLastAcitveTextEditor = () => {
   const { visibleTextEditors } = window;
-  const activeTextEditor = visibleTextEditors.find(
-    (item: any) => item.id === data.activeTextEditorId,
-  );
+  const activeTextEditor = visibleTextEditors.find((item: any) => item.id === data.activeTextEditorId);
   return window.activeTextEditor || activeTextEditor;
 };
 
 export const getExtensionPath = () => data.extensionPath;
 
-export const init = (options: {
-  extensionContext?: ExtensionContext;
-  rootPath?: string;
-  extensionPath?: string;
-}) => {
-  if (options.rootPath)
-    data.rootPath = options.rootPath;
+export const init = (options: { extensionContext?: ExtensionContext; rootPath?: string; extensionPath?: string }) => {
+  if (options.rootPath) data.rootPath = options.rootPath;
 
-  if (options.extensionPath)
-    data.extensionPath = options.extensionPath;
+  if (options.extensionPath) data.extensionPath = options.extensionPath;
 
-  if (options.extensionContext)
-    data.extensionContext = options.extensionContext;
+  if (options.extensionContext) data.extensionContext = options.extensionContext;
 };
