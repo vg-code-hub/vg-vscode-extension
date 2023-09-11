@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-05-31 22:05:06
  * @LastEditors: jimmyZhao
- * @LastEditTime: 2023-09-08 21:47:49
+ * @LastEditTime: 2023-09-11 18:42:23
  * @FilePath: /vg-vscode-extension/src/swagger-generator/dart/generate/model.ts
  * @Description:
  */
@@ -141,11 +141,9 @@ class ${className} {
       str += `${INDENT}${INDENT}${camelPropertyName}: `;
       if (dartType.startsWith('List')) {
         var subType = dartType.substring(5, dartType.length - 1);
-        str += `json["${propertyName}"] != null ? ${
-          DART_TYPE.includes(subType)
-            ? `json["${propertyName}"] as List<${subType}>`
-            : `List<${subType}>.from(json["${propertyName}"].map((e) => ${subType}.fromJson(e)))`
-        } : [],\n`;
+        str += `json["${propertyName}"] != null ? List<${subType}>.from(json["${propertyName}"].map((e) => ${
+          DART_TYPE.includes(subType) ? 'e' : `${subType}.fromJson(e)`
+        })) : [],\n`;
       } else if (!DART_TYPE.includes(dartType)) {
         str += require
           ? `${dartType}.fromJson(json["${propertyName}"]),\n`
