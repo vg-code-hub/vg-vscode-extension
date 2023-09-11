@@ -1,8 +1,8 @@
 /*
  * @Author: zdd
  * @Date: 2023-06-27 22:07:27
- * @LastEditors: zdd
- * @LastEditTime: 2023-07-21 16:42:15
+ * @LastEditors: jimmyZhao
+ * @LastEditTime: 2023-09-11 10:23:12
  * @FilePath: /vg-vscode-extension/webview-react/src/pages/schema2code/index.tsx
  * @Description: 
  */
@@ -10,7 +10,7 @@
 import type { ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
 import { useMount } from 'ahooks';
-import { Card, Descriptions, Menu } from 'antd';
+import { Menu } from 'antd';
 import { useImmer } from 'use-immer';
 import { useEffect, useState } from 'react';
 import { getLocalSchemas } from '@/common';
@@ -33,9 +33,13 @@ const columns: ProColumns<TableListItem>[] = [
     width: 80,
   },
   {
-    title: 'schema',
-    key: 'schema',
-    dataIndex: 'key',
+    title: 'methodName',
+    key: 'methodName',
+    dataIndex: 'methodName',
+  },
+  {
+    title: 'summary',
+    dataIndex: 'summary',
   },
 ];
 const Schema2codePage: React.FC = () => {
@@ -46,9 +50,11 @@ const Schema2codePage: React.FC = () => {
   });
   const [schemas, setSchemas] = useImmer<Record<string, any>>({});
   const [openKeys, setOpenKeys] = useImmer<string[]>([]);
+  const [modelList, setModelList] = useImmer<any[]>([]);
 
   useMount(async () => {
     const _schemas = await getLocalSchemas();
+
     setSchemas(_schemas);
     const _menuItems: any[] = []
     for (let keyT in _schemas) {
@@ -83,7 +89,6 @@ const Schema2codePage: React.FC = () => {
       }
     }
     setMenuItems(_menuItems);
-    // console.log(_menuItems);
   })
 
   useEffect(() => {
@@ -100,6 +105,7 @@ const Schema2codePage: React.FC = () => {
       <GenPage visible={formModal.visible}
         config={formModal.config}
         pageName={formModal.pageName}
+        modelList={modelList}
         onClose={(ok) => {
           setFormModal((s: any) => {
             s.visible = false
@@ -112,22 +118,27 @@ const Schema2codePage: React.FC = () => {
           valueType: 'option',
           key: 'option',
           width: 120,
-          render: (text: string, record: any) => [
-            <a
-              key="editable"
-              onClick={() => {
-                setFormModal({
-                  visible: true,
-                  config: record,
-                  pageName: selectedKey,
-                })
-              }}
-            >
-              生成page
-            </a>
-          ],
+          render: (_: string, record: any) => {
+            if (record.methodName.startsWith('update') || record.methodName.startsWith('delete')) {
+              return []
+            }
+            return [
+              <a
+                key="editable"
+                onClick={() => {
+                  setFormModal({
+                    visible: true,
+                    config: record,
+                    pageName: selectedKey,
+                  })
+                }}
+              >
+                生成page
+              </a>
+            ];
+          },
         },]}
-        rowKey="key"
+        rowKey="methodName"
         pagination={false}
         tableRender={(_: any, dom: any) => (
           <div
@@ -144,9 +155,6 @@ const Schema2codePage: React.FC = () => {
               openKeys={openKeys}
               selectedKeys={[selectedKey]}
               onOpenChange={setOpenKeys}
-              // selectedKeys={[...selectedKey.split('/')]}
-              // openKeys={[...selectedKey.slice(0, selectedKey.length - 1).split('/')]}
-              // defaultOpenKeys={[...selectedKey.slice(0, selectedKey.length - 1).split('/')]}
               mode="inline"
               items={menuItems}
             />
@@ -159,39 +167,27 @@ const Schema2codePage: React.FC = () => {
             </div>
           </div>
         )}
-        // tableExtraRender={(_: any, data: any) => (
-        //   <Card>
-        //     <Descriptions size="small" column={3}>
-        //       <Descriptions.Item label="Row">{data.length}</Descriptions.Item>
-        //       <Descriptions.Item label="Created">Lili Qu</Descriptions.Item>
-        //       <Descriptions.Item label="Association">
-        //         <a>421421</a>
-        //       </Descriptions.Item>
-        //       <Descriptions.Item label="Creation Time">
-        //         2017-01-10
-        //       </Descriptions.Item>
-        //       <Descriptions.Item label="Effective Time">
-        //         2017-10-10
-        //       </Descriptions.Item>
-        //     </Descriptions>
-        //   </Card>
-        // )}
         params={{
           selectedKey,
         }}
         expandable={{
-          expandedRowRender: (record: any) => <CodeMirror domId={"templateCodeMirror_" + record.key} readonly={true} value={record.code} />,
+          expandedRowRender: (record: any) => <CodeMirror domId={"templateCodeMirror_" + record.methodName} readonly={true} value={record.code} />,
         }}
         request={async () => {
           var tableListDataSource: any[] = [];
           const findKey = Object.keys(schemas).find((key) =>
             key.startsWith('/') ? key.substring(1) == selectedKey : key == selectedKey);
-          if (selectedKey != '' && findKey) tableListDataSource = schemas[findKey];
+          if (selectedKey != '' && findKey) {
+            const [apis, models] = schemas[findKey];
+            tableListDataSource = apis;
+            setModelList(models)
+          }
+
           return {
             success: true,
             data: tableListDataSource.map((item) => ({
               ...item,
-              code: JSON.stringify(item.value, null, 2),
+              code: JSON.stringify(item, null, 2),
             })),
           };
         }}

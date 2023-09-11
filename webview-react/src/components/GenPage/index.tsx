@@ -1,8 +1,8 @@
 /*
  * @Author: zdd
  * @Date: 2023-07-20 15:14:05
- * @LastEditors: zdd
- * @LastEditTime: 2023-07-21 17:54:58
+ * @LastEditors: jimmyZhao
+ * @LastEditTime: 2023-09-11 10:39:25
  * @FilePath: /vg-vscode-extension/webview-react/src/components/GenPage/index.tsx
  * @Description: 
  */
@@ -11,7 +11,7 @@ import { camelCase, find, snakeCase, upperFirst } from 'lodash';
 import { render as ejsRender } from 'ejs';
 import { useModel } from '@umijs/max';
 import { useImmer } from 'use-immer';
-import { Modal, Form, Input, Checkbox, Card, Space, Divider, Menu, Radio, Select, message } from 'antd';
+import { Modal, Form, Input, Checkbox, Card, Space, Divider, Menu, Radio, message } from 'antd';
 import { genPagesCode } from '@/common';
 import CodeMirror from '../CodeMirror';
 import styles from "./index.less";
@@ -19,14 +19,16 @@ import styles from "./index.less";
 interface IProps {
   visible: boolean;
   config: any;
+  modelList: any;
   pageName: string;
   onClose: (ok?: boolean) => void;
 }
 
 
-const GenPage: React.FC<IProps> = ({ visible, config, pageName: _pageName, onClose }) => {
+const GenPage: React.FC<IProps> = ({ visible, modelList, config, pageName: _pageName, onClose }) => {
   const [indeterminate, setIndeterminate] = useState(true);
   const [checkAll, setCheckAll] = useState(false);
+  const [menuWidth, setMenuWidth] = useState(100);
   const [checkAllDisable, setCheckAllDisable] = useState(false);
   const [checkedList, setCheckedList] = useState<any[]>([]);
   const [plainOptions, setPlainOptions] = useState<any[]>([]);
@@ -67,35 +69,53 @@ const GenPage: React.FC<IProps> = ({ visible, config, pageName: _pageName, onClo
   }, [checkedList])
 
   useEffect(() => {
-    if (config) {
-      let { required = [], properties } = config.value;
-      const _checkedList: string[] = [];
-      const _options = Object.keys(properties).map((key) => {
-        if (required.includes(key)) _checkedList.push(key);
-        return { label: key, value: key, disabled: required.includes(key) };
-      });
-      setPlainOptions(_options);
-      setCheckedList(_checkedList)
-      if (required.length != 0 && required.length === _checkedList.length) {
-        setCheckAllDisable(true);
+    if (!config) return;
+    let model;
+    if (config.methodName.startsWith('get')) {
+      model = find(modelList, { name: config.returnType.type });
+      if (config.returnType.isPagination || config.returnType.isList) {
+        setSelectPages(['list'])
+      } else {
+        setSelectPages(['detail'])
       }
+    } else if (config.methodName.startsWith('create')) {
+      model = find(modelList, { name: config.body.type });
+      setSelectPages(['create'])
+    }
+    if (!model) return;
+
+    let { required = [], properties } = model.schema;
+    const _checkedList: string[] = [];
+    const _options = Object.keys(properties).map((key) => {
+      if (required.includes(key)) _checkedList.push(key);
+      return { label: key, value: key, disabled: required.includes(key) };
+    });
+    setPlainOptions(_options);
+    setCheckedList(_checkedList)
+    if (required.length != 0 && required.length === _checkedList.length) {
+      setCheckAllDisable(true);
     }
   }, [config])
 
   useEffect(() => {
-    if (_pageName) {
-      setPageNameFull(_pageName)
+    if (!config || !_pageName) return;
+    const paths = _pageName.split('/')
+    const names = snakeCase(config.methodName).split('_')
+    names.shift();
+    if (paths[paths.length - 1] == names[0]) {
+      names.shift();
     }
-  }, [_pageName])
+    setPageNameFull(_pageName + '/' + names.join('_'))
+  }, [_pageName, config, selectPages])
 
   useEffect(() => {
-    const pages = pageNameFull.startsWith('entitys/') ? pageNameFull.substring(8).split('/') : pageNameFull.split('/');
+    const pages = pageNameFull.split('/');
     const snakeCaseName = snakeCase(pages[pages.length - 1]);
     let menuItem = {}
     let current: any = {};
     let _codeMap: any = {};
     let children: any[] = [];
-
+    let _selectedKey = '';
     for (let i = 0; i < pages.length; i++) {
       const label = pages[i];
       const key = pages.slice(0, i + 1).join('/');
@@ -152,7 +172,14 @@ const GenPage: React.FC<IProps> = ({ visible, config, pageName: _pageName, onClo
 
         function findCodeTemplate(arr: string[]) {
 
-          let { required = [], properties } = config.value;
+          let model;
+          if (config.methodName.startsWith('get')) {
+            model = find(modelList, { name: config.returnType.type });
+          } else if (config.methodName.startsWith('create')) {
+            model = find(modelList, { name: config.body.type });
+          }
+          if (!model) return '';
+          let { required = [], properties } = model.schema;
 
           return ejsRender(find(schema2codeMaterial, { name: arr.join('-') })?.template, {
             className: upperFirst(camelCase(snakeCaseName)),
@@ -166,26 +193,37 @@ const GenPage: React.FC<IProps> = ({ visible, config, pageName: _pageName, onClo
         }
 
         if (schema2codeMaterial) {
-          _codeMap[`${_key}/${snakeCaseName}_create_page.dart`] = findCodeTemplate(['dart', 'create', 'page'])
-          _codeMap[`${_key}/${snakeCaseName}_detail_page.dart`] = findCodeTemplate(['dart', 'detail', 'page'])
-          _codeMap[`${_key}/${snakeCaseName}_list_page.dart`] = findCodeTemplate(['dart', 'list', 'page'])
-          _codeMap[`${_key}/widgets/${snakeCaseName}_item.dart`] = findCodeTemplate(['dart', 'list', 'item'])
-
-          _codeMap[`${_key}/controllers/${snakeCaseName}_create.dart`] = findCodeTemplate(['dart', 'create', 'controller'])
-          _codeMap[`${_key}/controllers/${snakeCaseName}_detail.dart`] = findCodeTemplate(['dart', 'detail', 'controller'])
-          _codeMap[`${_key}/controllers/${snakeCaseName}_list.dart`] = findCodeTemplate(['dart', 'list', 'controller'])
+          let indexContent = '';
+          if (selectPages.includes('create')) {
+            _codeMap[`${_key}/controllers/${snakeCaseName}_create.dart`] = findCodeTemplate(['dart', 'create', 'controller'])
+            _codeMap[`${_key}/${snakeCaseName}_create_page.dart`] = findCodeTemplate(['dart', 'create', 'page'])
+            indexContent += `export '${_key}/${snakeCaseName}_create_page.dart';\n`;
+            _selectedKey = `${_key}/${snakeCaseName}_create_page.dart`;
+          }
+          if (selectPages.includes('detail')) {
+            _codeMap[`${_key}/${snakeCaseName}_detail_page.dart`] = findCodeTemplate(['dart', 'detail', 'page'])
+            _codeMap[`${_key}/controllers/${snakeCaseName}_detail.dart`] = findCodeTemplate(['dart', 'detail', 'controller'])
+            indexContent += `export '${_key}/${snakeCaseName}_detail_page.dart';\n`;
+            _selectedKey = `${_key}/${snakeCaseName}_detail_page.dart`;
+          }
+          if (selectPages.includes('list')) {
+            _codeMap[`${_key}/${snakeCaseName}_list_page.dart`] = findCodeTemplate(['dart', 'list', 'page'])
+            _codeMap[`${_key}/widgets/${snakeCaseName}_item.dart`] = findCodeTemplate(['dart', 'list', 'item'])
+            _codeMap[`${_key}/controllers/${snakeCaseName}_list.dart`] = findCodeTemplate(['dart', 'list', 'controller'])
+            indexContent += `export '${_key}/${snakeCaseName}_list_page.dart';\n`;
+            _selectedKey = `${_key}/${snakeCaseName}_list_page.dart`;
+          }
+          _codeMap['index.dart'] = indexContent;
         }
-        _codeMap['index.dart'] = `export '${_key}/${snakeCaseName}_create_page.dart';\nexport '${_key}/${snakeCaseName}_detail_page.dart';\nexport '${_key}/${snakeCaseName}_list_page.dart';\n`
       }
     }
+
     if (pages.length > 0) {
-      var _selectedKey = [...pages.slice(0, pages.length - 1), snakeCaseName].join('/') + '_list_page.dart';
       setSelectedKey(_selectedKey);
       setFileItems(s => {
         s[0].children[0] = menuItem
       })
     }
-
     setCodeMap(_codeMap)
   }, [pageNameFull, selectPages])
 
@@ -197,13 +235,21 @@ const GenPage: React.FC<IProps> = ({ visible, config, pageName: _pageName, onClo
     })
 
     setOpenKeys(['pages', ..._openKeys]);
+
+    if (keys.length > 1) {
+      const pages = pageNameFull.split('/');
+      const snakeCaseName = snakeCase(pages[pages.length - 1]);
+      const width = (keys.length) * 8 + `${snakeCaseName}_create${keys.includes('controllers') || keys.includes('widgets') ? '' : '_page'}.dart`.length * 9;
+      setMenuWidth(width)
+    }
   }, [selectedKey])
 
 
   return (
     <Modal
       title="schema2code"
-      width={'calc(100% - 80px)'}
+      width={'calc(100vw - 80px)'}
+      style={{}}
       open={visible}
       onCancel={() => {
         onClose();
@@ -223,7 +269,6 @@ const GenPage: React.FC<IProps> = ({ visible, config, pageName: _pageName, onClo
             fields={[
               { name: 'pageName', value: pageNameFull },
               { name: 'type', value: 'dart' },
-              { name: 'pages', value: selectPages },
             ]}
             layout={'inline'}
           >
@@ -245,7 +290,7 @@ const GenPage: React.FC<IProps> = ({ visible, config, pageName: _pageName, onClo
                 }}
               />
             </Form.Item>
-            <Form.Item
+            {/* <Form.Item
               name="pages"
               label="要生成页面"
               rules={[{ required: true, type: 'array' }]}
@@ -259,10 +304,10 @@ const GenPage: React.FC<IProps> = ({ visible, config, pageName: _pageName, onClo
                 <Select.Option value="create">create</Select.Option>
                 <Select.Option value="detail">detail</Select.Option>
               </Select>
-            </Form.Item>
+            </Form.Item> */}
           </Form>
-          <Space direction="horizontal" align="start" style={{ width: '100%', marginTop: '36px' }} classNames={{ item: styles['space-item'] }} size={16}>
-            <Card size='small' title={`表名:${config.key}`} style={{ width: '100%' }}>
+          <Space direction="horizontal" align="start" style={{ width: '100%', marginTop: '20px', height: 'calc(100% - 130px)' }} classNames={{ item: styles['space-item'] }} size={16}>
+            <Card size='small' title={`表名:${config.key}`}>
               <Checkbox disabled={checkAllDisable} indeterminate={indeterminate} onChange={(e) => {
                 setCheckedList(e.target.checked ? plainOptions.map((item) => item.label) : []);
               }} checked={checkAll}>
@@ -271,21 +316,22 @@ const GenPage: React.FC<IProps> = ({ visible, config, pageName: _pageName, onClo
               <Divider style={{ margin: '8px 0' }} />
               <Checkbox.Group className={styles['checkbox-group']} style={{ display: 'flex', flexDirection: 'column' }} options={plainOptions} value={checkedList} onChange={setCheckedList} />
             </Card>
-            <Card size='small' title="导出文件清单" style={{ width: '100%' }}>
+            <Card size='small' title="导出文件清单">
               <Menu
                 onSelect={(e) => {
                   setSelectedKey(e.key as string)
                 }}
-                style={{ width: 256 }}
+                style={{ width: menuWidth }}
                 openKeys={openKeys}
                 selectedKeys={[selectedKey]}
                 onOpenChange={setOpenKeys}
                 items={fileItems}
+                inlineIndent={8}
                 mode="inline"
               />
             </Card>
-            <Card size='small' title="文件预览" style={{ width: '100%' }}>
-              <CodeMirror domId='templateCodeMirror' height='60vh' value={codeMap[selectedKey]} />
+            <Card size='small' title="文件预览">
+              <CodeMirror domId='templateCodeMirror' height='100%' value={codeMap[selectedKey]} />
             </Card>
           </Space>
         </>}

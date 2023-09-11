@@ -1,24 +1,21 @@
 /*
  * @Author: zdd
  * @Date: 2023-06-17 09:43:56
- * @LastEditors: zdd
- * @LastEditTime: 2023-07-20 11:45:42
+ * @LastEditors: jimmyZhao
+ * @LastEditTime: 2023-09-10 13:46:03
  * @FilePath: /vg-vscode-extension/src/webview/controllers/schema.ts
  * @Description:
  */
-import { getLocalSchemas } from '../../utils/schema';
-import { existsSync, getConfig, getRootPath, join, mkdirpSync, writeFileSync } from '@root/utils';
+import { SwaggerConfig, SwaggerSchema } from '@root/swagger-generator/utils';
+import { existsSync, getRootPath, join, mkdirpSync, writeFileSync } from '@root/utils';
 
 const schema = {
   getLocalSchemas: async () => {
     let rootPath = getRootPath(undefined);
     if (!rootPath) throw Error('no root path');
-    const {
-      type,
-      swagger: { outputDir },
-    } = getConfig();
-    const targetDirectory = outputDir.startsWith('/') ? join(rootPath, outputDir) : join(rootPath, type === 'dart' ? 'lib' : 'src', outputDir);
-    return getLocalSchemas(targetDirectory);
+    await SwaggerConfig.instance.getConfig(rootPath);
+    const swaggerSchema = SwaggerSchema.fromTargetDirectory();
+    return swaggerSchema.getLocalSchemas();
   },
   genPagesCode: async ({ data: codeMap }: Record<string, any>) => {
     let rootPath = getRootPath(undefined);

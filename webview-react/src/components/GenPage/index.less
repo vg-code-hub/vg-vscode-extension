@@ -1,10 +1,35 @@
 .gen-page-modal {
-  // .space-item {
-  //   height: 70vh;
-  // }
+  top: 50px;
+  padding-bottom: 0;
+  height: calc(100vh - 100px);
+  :global(.ant-modal-content) {
+    width: 100%;
+    height: 100%;
+  }
+
+  :global(.ant-modal-body) {
+    display: contents;
+    width: 100%;
+    height: 100%;
+  }
+
+  .space-item {
+    height: 100%;
+    overflow: auto;
+    :global(.ant-card) {
+      width: 100%;
+      height: 100%;
+      :global(.ant-card-body) {
+        height: calc(100% - 38px);
+        overflow: auto;
+      }
+    }
+  }
+
   .space-item:last-child {
     flex: 1;
   }
+
   .checkbox-group {
     .ant-checkbox-wrapper {
       padding: 5px 0;

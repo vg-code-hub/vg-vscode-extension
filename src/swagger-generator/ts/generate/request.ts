@@ -156,7 +156,7 @@ export const http = {
     }
 
     const translationObj = SwaggerConfig.translationObj;
-    let { dirPath, deeps } = getDirPath(folder, rootName, { translationObj, rootPath }) as {
+    let { dirPath, deeps } = getDirPath(folder, { translationObj, rootPath }) as {
       dirPath: string;
       deeps: number;
     };
@@ -303,9 +303,11 @@ export async function ${methodName}(${params}): Promise<${returnType}> {
 
   getFunctionArgs(key: string, method: Method, parameters: SwaggerHttpEndpoint['parameters'], reqClassName: string) {
     const data = getParamObj(parameters);
-    if (!data) return `'${key}'`;
+    const { urlPrefix } = SwaggerConfig.config;
+    const path = (urlPrefix ?? '') + key;
+    if (!data) return `'${path}'`;
     let str = '',
-      reqPath = key;
+      reqPath = path;
     const { pathParams, queryParams, formDataParams, bodyParams } = data;
     pathParams.forEach((p) => {
       const name = camelCase(p.name);
@@ -337,9 +339,10 @@ export async function ${methodName}(${params}): Promise<${returnType}> {
 
     if (returnType.startsWith('PageResp<')) {
       var subType = returnType.substring(9, returnType.length - 1);
-      return `\n${INDENT}return { ...res.data, list: res.data.list ? ${
-        TS_TYPE.includes(subType) ? 'res.data.list' : `(res.data.list as any[]).map<${subType}>((v: any) => ${subType}.fromJson(v))`
-      } : [] };`;
+      return `\n${INDENT}const data = res.data?.data ? ${
+        TS_TYPE.includes(subType) ? 'res.data.data' : `(res.data.data as any[]).map<${subType}>((v: any) => ${subType}.fromJson(v))`
+      } : [];
+  return { ...res.data, data };`;
     }
     if (returnType.endsWith('[]')) {
       var subType = returnType.substring(0, returnType.length - 2);

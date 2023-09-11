@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-06-01 16:59:31
  * @LastEditors: jimmyZhao
- * @LastEditTime: 2023-09-08 22:07:32
+ * @LastEditTime: 2023-09-10 09:45:17
  * @FilePath: /vg-vscode-extension/src/swagger-generator/utils/common.ts
  * @Description:
  */
@@ -16,6 +16,12 @@ export const INDENT = '  ';
 export const DART_TYPE = ['String', 'int', 'double', 'bool', 'num', 'DateTime', 'dynamic', 'Map<String, dynamic>', 'List'];
 export const TS_TYPE = ['string', 'number', 'boolean', 'null', 'undefined', 'File', 'Record<string, any>', 'any', 'any[]'];
 
+export const METHOD_MAP = {
+  get: 'get',
+  post: 'create',
+  put: 'update',
+  delete: 'delete',
+};
 interface TypeParam {
   key?: string;
   property?: JSONSchema;
@@ -136,7 +142,7 @@ export function getDartType({ key, property, param }: TypeParam): string {
   return 'dynamic';
 }
 
-export const getDirPath = (folder: string | undefined, type: 'entitys' | 'requests', { translationObj, rootPath }: any) => {
+export const getDirPath = (folder: string | undefined, { translationObj, rootPath }: any) => {
   let dirPath: string,
     deeps = 1,
     className: string;
@@ -160,13 +166,12 @@ export const getDirPath = (folder: string | undefined, type: 'entitys' | 'reques
     dirPath = join(rootPath);
     className = pascalCase('request');
   }
-  if (type === 'entitys') return dirPath;
-  else
-    return {
-      className,
-      dirPath,
-      deeps,
-    };
+
+  return {
+    className,
+    dirPath,
+    deeps,
+  };
 };
 
 export const isStandardResponse = (response?: JSONSchema) => {

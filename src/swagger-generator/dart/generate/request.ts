@@ -2,6 +2,7 @@ import { find, first, join, mkdirpSync, existsSync, writeFileSync, writeFile, ca
 import type { SwaggerPath, Method, SwaggerHttpEndpoint, JSONSchema } from '../../index.d';
 import {
   DART_TYPE,
+  METHOD_MAP,
   INDENT,
   SwaggerConfig,
   filterPathName,
@@ -14,16 +15,9 @@ import {
 } from '../../utils';
 import { arrayClass, getModelClassContent } from './model_tool';
 
-const METHOD_MAP = {
-  get: 'get',
-  post: 'create',
-  put: 'update',
-  delete: 'delete',
-};
-
 const rootName = 'requests';
 
-const getReturnType = (resClass?: string, isPagination = false) => {
+const getDartReturnType = (resClass?: string, isPagination = false) => {
   if (!resClass) return undefined;
   if (resClass.startsWith('List<')) {
     const subType = arrayClass(resClass);
@@ -124,7 +118,7 @@ class PageResp<T> {
     }
 
     const translationObj = SwaggerConfig.translationObj;
-    let { dirPath, deeps, className } = getDirPath(folder, rootName, { translationObj, rootPath }) as {
+    let { dirPath, deeps, className } = getDirPath(folder, { translationObj, rootPath }) as {
       className: string;
       dirPath: string;
       deeps: number;
@@ -201,7 +195,7 @@ class ${className} {\n`;
     } else {
       resClass = 'dynamic';
     }
-    resClass = getReturnType(resClass, isPagination);
+    resClass = getDartReturnType(resClass, isPagination);
     return resClass !== undefined ? `${resClass}` : 'void';
   }
 
@@ -258,9 +252,11 @@ class ${className} {\n`;
 
   getFunctionArgs(key: string, method: Method, parameters: SwaggerHttpEndpoint['parameters']) {
     const data = getParamObj(parameters);
-    if (!data) return `'${key}'`;
+    const { urlPrefix } = SwaggerConfig.config;
+    const path = (urlPrefix ?? '') + key;
+    if (!data) return `'${path}'`;
     let str = '',
-      reqPath = key,
+      reqPath = path,
       queryStr = '';
     const { pathParams, queryParams, formDataParams, bodyParams } = data;
 

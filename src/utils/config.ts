@@ -1,8 +1,8 @@
 /*
  * @Author: zdd
  * @Date: 2023-06-27 22:01:26
- * @LastEditors: zdd
- * @LastEditTime: 2023-07-05 16:33:51
+ * @LastEditors: jimmyZhao
+ * @LastEditTime: 2023-09-11 17:10:43
  * @FilePath: /vg-vscode-extension/src/utils/config.ts
  * @Description:
  */
@@ -30,6 +30,7 @@ export type Config = {
   swagger: {
     jsonUrl: string;
     outputDir: string;
+    urlPrefix?: string;
     overwrite: boolean;
     folderFilter?: string[];
     folderMap?: Record<string, string>;

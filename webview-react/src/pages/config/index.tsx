@@ -1,8 +1,8 @@
 /*
  * @Author: zdd
  * @Date: 2023-06-27 22:01:26
- * @LastEditors: zdd
- * @LastEditTime: 2023-07-19 18:03:05
+ * @LastEditors: jimmyZhao
+ * @LastEditTime: 2023-09-11 16:55:28
  * @FilePath: /vg-vscode-extension/webview-react/src/pages/config/index.tsx
  * @Description: 
  */
@@ -47,6 +47,7 @@ const schame: any = {
           "type": "string",
           "description": "",
           "labelWidth": 100,
+          "required": true,
           "ui:readonly": false,
           "ui:options": {
             "labelAlign": "left"
@@ -58,16 +59,26 @@ const schame: any = {
           "type": "string",
           "description": "",
           "labelWidth": 100,
-          "width": "50%",
+          "width": "33%",
+          "required": true,
           "ui:readonly": false,
           "ui:options": {},
+          "props": {}
+        },
+        "urlPrefix": {
+          "title": "urlPrefix",
+          "type": "string",
+          "description": "",
+          "labelWidth": 100,
+          "width": "33%",
+          "ui:readonly": false,
           "props": {}
         },
         "overwrite": {
           "title": "覆盖",
           "type": "boolean",
           "labelWidth": 100,
-          "width": "50%",
+          "width": "33%",
           "widget": "switch"
         },
         "folderFilter": {

@@ -1,12 +1,13 @@
 /*
  * @Author: zdd
  * @Date: 2023-06-01 16:34:25
- * @LastEditors: zdd
- * @LastEditTime: 2023-06-12 18:38:05
+ * @LastEditors: jimmyZhao
+ * @LastEditTime: 2023-09-10 09:43:52
  * @FilePath: /vg-vscode-extension/src/swagger-generator/index.d.ts
  * @Description:
  */
 
+export type ProjectType = 'entitys' | 'requests';
 type Type = 'string' | 'number' | 'integer' | 'object' | 'array' | 'boolean' | 'null' | 'file';
 
 // https://apifox.com/help/reference/json-schema

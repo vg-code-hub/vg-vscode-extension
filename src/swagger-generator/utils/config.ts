@@ -1,8 +1,8 @@
 /*
  * @Author: zdd
  * @Date: 2023-06-05 11:28:07
- * @LastEditors: zdd
- * @LastEditTime: 2023-06-19 14:55:00
+ * @LastEditors: jimmyZhao
+ * @LastEditTime: 2023-09-11 17:14:02
  * @FilePath: /vg-vscode-extension/src/swagger-generator/utils/config.ts
  * @Description:
  */
@@ -14,12 +14,14 @@ interface Config {
   jsonUrl: string;
   outputDir: string;
   overwrite?: boolean;
+  urlPrefix?: string;
   folderFilter?: (string | RegExp)[];
   folderMap?: Record<string, string>;
   customPathFolder?: Map<string | RegExp, string>;
   customModelFolder?: Record<string, string>;
   translationObj?: Record<string, string>;
   rootPath: string;
+  type: 'dart' | 'typescript';
 }
 
 class SwaggerConfig {
@@ -54,21 +56,21 @@ class SwaggerConfig {
   async getConfig(rootPath: string) {
     if (!existsSync(rootPath.concat(`/vgcode.yaml`))) throw Error('config your vgcode.yaml then  try again');
 
-    const data = getConfig().swagger;
+    const { swagger, type } = getConfig();
     let folderFilter: (string | RegExp)[] = [];
-    if (data.folderFilter) {
+    if (swagger.folderFilter) {
       if (!Array.isArray(folderFilter)) throw Error('folderFilter must be array');
-      folderFilter = data.folderFilter.map(getRegExp);
+      folderFilter = swagger.folderFilter.map(getRegExp);
     }
     let customPathFolder = new Map();
-    if (data.customPathFolder)
-      for (const key in data.customPathFolder) {
-        const element = data.customPathFolder[key];
+    if (swagger.customPathFolder)
+      for (const key in swagger.customPathFolder) {
+        const element = swagger.customPathFolder[key];
         let _key = getRegExp(key);
         customPathFolder.set(_key, element);
       }
-
-    this._config = { ...data, outputDir: data.outputDir ?? 'api', rootPath, folderFilter, customPathFolder };
+    if (swagger.urlPrefix && !swagger.urlPrefix.startsWith('/')) swagger.urlPrefix = '/' + swagger.urlPrefix;
+    this._config = { ...swagger, type, outputDir: swagger.outputDir ?? 'api', rootPath, folderFilter, customPathFolder };
     return this.config;
   }
 
