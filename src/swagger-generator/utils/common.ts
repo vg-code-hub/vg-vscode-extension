@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-06-01 16:59:31
  * @LastEditors: jimmyZhao
- * @LastEditTime: 2023-09-10 09:45:17
+ * @LastEditTime: 2023-09-13 17:14:52
  * @FilePath: /vg-vscode-extension/src/swagger-generator/utils/common.ts
  * @Description:
  */
@@ -217,7 +217,7 @@ export function getModelName(key: string) {
     className = pascalCase(key);
   } else {
     const [a, b] = key.split('.');
-    if (/^v\d+$/i.test(a) || RegExp(`^${a}`, 'i').test(b)) className = pascalCase(b);
+    if (/^v\d+$/i.test(a) || ['api'].includes(a) || RegExp(`^${a}`, 'i').test(b)) className = pascalCase(b);
     else className = pascalCase(a + '_' + b);
   }
   return className;
