@@ -11,6 +11,7 @@ import {
   isStandardResponse,
   isPaginationResponse,
   getParamObj,
+  LIST_KEY,
 } from '../../utils';
 import { getModelClassContent } from './model_tool';
 
@@ -339,8 +340,8 @@ export async function ${methodName}(${params}): Promise<${returnType}> {
 
     if (returnType.startsWith('PageResp<')) {
       var subType = returnType.substring(9, returnType.length - 1);
-      return `\n${INDENT}const data = res.data?.data ? ${
-        TS_TYPE.includes(subType) ? 'res.data.data' : `(res.data.data as any[]).map<${subType}>((v: any) => ${subType}.fromJson(v))`
+      return `\n${INDENT}const data = res.data?.${LIST_KEY} ? ${
+        TS_TYPE.includes(subType) ? `res.data.${LIST_KEY}` : `(res.data.${LIST_KEY} as any[]).map<${subType}>((v: any) => ${subType}.fromJson(v))`
       } : [];
   return { ...res.data, data };`;
     }

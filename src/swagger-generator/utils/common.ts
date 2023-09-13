@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-06-01 16:59:31
  * @LastEditors: jimmyZhao
- * @LastEditTime: 2023-09-13 17:14:52
+ * @LastEditTime: 2023-09-13 18:07:14
  * @FilePath: /vg-vscode-extension/src/swagger-generator/utils/common.ts
  * @Description:
  */
@@ -12,6 +12,7 @@ import { first, join, snakeCase, pascalCase, camelCase } from '@root/utils';
 
 /** tab 空格数 */
 export const INDENT = '  ';
+export const LIST_KEY = 'items';
 
 export const DART_TYPE = ['String', 'int', 'double', 'bool', 'num', 'DateTime', 'dynamic', 'Map<String, dynamic>', 'List'];
 export const TS_TYPE = ['string', 'number', 'boolean', 'null', 'undefined', 'File', 'Record<string, any>', 'any', 'any[]'];
@@ -186,7 +187,7 @@ export const isPaginationResponse = (standardResponse: JSONSchema) => {
   if (standardResponse.properties && Object.keys(standardResponse.properties).includes('list') && standardResponse.properties['list'].type === 'array')
     return standardResponse!['properties']!['list'];
   if (standardResponse.allOf && standardResponse.allOf.length > 1 && standardResponse.allOf[0].$ref?.endsWith('utils.PageData'))
-    return standardResponse.allOf[1].properties!['data'];
+    return standardResponse.allOf[1].properties![LIST_KEY];
   return undefined;
 };
 

@@ -12,6 +12,7 @@ import {
   getParamObj,
   isPaginationResponse,
   isStandardResponse,
+  LIST_KEY,
 } from '../../utils';
 import { arrayClass, getModelClassContent } from './model_tool';
 
@@ -153,10 +154,10 @@ class ${className} {\n`;
 
     var _name = filterPathName(_temp);
 
-    // if (key === '/v1/app/base/confirmLogin') {
-    //   console.log(key);
-    //   console.log(key);
-    // }
+    if (key === '/device/devices') {
+      console.log(key);
+      console.log(key);
+    }
     this.filesMap[dirPath][1] = getModelClassContent(_name, value, this.filesMap[dirPath][1]);
     const reqClassName = getClassName(_name);
 
@@ -311,10 +312,10 @@ class ${className} {\n`;
     } else if (type.startsWith('PageResp')) {
       const subType = type.substring(9, type.length - 1);
       return `\n${INDENT}${INDENT}var pageData = res.body['data'];
-    List<${subType}> data = pageData['data'] == null
+    List<${subType}> data = pageData['${LIST_KEY}'] == null
         ? []
         : List<${subType}>.from(
-            pageData['data'].map((e) => ${subType}.fromJson(e)));
+            pageData['${LIST_KEY}'].map((e) => ${subType}.fromJson(e)));
     return PageResp(
       data,
       page: pageData['page'],
