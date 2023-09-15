@@ -1,3 +1,11 @@
+/*
+ * @Author: jimmyZhao
+ * @Date: 2023-07-28 10:27:11
+ * @LastEditors: jimmyZhao
+ * @LastEditTime: 2023-09-15 16:18:13
+ * @FilePath: /vg-vscode-extension/src/commands/routers-generate.ts
+ * @Description:
+ */
 import { Uri, window } from 'vscode';
 import * as vscode from 'vscode';
 import { join, getRootPath, readdirSync, statSync, existsSync, appendFileSync, rmSync, snakeCase, camelCase, pascalCase, mkdirp } from '@root/utils';
@@ -32,9 +40,9 @@ function routeNamesGenerate(targetDirectory: string) {
 
     // 排除 lib/pages/index.dart
     if (
-      relativePath.indexOf('lib/pages/index.dart') !== -1 ||
-      relativePath.indexOf('bindings/') !== -1 ||
+      relativePath.indexOf('lib/pages/pages.dart') !== -1 ||
       relativePath.indexOf('widgets/') !== -1 ||
+      relativePath.indexOf('services/') !== -1 ||
       relativePath.indexOf('controllers/') !== -1
     )
       return;
@@ -45,12 +53,6 @@ function routeNamesGenerate(targetDirectory: string) {
     const filePathName = arrFilePath.join('/');
     if (filePathName.startsWith('.')) return;
 
-    const snakeCaseName = snakeCase(modalFileName);
-    const camelCaseName = camelCase(modalFileName);
-
-    // 文件名
-    const pascalCaseName = pascalCase(arrFilePath[arrFilePath.length - 1]);
-
     // 删除文件
     if (isFirst === true) {
       isFirst = false;
@@ -58,23 +60,34 @@ function routeNamesGenerate(targetDirectory: string) {
 
       if (existsSync(`${rootPath}/lib/routers/pages.txt`)) rmSync(`${rootPath}/lib/routers/pages.txt`);
 
-      if (existsSync(`${rootPath}/lib/pages/index.txt`)) rmSync(`${rootPath}/lib/pages/index.txt`);
+      if (existsSync(`${rootPath}/lib/pages/pages.txt`)) rmSync(`${rootPath}/lib/pages/pages.txt`);
 
       if (!existsSync(`${rootPath}/lib/routers`)) mkdirp(`${rootPath}/lib/routers`);
     }
+    if (relativePath.indexOf('bindings') === -1) {
+      const snakeCaseName = snakeCase(modalFileName);
+      const camelCaseName = camelCase(modalFileName);
 
-    // 写入列表
-    appendFileSync(`${rootPath}/lib/routers/names.txt`, `static const ${camelCaseName} = '/${snakeCaseName}';\r\n`, 'utf8');
-    appendFileSync(
-      `${rootPath}/lib/routers/pages.txt`,
-      `
+      // 文件名
+      const pascalCaseName =
+        arrFilePath.length > 1
+          ? pascalCase(arrFilePath[arrFilePath.length - 2] + '_' + arrFilePath[arrFilePath.length - 1])
+          : pascalCase(arrFilePath[arrFilePath.length - 1]);
+
+      // 写入列表
+      appendFileSync(`${rootPath}/lib/routers/names.txt`, `static const ${camelCaseName} = '/${snakeCaseName}';\r\n`, 'utf8');
+      appendFileSync(
+        `${rootPath}/lib/routers/pages.txt`,
+        `
       GetPage(
         name: RouteNames.${camelCaseName},
         page: () => const ${pascalCaseName}(),
       ),`,
-      'utf8'
-    );
-    appendFileSync(`${rootPath}/lib/pages/index.txt`, `export '${filePathName}.dart';\r\n`, 'utf8');
+        'utf8'
+      );
+    }
+
+    appendFileSync(`${rootPath}/lib/pages/pages.txt`, `export '${filePathName}.dart';\r\n`, 'utf8');
   });
 }
 
