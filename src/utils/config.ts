@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-06-27 22:01:26
  * @LastEditors: jimmyZhao
- * @LastEditTime: 2023-09-11 17:10:43
+ * @LastEditTime: 2023-09-15 18:06:17
  * @FilePath: /vg-vscode-extension/src/utils/config.ts
  * @Description:
  */
@@ -30,6 +30,8 @@ export type Config = {
   swagger: {
     jsonUrl: string;
     outputDir: string;
+    ignoreResponse?: string;
+    pageResponse?: { name: string; props: string };
     urlPrefix?: string;
     overwrite: boolean;
     folderFilter?: string[];

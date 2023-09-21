@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-06-01 16:59:31
  * @LastEditors: jimmyZhao
- * @LastEditTime: 2023-09-13 18:07:14
+ * @LastEditTime: 2023-09-21 10:13:06
  * @FilePath: /vg-vscode-extension/src/swagger-generator/utils/common.ts
  * @Description:
  */
@@ -14,7 +14,7 @@ import { first, join, snakeCase, pascalCase, camelCase } from '@root/utils';
 export const INDENT = '  ';
 export const LIST_KEY = 'items';
 
-export const DART_TYPE = ['String', 'int', 'double', 'bool', 'num', 'DateTime', 'dynamic', 'Map<String, dynamic>', 'List'];
+export const DART_TYPE = ['String', 'int', 'double', 'bool', 'num', 'DateTime', 'dynamic', 'null', 'Map<String, dynamic>', 'List'];
 export const TS_TYPE = ['string', 'number', 'boolean', 'null', 'undefined', 'File', 'Record<string, any>', 'any', 'any[]'];
 
 export const METHOD_MAP = {
@@ -70,6 +70,7 @@ function calcTypeParam({ key, property, param }: TypeParam) {
     type = getCuncrrentType(property.type);
   } else if (param) {
     const schema = param.schema;
+    property = schema;
     if (param.type) type = getCuncrrentType(param.type);
     else if (!schema) type = '';
     else type = typeof schema === 'string' ? schema : getCuncrrentType(schema.type);
@@ -94,6 +95,8 @@ export function getTsType({ key, property, param }: TypeParam): string {
       if (!subClass) return 'any';
       return subClass;
     case 'array':
+      if (!property) return 'any[]';
+
       const items = property!['items'];
       if (!items) return 'any[]';
       let item = items;
@@ -122,6 +125,8 @@ export function getDartType({ key, property, param }: TypeParam): string {
       return 'String';
     case 'boolean':
       return 'bool';
+    case 'null':
+      return 'null';
     case 'file':
       return 'File';
     case 'object':

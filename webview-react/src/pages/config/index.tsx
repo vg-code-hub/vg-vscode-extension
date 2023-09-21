@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-06-27 22:01:26
  * @LastEditors: jimmyZhao
- * @LastEditTime: 2023-09-11 16:55:28
+ * @LastEditTime: 2023-09-17 20:22:00
  * @FilePath: /vg-vscode-extension/webview-react/src/pages/config/index.tsx
  * @Description: 
  */
@@ -40,14 +40,16 @@ const schame: any = {
       "title": "swagger配置",
       "type": "object",
       "theme": "collapse",
+      "column": 3,
       "style": { "backgroundColor": "#fff" },
       "properties": {
         "jsonUrl": {
           "title": "域名",
           "type": "string",
           "description": "",
-          "labelWidth": 100,
+          "labelWidth": 140,
           "required": true,
+          "width": "100%",
           "ui:readonly": false,
           "ui:options": {
             "labelAlign": "left"
@@ -58,8 +60,7 @@ const schame: any = {
           "title": "目标位置",
           "type": "string",
           "description": "",
-          "labelWidth": 100,
-          "width": "33%",
+          "labelWidth": 140,
           "required": true,
           "ui:readonly": false,
           "ui:options": {},
@@ -69,8 +70,7 @@ const schame: any = {
           "title": "urlPrefix",
           "type": "string",
           "description": "",
-          "labelWidth": 100,
-          "width": "33%",
+          "labelWidth": 140,
           "ui:readonly": false,
           "props": {}
         },
@@ -78,13 +78,39 @@ const schame: any = {
           "title": "覆盖",
           "type": "boolean",
           "labelWidth": 100,
-          "width": "33%",
           "widget": "switch"
+        },
+        "ignoreResponse": {
+          "title": "忽略响应类",
+          "tooltip": "例：$1.data (表示取第一层data字段)，$1从第一层开始取值。",
+          "type": "string",
+          "labelWidth": 140,
+          "props": {}
+        },
+        "pageResponse": {
+          "type": "object",
+          "title": "分页响应类",
+          "widget": "card",
+          "column": 2,
+          "properties": {
+            "name": {
+              "title": "类名",
+              "tooltip": "例：PageData.data (PageData 表示公共分页类，data 表示数据字段)",
+              "type": "string",
+              "props": {}
+            },
+            "props": {
+              "title": "参数",
+              "tooltip": "参数最后一项会映射为类名数据字段[data]。",
+              "type": "string",
+              "props": {}
+            }
+          }
         },
         "folderFilter": {
           "title": "过滤路径",
           "type": "array",
-          "description": "源路径过滤不会显示",
+          "description": "只显示过滤的swagger路径",
           "items": {
             "type": "object",
             "properties": {
@@ -293,7 +319,7 @@ const ConfigPage: React.FC = () => {
       setFormDate((s: any) => {
         for (const key in data) {
           s[key] = data[key as keyof typeof data];
-          if (key === 'swagger' && folderFilter) {
+          if (key === 'swagger' && folderFilter && Array.isArray(folderFilter)) {
             s[key].folderFilter = folderFilter.map((value) => ({ value }));
           }
           if (key === 'swagger' && folderMap) {

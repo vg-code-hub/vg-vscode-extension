@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-05-31 22:05:06
  * @LastEditors: jimmyZhao
- * @LastEditTime: 2023-09-07 11:18:22
+ * @LastEditTime: 2023-09-21 10:25:23
  * @FilePath: /vg-vscode-extension/src/swagger-generator/ts/generate/model_tool.ts
  * @Description:
  */
@@ -12,7 +12,7 @@ import { TS_TYPE, getClassName, getResSchema, getTsType, isPaginationResponse, i
 import ModelGenerate from './model';
 
 export class MM {
-  static gen: ModelGenerate;
+  static gen = new ModelGenerate();
 }
 
 export function getModelClassContent(name: string, value: SwaggerHttpEndpoint, content: string) {

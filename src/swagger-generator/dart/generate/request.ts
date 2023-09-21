@@ -1,19 +1,6 @@
-import { find, first, join, mkdirpSync, existsSync, writeFileSync, writeFile, camelCase, isRegExp, upperFirst } from '@root/utils';
+import { find, first, join, mkdirpSync, existsSync, writeFileSync, writeFile, camelCase, isRegExp } from '@root/utils';
 import type { SwaggerPath, Method, SwaggerHttpEndpoint, JSONSchema } from '../../index.d';
-import {
-  DART_TYPE,
-  METHOD_MAP,
-  INDENT,
-  SwaggerConfig,
-  filterPathName,
-  getClassName,
-  getDartType,
-  getDirPath,
-  getParamObj,
-  isPaginationResponse,
-  isStandardResponse,
-  LIST_KEY,
-} from '../../utils';
+import { DART_TYPE, METHOD_MAP, INDENT, SwaggerGenTool, filterPathName, getClassName, getDartType, getDirPath, getParamObj } from '../../utils';
 import { arrayClass, getModelClassContent } from './model_tool';
 
 const rootName = 'requests';
@@ -22,7 +9,8 @@ const getDartReturnType = (resClass?: string, isPagination = false) => {
   if (!resClass) return undefined;
   if (resClass.startsWith('List<')) {
     const subType = arrayClass(resClass);
-    return isPagination ? `PageResp<${subType}>` : resClass;
+    const [pageName] = SwaggerGenTool.pageResName;
+    return isPagination ? `${pageName}<${subType}>` : resClass;
   }
   return resClass;
 };
@@ -40,9 +28,9 @@ class RequestGenerate {
     for (let key in this.paths) for (let method in this.paths[key]) this.generateRequest(key, method as Method, this.paths[key][method as Method]) + '\n';
 
     let str = `library ${rootName};\n\n`;
-    const requestsDir = join(SwaggerConfig.config.rootPath);
-    const overwrite = SwaggerConfig.config.overwrite ?? false;
-
+    const requestsDir = join(SwaggerGenTool.config.rootPath);
+    const overwrite = SwaggerGenTool.config.overwrite ?? false;
+    const [pageName] = SwaggerGenTool.pageResName;
     // request内容写入
     for (let key in this.filesMap) {
       str += `export '.${key.replace(requestsDir, '')}/model.g.dart';\n`;
@@ -79,7 +67,7 @@ abstract class FormData {}
 class BaseProvider extends GetConnect {}
 
 var httpInstance = BaseProvider()..onInit();
-class PageResp<T> {
+class ${pageName}<T> {
   List<T> data;
   int page;
   int size;
@@ -95,11 +83,11 @@ class PageResp<T> {
 `,
         'utf-8'
       );
-    SwaggerConfig.writeExceptionToFile(requestsDir);
+    SwaggerGenTool.writeExceptionToFile(requestsDir);
   }
 
   generateRequest(key: string, method: Method, value: SwaggerHttpEndpoint) {
-    const { rootPath, customPathFolder } = SwaggerConfig.config;
+    const { rootPath, customPathFolder } = SwaggerGenTool.config;
     let folder;
     if (customPathFolder)
       for (const customKey of customPathFolder.keys())
@@ -114,11 +102,11 @@ class PageResp<T> {
     if (!folder) {
       folder = value['x-apifox-folder'];
       if (!folder && value.tags && value.tags.length > 0) folder = value.tags[0];
-      if (!SwaggerConfig.testFolder(folder ?? '')) return;
-      folder = SwaggerConfig.exchangeConfigMap(folder);
+      if (!SwaggerGenTool.testFolder(folder ?? '')) return;
+      folder = SwaggerGenTool.exchangeConfigMap(folder);
     }
 
-    const translationObj = SwaggerConfig.translationObj;
+    const translationObj = SwaggerGenTool.translationObj;
     let { dirPath, deeps, className } = getDirPath(folder, { translationObj, rootPath }) as {
       className: string;
       dirPath: string;
@@ -133,7 +121,7 @@ class PageResp<T> {
     if (!keyLast) return;
 
     const methodName = camelCase(METHOD_MAP[method] + '_' + keyLast);
-    const overwrite = SwaggerConfig.config.overwrite ?? false;
+    const overwrite = SwaggerGenTool.config.overwrite ?? false;
 
     // 写入 class 头
     if (!this.filesMap[dirPath]) {
@@ -154,10 +142,10 @@ class ${className} {\n`;
 
     var _name = filterPathName(_temp);
 
-    if (key === '/device/devices') {
-      console.log(key);
-      console.log(key);
-    }
+    // if (key === '/repair/repairers') {
+    //   console.log(key);
+    //   console.log(key);
+    // }
     this.filesMap[dirPath][1] = getModelClassContent(_name, value, this.filesMap[dirPath][1]);
     const reqClassName = getClassName(_name);
 
@@ -184,9 +172,9 @@ class ${className} {\n`;
     if (!responses) return 'any';
     let resClass: string | undefined,
       isPagination = false;
-    let standardRes: JSONSchema | undefined = isStandardResponse(responses);
+    let standardRes: JSONSchema | undefined = SwaggerGenTool.getStandardResponse(responses);
     if (standardRes) {
-      const pageData = isPaginationResponse(standardRes);
+      const pageData = SwaggerGenTool.getPageResponse(standardRes);
       if (pageData) {
         standardRes = pageData;
         isPagination = true;
@@ -196,6 +184,7 @@ class ${className} {\n`;
     } else {
       resClass = 'dynamic';
     }
+    if (resClass === 'null') return 'void';
     resClass = getDartReturnType(resClass, isPagination);
     return resClass !== undefined ? `${resClass}` : 'void';
   }
@@ -253,7 +242,7 @@ class ${className} {\n`;
 
   getFunctionArgs(key: string, method: Method, parameters: SwaggerHttpEndpoint['parameters']) {
     const data = getParamObj(parameters);
-    const { urlPrefix } = SwaggerConfig.config;
+    const { urlPrefix } = SwaggerGenTool.config;
     const path = (urlPrefix ?? '') + key;
     if (!data) return `'${path}'`;
     let str = '',
@@ -301,29 +290,29 @@ class ${className} {\n`;
   getReturnContent(responses: JSONSchema | undefined, resClassName: string) {
     const returnType = this.getReturnType(responses, resClassName);
     if (returnType === 'void') return '';
-    if (!isStandardResponse(responses)) return `\n${INDENT}${INDENT}return res;`;
+    const resName = SwaggerGenTool.resName;
+    const [pageName, keyName] = SwaggerGenTool.pageResName;
+    const pageDataKey = SwaggerGenTool.pageResDataKey;
+    if (!SwaggerGenTool.getStandardResponse(responses)) return `\n${INDENT}${INDENT}return ${resName};`;
 
     let type = returnType;
     if (DART_TYPE.includes(type) || type === 'List<Map<String, dynamic>>') {
-      return `\n${INDENT}${INDENT}return res.body['data'];`;
+      return `\n${INDENT}${INDENT}return ${resName};`;
     } else if (type.startsWith('List')) {
       const subType = type.substring(5, type.length - 1);
-      return `\n${INDENT}${INDENT}return res.body['data'] == null ? [] : ${type}.from(res.body['data'].map((e) => ${subType}.fromJson(e)));`;
-    } else if (type.startsWith('PageResp')) {
-      const subType = type.substring(9, type.length - 1);
-      return `\n${INDENT}${INDENT}var pageData = res.body['data'];
-    List<${subType}> data = pageData['${LIST_KEY}'] == null
+      return `\n${INDENT}${INDENT}return ${resName} == null ? [] : ${type}.from(${resName}.map((e) => ${subType}.fromJson(e)));`;
+    } else if (type.startsWith(pageName)) {
+      const subType = type.substring(pageName.length + 1, type.length - 1);
+      return `\n${INDENT}${INDENT}var pageData = ${resName};
+    List<${subType}> ${keyName} = pageData['${pageDataKey}'] == null
         ? []
         : List<${subType}>.from(
-            pageData['${LIST_KEY}'].map((e) => ${subType}.fromJson(e)));
-    return PageResp(
-      data,
-      page: pageData['page'],
-      size: pageData['size'],
-      total: pageData['total'],
+            pageData['${pageDataKey}'].map((e) => ${subType}.fromJson(e)));
+    return ${pageName}(
+      ${keyName},${SwaggerGenTool.pageResProps.map((key) => `\n${INDENT}${INDENT}${INDENT}${key}: pageData['${key}']`).join(',')}
     );`;
     } else {
-      return `\n${INDENT}${INDENT}return ${type}.fromJson(res.body['data']);`;
+      return `\n${INDENT}${INDENT}return ${type}.fromJson(${resName});`;
     }
   }
 }

@@ -1,24 +1,16 @@
+/*
+ * @Author: jimmyZhao
+ * @Date: 2023-07-28 10:27:11
+ * @LastEditors: jimmyZhao
+ * @LastEditTime: 2023-09-17 20:17:28
+ * @FilePath: /vg-vscode-extension/src/utils/ejs.ts
+ * @Description:
+ */
 import * as ejs from 'ejs';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as glob from 'glob';
 import * as prettier from 'prettier';
-
-export type YapiInfo = {
-  query_path: { path: string };
-  method: string;
-  title: string;
-  project_id: number;
-  req_params: {
-    name: string;
-    desc: string;
-  }[];
-  _id: number;
-  req_query: { required: '0' | '1'; name: string }[];
-  res_body_type: 'raw' | 'json';
-  res_body: string;
-  username: string;
-};
 
 export type Model = {
   type: string;
@@ -26,7 +18,6 @@ export type Model = {
   funcName: string;
   typeName: string;
   inputValues: string[];
-  api?: YapiInfo;
   mockCode: string;
   mockData: string;
   jsonData: any;

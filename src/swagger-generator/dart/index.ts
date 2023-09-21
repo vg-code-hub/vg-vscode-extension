@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-06-01 15:12:03
  * @LastEditors: jimmyZhao
- * @LastEditTime: 2023-09-07 10:41:52
+ * @LastEditTime: 2023-09-21 10:18:36
  * @FilePath: /vg-vscode-extension/src/swagger-generator/dart/index.ts
  * @Description:
  */
@@ -10,17 +10,15 @@
 import { Uri, window } from 'vscode';
 import { join, mkdirp, getRootPath, existsSync, writeFile } from '@root/utils';
 import { getSimpleData } from '../http';
-import { SwaggerConfig, collectChinese } from '../utils';
-import ModelGenerate from './generate/model';
+import { SwaggerGenTool, collectChinese } from '../utils';
 import RequestGenerate from './generate/request';
-import { MM } from './generate/model_tool';
 
 export const genWebapiForDart = async (uri: Uri) => {
   try {
     let rootPath = getRootPath(undefined);
     if (!rootPath) throw Error('no root path');
 
-    const { jsonUrl, outputDir } = await SwaggerConfig.instance.getConfig(rootPath);
+    const { jsonUrl, outputDir } = await SwaggerGenTool.instance.initConfig(rootPath);
     if (!jsonUrl) throw Error('no swagger jsonUrl');
 
     const absPath = outputDir.startsWith('/') ? join(rootPath, outputDir) : join(rootPath, 'lib', outputDir);
@@ -48,16 +46,11 @@ async function generateCode(jsonUrl: string, targetDirectory: string) {
 
   const translationPath = targetDirectory.concat(`/translation.json`);
   // 拿到所有中英文映射对象
-  let translateJson = await SwaggerConfig.instance.getTranslateInfo(chineseList, translationPath);
+  await SwaggerGenTool.getTranslateInfo(chineseList, translationPath);
 
-  if (Object.keys(translateJson).length > 0)
-    // 把翻译的内容写入
-    writeFile(translationPath, JSON.stringify(translateJson, null, 4), 'utf-8');
+  SwaggerGenTool.addConfig({ rootPath: targetDirectory });
+  SwaggerGenTool.dataModels = values.data;
 
-  SwaggerConfig.instance.addConfig({ rootPath: targetDirectory });
-
-  // 生成 model
-  // await new ModelGenerate(values.data).generateAllModel();
-  MM.gen = new ModelGenerate(values.data);
   await new RequestGenerate(values.paths).generateAllRequest();
+  SwaggerGenTool.reset();
 }

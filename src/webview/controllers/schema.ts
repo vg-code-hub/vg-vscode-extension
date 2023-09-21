@@ -6,14 +6,14 @@
  * @FilePath: /vg-vscode-extension/src/webview/controllers/schema.ts
  * @Description:
  */
-import { SwaggerConfig, SwaggerSchema } from '@root/swagger-generator/utils';
+import { SwaggerGenTool, SwaggerSchema } from '@root/swagger-generator/utils';
 import { existsSync, getRootPath, join, mkdirpSync, writeFileSync } from '@root/utils';
 
 const schema = {
   getLocalSchemas: async () => {
     let rootPath = getRootPath(undefined);
     if (!rootPath) throw Error('no root path');
-    await SwaggerConfig.instance.getConfig(rootPath);
+    await SwaggerGenTool.instance.initConfig(rootPath);
     const swaggerSchema = SwaggerSchema.fromTargetDirectory();
     return swaggerSchema.getLocalSchemas();
   },

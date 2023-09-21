@@ -1,8 +1,8 @@
 /*
  * @Author: zdd
  * @Date: 2023-06-17 09:43:56
- * @LastEditors: zdd
- * @LastEditTime: 2023-07-20 11:47:16
+ * @LastEditors: jimmyZhao
+ * @LastEditTime: 2023-09-17 20:18:02
  * @FilePath: /vg-vscode-extension/src/webview/routes/index.ts
  * @Description:
  */
@@ -12,7 +12,6 @@ import schema from '../controllers/schema';
 import command from '../controllers/command';
 import * as scaffold from '../controllers/scaffold';
 import * as directory from '../controllers/directory';
-import * as yapi from '../controllers/yapi';
 import * as generate from '../controllers/generate';
 import * as snippet from '../controllers/snippet';
 import * as block from '../controllers/block';
@@ -47,10 +46,6 @@ export const routes: Record<string, any> = {
 
   getDirectoryTree: directory.getDirectoryTree,
 
-  getYapiDomain: yapi.getYapiDomain,
-  getYapiProjects: yapi.getYapiProjects,
-
-  genTemplateModelByYapi: generate.genTemplateModelByYapi,
   genCodeByBlockMaterial: generate.genCodeByBlockMaterial,
   genCodeBySnippetMaterial: generate.genCodeBySnippetMaterial,
 

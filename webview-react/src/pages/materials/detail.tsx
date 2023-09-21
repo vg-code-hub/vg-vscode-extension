@@ -1,8 +1,8 @@
 /*
  * @Author: zdd
  * @Date: 2023-06-29 15:19:34
- * @LastEditors: zdd
- * @LastEditTime: 2023-07-21 18:03:03
+ * @LastEditors: jimmyZhao
+ * @LastEditTime: 2023-09-17 20:16:21
  * @FilePath: /vg-vscode-extension/webview-react/src/pages/materials/detail.tsx
  * @Description: 
  */
@@ -15,7 +15,6 @@ import { useParams, useLocation, useModel } from '@umijs/max';
 import { IGetLocalMaterialsResult, genCodeBySnippetMaterial } from '@/common';
 import CodeMirror from '@/components/CodeMirror';
 import AmisComponent from '@/components/AmisComponent';
-import YapiModal from '@/components/YapiModal';
 import RunScript from '@/components/RunScript';
 
 const MaterialDetailPage: React.FC = () => {
@@ -26,7 +25,6 @@ const MaterialDetailPage: React.FC = () => {
   const { initialState, loading } = useModel('@@initialState', ({ initialState, loading }) => ({ initialState, loading }));
   const [selectedMaterial, setSelectedMaterial] = useImmer<IGetLocalMaterialsResult>({ schema: {}, model: {} } as any);
   const [templateModalVisble, setTemplateModalVisble] = useImmer(false);
-  const [yapiModalVsible, setYapiModalVsible] = useImmer(false);
   const [scriptModalVisible, setScriptModalVisible] = useImmer(false);
 
   useEffect(() => {
@@ -167,19 +165,6 @@ const MaterialDetailPage: React.FC = () => {
           返回
         </Button>
       </div>
-      <YapiModal
-        visible={yapiModalVsible}
-        onOk={(m) => {
-          setSelectedMaterial((s) => ({
-            ...s,
-            model: { ...selectedMaterial.model, ...m },
-          }));
-          setYapiModalVsible(false);
-        }}
-        onCancel={() => {
-          setYapiModalVsible(false);
-        }}
-      />
 
       <Modal
         open={templateModalVisble}

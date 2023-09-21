@@ -2,20 +2,22 @@
  * @Author: zdd
  * @Date: 2023-05-31 22:05:06
  * @LastEditors: jimmyZhao
- * @LastEditTime: 2023-09-11 18:42:23
+ * @LastEditTime: 2023-09-16 08:56:17
  * @FilePath: /vg-vscode-extension/src/swagger-generator/dart/generate/model.ts
  * @Description:
  */
 import { find, camelCase, pascalCase } from '@root/utils';
 import type { JSONSchema } from '../../index.d';
-import { DART_TYPE, INDENT, SwaggerConfig, getDartType } from '../../utils';
+import { DART_TYPE, INDENT, SwaggerGenTool, getDartType } from '../../utils';
 
 class ModelGenerate {
-  data: Record<string, JSONSchema>;
+  get data(): Record<string, JSONSchema> {
+    return SwaggerGenTool.dataModels!;
+  }
+
   content: string;
 
-  constructor(data: Record<string, JSONSchema>) {
-    this.data = data;
+  constructor() {
     this.content = '';
   }
 
@@ -23,9 +25,9 @@ class ModelGenerate {
     const value = this.data[className] ?? _value;
     this.content = content;
     if (!value) return content;
-    if (!this.data[className] && _value) SwaggerConfig.addException(`info: auto create [class ${className}] in some object propertys`);
+    if (!this.data[className] && _value) SwaggerGenTool.addException(`info: auto create [class ${className}] in some object propertys`);
     if (this.content.includes(`class ${className} `)) {
-      SwaggerConfig.addException(`warn: [class ${className}] already exists, please check orginal swagger.json`);
+      SwaggerGenTool.addException(`warn: [class ${className}] already exists, please check orginal swagger.json`);
       return this.content;
     }
 
@@ -59,7 +61,7 @@ class ${className} {
 
   generateOtherModel(className: string, value: any) {
     if (this.content.includes(`class ${className} `)) {
-      SwaggerConfig.addException(`warn: [class ${className}] already exists, please check orginal swagger.json`);
+      SwaggerGenTool.addException(`warn: [class ${className}] already exists, please check orginal swagger.json`);
       return;
     }
     if (!value.properties) value = this.data[className];

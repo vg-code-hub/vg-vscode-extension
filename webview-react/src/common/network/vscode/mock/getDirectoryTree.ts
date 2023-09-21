@@ -2342,21 +2342,6 @@ export default {
                   size: 0,
                   type: 'directory',
                 },
-                {
-                  path: 'D:\\GithubProject\\yapi-code\\webview-react\\src\\components\\YapiModal',
-                  name: 'YapiModal',
-                  children: [
-                    {
-                      path: 'D:\\GithubProject\\yapi-code\\webview-react\\src\\components\\YapiModal\\index.tsx',
-                      name: 'index.tsx',
-                      size: 3332,
-                      extension: '.tsx',
-                      type: 'file',
-                    },
-                  ],
-                  size: 3332,
-                  type: 'directory',
-                },
               ],
               size: 3332,
               type: 'directory',

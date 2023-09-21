@@ -2,20 +2,22 @@
  * @Author: zdd
  * @Date: 2023-05-31 22:05:06
  * @LastEditors: jimmyZhao
- * @LastEditTime: 2023-09-07 14:20:54
+ * @LastEditTime: 2023-09-21 10:25:49
  * @FilePath: /vg-vscode-extension/src/swagger-generator/ts/generate/model.ts
  * @Description:
  */
 import { find, camelCase } from '@root/utils';
 import type { JSONSchema } from '../../index.d';
-import { TS_TYPE, INDENT, SwaggerConfig, getTsType } from '../../utils';
+import { TS_TYPE, INDENT, SwaggerGenTool, getTsType } from '../../utils';
 
 class ModelGenerate {
-  data: Record<string, JSONSchema>;
+  get data(): Record<string, JSONSchema> {
+    return SwaggerGenTool.dataModels!;
+  }
+
   content: string;
 
-  constructor(data: Record<string, JSONSchema>) {
-    this.data = data;
+  constructor() {
     this.content = '';
   }
 
@@ -24,9 +26,9 @@ class ModelGenerate {
     this.content = content;
 
     if (!value) return content;
-    if (!this.data[className] && _value) SwaggerConfig.addException(`info: auto create [class ${className}] in some object propertys`);
+    if (!this.data[className] && _value) SwaggerGenTool.addException(`info: auto create [class ${className}] in some object propertys`);
     if (this.content.includes(`class ${className} `)) {
-      SwaggerConfig.addException(`warn: [class ${className}] already exists, please check orginal swagger.json`);
+      SwaggerGenTool.addException(`warn: [class ${className}] already exists, please check orginal swagger.json`);
       return this.content;
     }
 
@@ -54,7 +56,7 @@ export class ${className} {
 
   generateOtherModel(className: string, value: any) {
     if (this.content.includes(`class ${className} `)) {
-      SwaggerConfig.addException(`warn: [class ${className}] already exists, please check orginal swagger.json`);
+      SwaggerGenTool.addException(`warn: [class ${className}] already exists, please check orginal swagger.json`);
       return;
     }
     if (!value.properties) value = this.data[className];

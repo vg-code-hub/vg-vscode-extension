@@ -1,10 +1,10 @@
 /*
  * @Author: zdd
  * @Date: 2023-06-28 18:00:11
- * @LastEditors: zdd
- * @LastEditTime: 2023-07-21 10:55:15
+ * @LastEditors: jimmyZhao
+ * @LastEditTime: 2023-09-17 20:18:12
  * @FilePath: /vg-vscode-extension/webview-react/src/common/network/vscode/index.ts
- * @Description: 
+ * @Description:
  */
 import { AxiosRequestConfig } from 'axios';
 import { request } from './vscode';
@@ -22,10 +22,10 @@ export interface IGetLocalMaterialsResult {
     img?: string | string[];
     category?: string[];
     schema?: 'form-render' | 'formily' | 'amis';
-    scripts?: [{ method: string; remark: string; }];
+    scripts?: [{ method: string; remark: string }];
   };
   template: string;
-  type: string
+  type: string;
 }
 
 /**
@@ -49,7 +49,7 @@ export function genPagesCode(codeMap: Record<string, any>) {
  */
 export function getLocalSchemas() {
   return request<Record<string, any>[]>({
-    cmd: 'getLocalSchemas'
+    cmd: 'getLocalSchemas',
   });
 }
 
@@ -60,8 +60,12 @@ export function getLocalSchemas() {
  * @returns
  */
 export function getLocalMaterials() {
-  return request<{ schema2code: IGetLocalMaterialsResult[], blocks: IGetLocalMaterialsResult[], snippets: IGetLocalMaterialsResult[] }>({
-    cmd: 'getLocalMaterials'
+  return request<{
+    schema2code: IGetLocalMaterialsResult[];
+    blocks: IGetLocalMaterialsResult[];
+    snippets: IGetLocalMaterialsResult[];
+  }>({
+    cmd: 'getLocalMaterials',
   });
 }
 /**
@@ -104,55 +108,6 @@ export function genCodeBySnippetMaterial(data: {
 }) {
   return request({
     cmd: 'genCodeBySnippetMaterial',
-    data,
-  });
-}
-/**
- * 获取 yapi 域名
- *
- * @export
- * @returns
- */
-export function getYapiDomain() {
-  return request<string>({
-    cmd: 'getYapiDomain',
-  });
-}
-
-/**
- * 获取 yapi 项目列表
- *
- * @export
- * @returns
- */
-export function getYapiProjects() {
-  return request<{ name: string; token: string; domain: string }[]>({
-    cmd: 'getYapiProjects',
-  });
-}
-
-/**
- * 拉取 yapi 接口信息生成 model
- *
- * @export
- * @param {{
- *   domain: string;
- *   id: string;
- *   token: string;
- *   typeName?: string;
- *   funName?: string;
- * }} data
- * @returns
- */
-export function genTemplateModelByYapi(data: {
-  domain: string;
-  id: string;
-  token: string;
-  typeName?: string;
-  funName?: string;
-}) {
-  return request({
-    cmd: 'genTemplateModelByYapi',
     data,
   });
 }
@@ -328,7 +283,6 @@ export function createBlockTemplate(data: {
   });
 }
 
-
 /**
  * @description 删除物料模板
  * @export
@@ -368,7 +322,7 @@ export function getPluginScaffoldJsonUrl() {
  */
 export function getPluginConfig() {
   return request<{
-    type: "dart" | "typescript"
+    type: 'dart' | 'typescript';
     swagger: {
       jsonUrl: string;
       outputDir: string;
@@ -440,7 +394,6 @@ export interface IScaffoldResponse {
   }[];
 }
 
-
 /**
  * 获取脚手架列表
  *
@@ -469,7 +422,7 @@ export function getScaffolds(url: string) {
 export function downloadScaffoldByVsCode(data: {
   type: 'git' | 'npm';
   repository: string;
-  tag?: string
+  tag?: string;
 }) {
   return request<{
     config: { formSchema?: { schema?: object; formData?: object } };
@@ -518,7 +471,7 @@ export function selectDirectory() {
  * @returns
  */
 export function createProject(data: {
-  model: { projectName: string;[key: string]: any };
+  model: { projectName: string; [key: string]: any };
   createDir: string;
   immediateOpen: boolean;
 }) {

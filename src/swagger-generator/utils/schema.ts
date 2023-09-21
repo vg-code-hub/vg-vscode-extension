@@ -10,7 +10,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { getFileContent, camelCase, find, first, isRegExp, getRootPath, join } from '../../utils';
 import {
-  SwaggerConfig,
+  SwaggerGenTool,
   getDirPath,
   METHOD_MAP,
   filterPathName,
@@ -36,7 +36,7 @@ export class SwaggerSchema {
   }
 
   static fromTargetDirectory() {
-    const { outputDir, type, rootPath } = SwaggerConfig.config;
+    const { outputDir, type, rootPath } = SwaggerGenTool.config;
     const targetDirectory = outputDir.startsWith('/') ? join(rootPath, outputDir) : join(rootPath, type === 'dart' ? 'lib' : 'src', outputDir);
     var schemaFullPath = path.join(targetDirectory, 'swagger.json');
     if (!fs.existsSync(schemaFullPath)) throw new Error('schema不存在');
@@ -47,7 +47,7 @@ export class SwaggerSchema {
 
   getLocalSchemas() {
     const filesMap: Record<string, [api: Request[], model: Model[]]> = {};
-    const { customPathFolder, outputDir } = SwaggerConfig.config;
+    const { customPathFolder, outputDir } = SwaggerGenTool.config;
 
     for (let key in this.paths)
       for (let method in this.paths[key]) {
@@ -66,10 +66,10 @@ export class SwaggerSchema {
         if (!folder) {
           folder = value['x-apifox-folder'];
           if (!folder && value.tags && value.tags.length > 0) folder = value.tags[0];
-          if (!SwaggerConfig.testFolder(folder ?? '')) return;
-          folder = SwaggerConfig.exchangeConfigMap(folder);
+          if (!SwaggerGenTool.testFolder(folder ?? '')) return;
+          folder = SwaggerGenTool.exchangeConfigMap(folder);
         }
-        const translationObj = SwaggerConfig.translationObj;
+        const translationObj = SwaggerGenTool.translationObj;
         let { dirPath } = getDirPath(folder, { translationObj, rootPath: outputDir });
         const _temp = key
           .split('/')
