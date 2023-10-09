@@ -1,8 +1,8 @@
 /*
  * @Author: zdd
  * @Date: 2023-06-17 18:03:33
- * @LastEditors: zdd
- * @LastEditTime: 2023-07-05 11:33:36
+ * @LastEditors: jimmyZhao
+ * @LastEditTime: 2023-10-07 12:04:32
  * @FilePath: /vg-vscode-extension/src/utils/download.ts
  * @Description:
  */
@@ -58,21 +58,4 @@ export const downloadMaterialsFromNpm = async (packageName: string) => {
 export const downloadMaterialsFromGit = (remote: string) => {
   fs.removeSync(tempGlobalDir.materials);
   execa.execaSync('git', ['clone', ...remote.split(' '), tempGlobalDir.materials]);
-};
-
-export const copyMaterialsFromTemp = (from: { blocks: string[]; snippets: string[] }, to: string) => {
-  from.blocks.map((s) => {
-    fs.copySync(
-      path.join(tempGlobalDir.blockMaterials, s),
-      fs.existsSync(path.join(to, 'blocks', s)) ? path.join(to, 'blocks', `${s} copy`) : path.join(to, 'blocks', s)
-    );
-  });
-  from.snippets.map((s) => {
-    fs.copySync(
-      path.join(tempGlobalDir.snippetMaterials, s),
-      fs.existsSync(path.join(to, 'snippets', s)) ? path.join(to, 'snippets', `${s} copy`) : path.join(to, 'snippets', s)
-    );
-  });
-
-  fs.removeSync(tempGlobalDir.materials);
 };

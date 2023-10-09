@@ -2,19 +2,20 @@
  * @Author: zdd
  * @Date: 2023-06-17 09:43:56
  * @LastEditors: jimmyZhao
- * @LastEditTime: 2023-09-10 13:46:03
+ * @LastEditTime: 2023-10-09 10:03:36
  * @FilePath: /vg-vscode-extension/src/webview/controllers/schema.ts
  * @Description:
  */
 import { SwaggerGenTool, SwaggerSchema } from '@root/swagger-generator/utils';
-import { existsSync, getRootPath, join, mkdirpSync, writeFileSync } from '@root/utils';
+import { VGConfig, existsSync, getRootPath, join, mkdirpSync, writeFileSync } from '@root/utils';
 
 const schema = {
   getLocalSchemas: async () => {
     let rootPath = getRootPath(undefined);
     if (!rootPath) throw Error('no root path');
-    await SwaggerGenTool.instance.initConfig(rootPath);
-    const swaggerSchema = SwaggerSchema.fromTargetDirectory();
+    await VGConfig.instance.initConfig(rootPath);
+    SwaggerGenTool.setSwagger2apiScript();
+    const swaggerSchema = await SwaggerSchema.fromTargetDirectory();
     return swaggerSchema.getLocalSchemas();
   },
   genPagesCode: async ({ data: codeMap }: Record<string, any>) => {

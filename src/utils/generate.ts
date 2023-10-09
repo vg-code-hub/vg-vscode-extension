@@ -2,7 +2,7 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 import * as fs from 'fs-extra';
-import { blockMaterialsPath, getEnv, rootPath, snippetMaterialsPath, tempWorkPath } from './vscodeEnv';
+import { blockMaterialsPath, getEnv, rootPath, tempWorkPath } from './env';
 import { renderEjsTemplates, compile } from './ejs';
 import { pasteToEditor } from './editor';
 import { getFileContent } from './file';
@@ -34,6 +34,7 @@ export const genCodeByBlock = async (data: { material: string; model: object; pa
       beforeCompile: (context: any) => <object | undefined>Promise.resolve(undefined),
       afterCompile: (context: any) => <object | undefined>Promise.resolve(undefined),
     };
+    // TODO: eval('require')
     if (fs.existsSync(scriptFile)) {
       delete eval('require').cache[eval('require').resolve(scriptFile)];
       const script = eval('require')(scriptFile);

@@ -1,18 +1,22 @@
+/*
+ * @Author: jimmyZhao
+ * @Date: 2023-07-28 10:27:11
+ * @LastEditors: jimmyZhao
+ * @LastEditTime: 2023-10-08 21:00:52
+ * @FilePath: /vg-vscode-extension/src/utils/tools.ts
+ * @Description:
+ */
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import { camelCase, isEmpty, isNil, upperFirst } from 'lodash';
 import type { PageType } from '../type.d';
-
-const os = require('os');
-const path = require('path');
-const exec = require('child_process').exec;
 
 /**
  * @description: getRootPath(undefined) 获取根路径
  * @param {vscode} resource
  * @return {*}
  */
-export function getRootPath(resource: vscode.Uri | undefined): string | undefined {
+export function getRootPath(resource?: vscode.Uri): string {
   let path: string | undefined;
   let workspace = vscode.workspace;
   if (!workspace.workspaceFolders) {
@@ -24,6 +28,7 @@ export function getRootPath(resource: vscode.Uri | undefined): string | undefine
 
     path = root?.uri.fsPath;
   }
+  if (!path) throw Error('请打开工作目录');
   return path;
 }
 

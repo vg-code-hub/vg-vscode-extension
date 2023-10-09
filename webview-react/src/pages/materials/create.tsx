@@ -127,10 +127,13 @@ export const defaultSchema = {
 };
 
 const MaterialCreatePage: React.FC = () => {
+  const { materialLocalKeys } = useModel('useMaterial');
+
   const location = useLocation();
   const [formData, setFormData] = useImmer<{
     name: string;
     template: string;
+    script: string;
     model: string;
     schema: string;
     schemaType: 'form-render' | 'amis' | 'formily' | '';
@@ -185,6 +188,7 @@ const MaterialCreatePage: React.FC = () => {
       setFormData(f => {
         f.name = record.name
         f.template = record.template
+        f.script = record.script
         f.model = JSON.stringify(record.model, null, 2)
         f.preview = JSON.stringify(record.preview, null, 2)
       });
@@ -201,6 +205,7 @@ const MaterialCreatePage: React.FC = () => {
                 { label: 'Snippet', value: 'snippets' },
                 { label: 'Block', value: 'blocks' },
                 { label: 'Schema2code', value: 'schema2code', disabled: true },
+                { label: 'Swagger2api', value: 'swagger2api', disabled: true },
               ]
             }
             disabled={edit}
@@ -236,10 +241,24 @@ const MaterialCreatePage: React.FC = () => {
             }}
           />
         </Form.Item>
+        <Form.Item label="script代码" required>
+          <CodeMirror
+            domId="scriptMirror"
+            lint={false}
+            value={formData.script}
+            onChange={(value) => {
+              setFormData((s) => ({
+                ...s,
+                script: value,
+              }));
+            }}
+          />
+        </Form.Item>
         <Form.Item label="模板数据">
           <CodeMirror
             domId="modelCodeMirror"
             lint
+            height={150}
             value={formData.model}
             onChange={(value) => {
               setFormData((s) => ({
@@ -281,6 +300,7 @@ const MaterialCreatePage: React.FC = () => {
               <CodeMirror
                 domId="schemaCodeMirror"
                 lint
+                height={150}
                 value={formData.schema}
                 onChange={(value) => {
                   setFormData((s) => ({
@@ -296,6 +316,7 @@ const MaterialCreatePage: React.FC = () => {
           <CodeMirror
             domId="previewCodeMirror"
             lint
+            height={150}
             value={formData.preview}
             onChange={(value) => {
               setFormData((s) => ({
@@ -307,7 +328,7 @@ const MaterialCreatePage: React.FC = () => {
         </Form.Item>
       </Form>
       <div style={{ textAlign: 'center', width: '100%' }}>
-        <Button
+        {/* {materialLocalKeys.includes(formType) && <Button
           shape="round"
           type="primary"
           onClick={() => {
@@ -325,7 +346,7 @@ const MaterialCreatePage: React.FC = () => {
           style={{ width: '30%', marginRight: '30%' }}
         >
           {edit ? '保存' : '添加'} {formType}
-        </Button>
+        </Button>} */}
         <Button
           shape="round"
           onClick={() => {

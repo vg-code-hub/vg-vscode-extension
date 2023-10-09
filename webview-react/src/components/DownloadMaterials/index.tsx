@@ -21,6 +21,11 @@ const DownloadMaterials: React.FC<IProps> = ({ visible, onCancel, onOk }) => {
           repository:
             'https://github.com/JimmyZDD/vg-materials.git',
         },
+        {
+          title: '默认提供的物料(gitee)',
+          repository:
+            'https://gitee.com/vg-code/vg-materials.git',
+        },
       ],
       npm: [
         // {

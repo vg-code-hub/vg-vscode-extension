@@ -2,7 +2,7 @@
   "name": "vg-vscode-extension",
   "displayName": "Frontend Code Generator - VG",
   "description": "It supports effective creation of business modules for frontend applications.",
-  "version": "2.5.8",
+  "version": "2.6.0",
   "engines": {
     "vscode": "^1.69.0"
   },
@@ -75,13 +75,8 @@
         "category": "VG"
       },
       {
-        "command": "extension.swagger-2-dart",
-        "title": "swagger to dart",
-        "category": "VG"
-      },
-      {
-        "command": "extension.swagger-2-ts",
-        "title": "swagger to ts",
+        "command": "extension.swagger-gen",
+        "title": "swagger to restapi",
         "category": "VG"
       },
       {
@@ -140,12 +135,7 @@
           "when": "explorerResourceIsFolder && resourcePath =~ /.?pages.?/i"
         },
         {
-          "command": "extension.swagger-2-dart",
-          "group": "blocGroup@1",
-          "when": "explorerResourceIsFolder"
-        },
-        {
-          "command": "extension.swagger-2-ts",
+          "command": "extension.swagger-gen",
           "group": "blocGroup@1",
           "when": "explorerResourceIsFolder"
         }
@@ -234,6 +224,7 @@
     "@typescript-eslint/eslint-plugin": "^5.59.8",
     "@typescript-eslint/parser": "^5.59.8",
     "@vscode/test-electron": "^2.3.2",
+    "cross-env": "^7.0.3",
     "eslint": "^8.41.0",
     "mocha": "^10.2.0",
     "ts-loader": "^9.4.3",

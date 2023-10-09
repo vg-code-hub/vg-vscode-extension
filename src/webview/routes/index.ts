@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-06-17 09:43:56
  * @LastEditors: jimmyZhao
- * @LastEditTime: 2023-09-17 20:18:02
+ * @LastEditTime: 2023-10-07 12:39:41
  * @FilePath: /vg-vscode-extension/src/webview/routes/index.ts
  * @Description:
  */
@@ -26,8 +26,9 @@ export const routes: Record<string, any> = {
 
   downloadMaterials: material.downloadMaterials,
   getLocalMaterials: material.getLocalMaterials,
-  saveDownloadMaterials: material.saveDownloadMaterials,
+  getMaterialLocalList: material.getMaterialLocalList,
   deleteMaterialTemplate: material.deleteMaterialTemplate,
+  saveMaterialLocal: material.saveMaterialLocal,
   getLocalSchemas: schema.getLocalSchemas,
   genPagesCode: schema.genPagesCode,
 

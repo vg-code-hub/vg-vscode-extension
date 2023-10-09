@@ -1,18 +1,21 @@
 import * as path from 'path';
 import * as fs from 'fs';
+import * as fsExtra from 'fs-extra';
+
 import { getFileContent } from './file';
 import { getTemplateFilePath } from './config';
-import { rootPath, snippetMaterialsPath } from './vscodeEnv';
-import { materialsDir, tempGlobalDir } from './env';
+import { materialsDir, tempGlobalDir, rootPath, snippetMaterialsPath, materialsPath } from './env';
 import * as execa from 'execa';
+import { MaterialType } from '@root/webview/type';
 
-export type IMaterialType = 'blocks' | 'snippets' | 'schema2code';
+export type IMaterialType = 'blocks' | 'snippets' | 'schema2code' | 'swagger2api-dart' | 'swagger2api-ts';
 
 export interface IGetLocalMaterialsResult {
   path: string;
   name: string;
-  model: any;
-  schema: any;
+  model: object;
+  schema?: object;
+  config?: object;
   preview: {
     title?: string;
     description?: string;
@@ -24,23 +27,22 @@ export interface IGetLocalMaterialsResult {
     notShowInCommand?: boolean;
   };
   template: string;
-  type?: string;
+  script?: string;
+  type?: IMaterialType;
 }
 
-/**
- * 获取本地 物料模板
- *
- * @param {(IMaterialType)} type
- */
-export const getLocalMaterials = (type: IMaterialType, materialsFullPath: string) => {
+/** 获取本地 物料模板 */
+export const getLocalMaterials = (materialsFullPath: string) => {
   let materials: IGetLocalMaterialsResult[] = [];
   try {
     materials = fs.readdirSync(materialsFullPath).map((s) => {
       const fullPath = path.join(materialsFullPath, s);
       let model = {} as any;
       let schema = {} as any;
-      let preview: IGetLocalMaterialsResult['preview'] = { description: '', img: '', category: [], schema: 'form-render' };
-      let template = '';
+      let config = {} as any;
+      let preview: IGetLocalMaterialsResult['preview'] = {};
+      let template = '',
+        script = '';
       try {
         model = JSON.parse(getFileContent(path.join(fullPath, 'config', 'model.json'), true));
       } catch {}
@@ -50,10 +52,16 @@ export const getLocalMaterials = (type: IMaterialType, materialsFullPath: string
       try {
         preview = JSON.parse(getFileContent(path.join(fullPath, 'config', 'preview.json'), true));
       } catch {}
-      if (type !== 'blocks')
-        try {
-          template = getFileContent(path.join(fullPath, 'src', type === 'schema2code' ? 'template' : 'template.ejs'), true);
-        } catch {}
+      try {
+        config = JSON.parse(getFileContent(path.join(fullPath, 'config', 'config.json'), true));
+      } catch {}
+      try {
+        if (fs.existsSync(path.join(fullPath, 'src', 'template'))) template = getFileContent(path.join(fullPath, 'src', 'template'), true);
+        else if (fs.existsSync(path.join(fullPath, 'src', 'template.ejs'))) template = getFileContent(path.join(fullPath, 'src', 'template.ejs'), true);
+      } catch {}
+      try {
+        if (fs.existsSync(path.join(fullPath, 'script', 'index.js'))) script = getFileContent(path.join(fullPath, 'script', 'index.js'), true);
+      } catch {}
 
       if (schema.formSchema) {
         if (schema.formSchema.formData) model = schema.formSchema.formData;
@@ -76,6 +84,8 @@ export const getLocalMaterials = (type: IMaterialType, materialsFullPath: string
       return {
         path: fullPath,
         name: s,
+        script,
+        config,
         model,
         schema,
         preview,
@@ -83,7 +93,7 @@ export const getLocalMaterials = (type: IMaterialType, materialsFullPath: string
       };
     });
   } catch {}
-  return materials.filter((s) => s.name !== '.DS_Store');
+  return materials.filter((s) => !s.name.startsWith('.'));
 };
 
 export const getCodeTemplateListFromFiles = () => {
@@ -125,11 +135,37 @@ export function getSnippets() {
     },
     template: s.template,
   }));
-  return templates.concat(getLocalMaterials('snippets', snippetMaterialsPath));
+  return templates.concat(getLocalMaterials(snippetMaterialsPath));
 }
 
-export const deleteMaterialTemplate = (data: { name: string; type: 'schema2code' | 'blocks' | 'snippets' }) => {
+export const deleteMaterialTemplate = (data: { name: string; type: MaterialType }) => {
   const snippetPath = path.join(tempGlobalDir.materials, materialsDir, data.type, data.name);
   execa.execaSync('rm', ['-rf', snippetPath]);
   return '删除成功';
 };
+
+export const saveMaterialLocal = (data: MaterialType) => {
+  const srcPath = path.join(tempGlobalDir.materials, materialsDir, data);
+  const destPath = path.join(materialsPath, data);
+
+  fsExtra.copySync(srcPath, fsExtra.existsSync(destPath) ? destPath + '-copy' : destPath);
+};
+
+const getMaterialLocalList = () => {
+  const arr = ['swagger2api', 'schema2code', 'blocks', 'snippets'];
+  return arr.filter((key) => {
+    const destPath = path.join(materialsPath, key);
+    return fsExtra.existsSync(destPath);
+  });
+};
+
+export class Material {
+  static get localList(): string[] {
+    return getMaterialLocalList();
+  }
+
+  static getDirPath(type: MaterialType) {
+    if (this.localList.includes(type)) return path.join(materialsPath, type);
+    return path.join(tempGlobalDir.materials, materialsDir, type);
+  }
+}

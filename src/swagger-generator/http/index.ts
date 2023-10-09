@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-06-01 16:31:38
  * @LastEditors: jimmyZhao
- * @LastEditTime: 2023-09-08 21:57:26
+ * @LastEditTime: 2023-10-07 18:43:44
  * @FilePath: /vg-vscode-extension/src/swagger-generator/http/index.ts
  * @Description:
  */
@@ -64,6 +64,13 @@ export const swagger3to2 = (data: any) => {
                 schema: content[contentType].schema,
               });
             else if (contentType === 'multipart/form-data')
+              methodData.parameters.push({
+                in: 'formData',
+                contentType,
+                required: true,
+                schema: content[contentType].schema,
+              });
+            else if (contentType === 'application/x-www-form-urlencoded')
               methodData.parameters.push({
                 in: 'formData',
                 contentType,

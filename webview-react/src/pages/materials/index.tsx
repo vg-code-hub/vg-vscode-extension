@@ -1,8 +1,8 @@
 /*
  * @Author: zdd
  * @Date: 2023-06-27 22:07:27
- * @LastEditors: zdd
- * @LastEditTime: 2023-07-19 19:58:06
+ * @LastEditors: jimmyZhao
+ * @LastEditTime: 2023-10-07 14:21:31
  * @FilePath: /vg-vscode-extension/webview-react/src/pages/materials/index.tsx
  * @Description: 
  */
@@ -11,8 +11,8 @@ import { useImmer } from 'use-immer';
 import { useEffect } from 'react';
 import { history, KeepAlive, useModel } from '@umijs/max';
 import { ProColumns, ProList } from '@ant-design/pro-components';
-import { Badge, Button, Card, Descriptions, Popconfirm, Space, Tag, message } from 'antd';
-import { IDownloadMaterialsResult, IGetLocalMaterialsResult, deleteMaterialTemplate, insertSnippet, refreshIntelliSense } from '@/common';
+import { Badge, Button, Card, Popconfirm, Space, Tag, Col, Row, message } from 'antd';
+import { IDownloadMaterialsResult, IGetLocalMaterialsResult, deleteMaterialTemplate, insertSnippet, refreshIntelliSense, saveMaterialLocal } from '@/common';
 import DownloadMaterials from '@/components/DownloadMaterials';
 import JsonToTs from '@/components/JsonToTs';
 import { LoadingOutlined, ReloadOutlined } from '@ant-design/icons';
@@ -59,7 +59,7 @@ const renderBadge = (count: number, active = false) => {
 };
 
 const MaterialsPage: React.FC = () => {
-  const { dataList, count, activeKey, setActiveKey } = useModel('useMaterial');
+  const { materialLocalKeys, dataList, count, activeKey, setActiveKey } = useModel('useMaterial');
   const { loading, refresh } = useModel('@@initialState', ({ loading, refresh }) => ({ loading, refresh }));
   const [downloadMaterialsVisible, setDownloadMaterialsVisible] = useImmer(false);
   const [metas, setMetas] = useImmer<any>(metasDefault);
@@ -90,8 +90,9 @@ const MaterialsPage: React.FC = () => {
     refresh();
     setMetas((m: any) => {
       m.subTitle = activeKey === 'blocks' ? metasDefault.subTitle : null
+      const showEdit = activeKey !== 'schema2code' && activeKey !== 'swagger2api';
       m.actions.render = (text: string, row: IGetLocalMaterialsResult) => [
-        activeKey !== 'schema2code' && <Button
+        showEdit && <Button
           type="link"
           block
           onClick={() => {
@@ -100,7 +101,7 @@ const MaterialsPage: React.FC = () => {
         >
           使用模版
         </Button>,
-        activeKey !== 'schema2code' && <Button
+        showEdit && <Button
           type="link"
           block
           onClick={() => {
@@ -117,7 +118,7 @@ const MaterialsPage: React.FC = () => {
         >
           直接添加
         </Button>,
-        activeKey !== 'schema2code' && <Popconfirm
+        showEdit && <Popconfirm
           title="Delete"
           description={`您确定要删除此${activeKey}吗?`}
           onConfirm={() => {
@@ -161,17 +162,21 @@ const MaterialsPage: React.FC = () => {
                 key: 'schema2code',
                 label: <span>schema2code{renderBadge(count.schema2code, activeKey === 'schema2code')}</span>,
               },
+              {
+                key: 'swagger2api',
+                label: <span>swagger2api{renderBadge(4, activeKey === 'swagger2api')}</span>,
+              },
             ],
             onChange: (key: "snippets" | "blocks" | "schema2code") => {
               setActiveKey(key);
             },
           },
           actions: [
-            <Button key="add" onClick={() => { setDownloadMaterialsVisible(true); }} type="primary">
-              下载物料
-            </Button>,
-            <Button key="add" onClick={() => { history.push('/material-create'); }} type="primary">
-              新建
+            <Button key="add" disabled={materialLocalKeys.includes(activeKey)} onClick={async () => {
+              await saveMaterialLocal(activeKey);
+              message.success('保存成功');
+            }} type="primary">
+              本地化
             </Button>,
           ],
         }}
@@ -182,28 +187,36 @@ const MaterialsPage: React.FC = () => {
           },
         })}
         dataSource={dataList}
-        // request={(params: any) => handleSearch({ ...params, type: activeKey })}
         pagination={false}
         grid={{ gutter: 16, column: 2 }}
         rowKey="name"
-        // showActions="hover"
-        // showExtra="hover"
         tableExtraRender={(_: any, data: any) => (
           <Card>
-            <Descriptions size="small" column={3}>
-              <Descriptions.Item>
+            <Row gutter={[24, 16]}>
+              <Col>
                 <Button onClick={() => { setJsonToTsModalVisble(true) }}>JSON TO TS</Button>
-              </Descriptions.Item>
-              <Descriptions.Item>
-                <Button type="primary" shape="circle" icon={loading ? <LoadingOutlined /> : <ReloadOutlined />} onClick={refresh}></Button>
-              </Descriptions.Item>
-              <Descriptions.Item>
+              </Col>
+              <Col>
                 <Button type='primary' onClick={async () => {
                   await refreshIntelliSense();
                   message.success('刷新成功');
                 }}>刷新代码智能提示</Button>
-              </Descriptions.Item>
-            </Descriptions>
+              </Col>
+              <Col flex="auto"></Col>
+              <Col>
+                <Button type="primary" shape="circle" icon={loading ? <LoadingOutlined /> : <ReloadOutlined />} onClick={refresh}></Button>
+              </Col>
+              <Col>
+                <Button key="add" onClick={() => { setDownloadMaterialsVisible(true); }} type="primary">
+                  下载物料
+                </Button>
+              </Col>
+              {/* <Col>
+                <Button key="add" onClick={() => { history.push('/material-create'); }} type="primary">
+                  新建
+                </Button>
+              </Col> */}
+            </Row>
           </Card>
         )}
         metas={metas}

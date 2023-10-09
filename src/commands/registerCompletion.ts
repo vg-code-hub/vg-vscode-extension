@@ -1,22 +1,22 @@
 /*
  * @Author: zdd
  * @Date: 2023-06-17 17:58:06
- * @LastEditors: zdd
- * @LastEditTime: 2023-07-06 14:51:42
+ * @LastEditors: jimmyZhao
+ * @LastEditTime: 2023-10-08 20:56:00
  * @FilePath: /vg-vscode-extension/src/commands/registerCompletion.ts
  * @Description:
  */
 import * as vscode from 'vscode';
-import { compile as compileEjs, getLocalMaterials, tempGlobalDir } from '../utils';
+import { compile as compileEjs, getLocalMaterials, rootPath, tempGlobalDir } from '../utils';
 
 let provider: vscode.Disposable;
 
 export const registerCompletion = (context: vscode.ExtensionContext) => {
-  if (!vscode.workspace.rootPath) return;
+  if (!rootPath) return;
 
   if (provider) provider.dispose();
 
-  const snippets = getLocalMaterials('snippets', tempGlobalDir.snippetMaterials).filter((s) => !s.preview.notShowInintellisense);
+  const snippets = getLocalMaterials(tempGlobalDir.snippetMaterials).filter((s) => !s.preview.notShowInintellisense);
   provider = vscode.languages.registerCompletionItemProvider(
     { pattern: '**', scheme: 'file' },
     {

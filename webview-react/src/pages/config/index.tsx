@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-06-27 22:01:26
  * @LastEditors: jimmyZhao
- * @LastEditTime: 2023-09-17 20:22:00
+ * @LastEditTime: 2023-10-06 23:45:33
  * @FilePath: /vg-vscode-extension/webview-react/src/pages/config/index.tsx
  * @Description: 
  */
@@ -40,7 +40,7 @@ const schame: any = {
       "title": "swagger配置",
       "type": "object",
       "theme": "collapse",
-      "column": 3,
+      "column": 2,
       "style": { "backgroundColor": "#fff" },
       "properties": {
         "jsonUrl": {
@@ -108,15 +108,34 @@ const schame: any = {
           }
         },
         "folderFilter": {
-          "title": "过滤路径",
+          "title": "显示路径",
           "type": "array",
-          "description": "只显示过滤的swagger路径",
+          "description": "默认全部，配置后只显示配置的路径",
           "items": {
             "type": "object",
             "properties": {
               "value": {
                 "title": "源路径",
+                "labelWidth": 120,
                 "type": "string",
+                "props": {}
+              }
+            }
+          },
+          "ui:options": {},
+          "props": {}
+        },
+        "pathHidden": {
+          "title": "需隐藏的 url path",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "value": {
+                "title": "源路径地址",
+                "tooltip": "支持：[path] | [method&&path], [method&&path] 只隐藏特定请求路径",
+                "type": "string",
+                "labelWidth": 120,
                 "props": {}
               }
             }

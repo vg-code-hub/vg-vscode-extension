@@ -1,8 +1,8 @@
 /*
  * @Author: zdd
  * @Date: 2023-06-17 09:45:05
- * @LastEditors: zdd
- * @LastEditTime: 2023-06-17 17:34:27
+ * @LastEditors: jimmyZhao
+ * @LastEditTime: 2023-10-08 20:54:44
  * @FilePath: /vg-vscode-extension/src/context.ts
  * @Description:
  */
@@ -10,30 +10,15 @@ import { ExtensionContext, window } from 'vscode';
 
 const data: {
   extensionContext?: ExtensionContext;
-  rootPath: string;
   extensionPath: string;
   activeTextEditorId: string;
 } = {
   extensionContext: undefined, // 插件 context
-  rootPath: '', // 工作空间根目录
   extensionPath: '', // 插件安装目录
   activeTextEditorId: '', // 激活的 tab id
 };
-export const setExtensionContext = (extensionContext: ExtensionContext) => {
-  data.extensionContext = extensionContext;
-};
 
 export const getExtensionContext = () => data.extensionContext;
-
-export const getRootPath = () => data.rootPath;
-
-export const setRootPath = (rootPath: string) => {
-  data.rootPath = rootPath;
-};
-
-export const setExtensionPath = (extensionPath: string) => {
-  data.extensionPath = extensionPath;
-};
 
 export const setLastActiveTextEditorId = (activeTextEditorId: string) => {
   data.activeTextEditorId = activeTextEditorId;
@@ -47,9 +32,7 @@ export const getLastAcitveTextEditor = () => {
 
 export const getExtensionPath = () => data.extensionPath;
 
-export const init = (options: { extensionContext?: ExtensionContext; rootPath?: string; extensionPath?: string }) => {
-  if (options.rootPath) data.rootPath = options.rootPath;
-
+export const init = (options: { extensionContext?: ExtensionContext; extensionPath?: string }) => {
   if (options.extensionPath) data.extensionPath = options.extensionPath;
 
   if (options.extensionContext) data.extensionContext = options.extensionContext;

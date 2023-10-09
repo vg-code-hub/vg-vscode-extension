@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-06-28 18:00:11
  * @LastEditors: jimmyZhao
- * @LastEditTime: 2023-09-17 20:18:12
+ * @LastEditTime: 2023-10-07 12:42:19
  * @FilePath: /vg-vscode-extension/webview-react/src/common/network/vscode/index.ts
  * @Description:
  */
@@ -10,7 +10,11 @@ import { AxiosRequestConfig } from 'axios';
 import { request } from './vscode';
 export * from './vscode';
 
-export type IMaterialType = 'blocks' | 'snippets' | 'schema2code';
+export type IMaterialType =
+  | 'blocks'
+  | 'snippets'
+  | 'schema2code'
+  | 'swagger2api';
 export interface IGetLocalMaterialsResult {
   path: string;
   name: string;
@@ -25,6 +29,7 @@ export interface IGetLocalMaterialsResult {
     scripts?: [{ method: string; remark: string }];
   };
   template: string;
+  script?: string;
   type: string;
 }
 
@@ -61,6 +66,7 @@ export function getLocalSchemas() {
  */
 export function getLocalMaterials() {
   return request<{
+    swagger2api: IGetLocalMaterialsResult[];
     schema2code: IGetLocalMaterialsResult[];
     blocks: IGetLocalMaterialsResult[];
     snippets: IGetLocalMaterialsResult[];
@@ -198,22 +204,10 @@ export function downloadMaterials(data: { type: string; url: string }) {
     data,
   });
 }
-/**
- * @description 保存物料
- * @export
- * @param {{
- *   blocks: string[];
- *   snippets: string[];
- * }} data
- * @returns
- */
-export function saveDownloadMaterials(data: {
-  blocks: string[];
-  snippets: string[];
-}) {
-  return request<string>({
-    cmd: 'saveDownloadMaterials',
-    data,
+
+export function getMaterialLocalList() {
+  return request<string[]>({
+    cmd: 'getMaterialLocalList',
   });
 }
 
@@ -288,13 +282,13 @@ export function createBlockTemplate(data: {
  * @export
  * @param {{
  *   name: string;
- *   type: 'schema2code' | 'blocks' | 'snippets';
+ *   type: 'swagger2api' | 'schema2code' | 'blocks' | 'snippets';
  * }} data
  * @returns
  */
 export function deleteMaterialTemplate(data: {
   name: string;
-  type: 'schema2code' | 'blocks' | 'snippets';
+  type: 'swagger2api' | 'schema2code' | 'blocks' | 'snippets';
 }) {
   return request<string>({
     cmd: 'deleteMaterialTemplate',
@@ -303,23 +297,28 @@ export function deleteMaterialTemplate(data: {
 }
 
 /**
- * 获取插件配置
+ * Saves the specified material locally.
  *
- * @export
- * @returns
+ * @param {'swagger2api' | 'schema2code' | 'blocks' | 'snippets'} data - The type of material to save.
+ * @return {Promise<string>} A promise that resolves to a string indicating the result of the save operation.
  */
+export function saveMaterialLocal(
+  data: 'swagger2api' | 'schema2code' | 'blocks' | 'snippets',
+) {
+  return request<string>({
+    cmd: 'saveMaterialLocal',
+    data,
+  });
+}
+
+/** 获取插件扩展设置 */
 export function getPluginScaffoldJsonUrl() {
   return request<string>({
     cmd: 'getPluginScaffoldJsonUrl',
   });
 }
 
-/**
- * 获取插件配置
- *
- * @export
- * @returns
- */
+/** 获取插件 vgcode.yaml 配置 */
 export function getPluginConfig() {
   return request<{
     type: 'dart' | 'typescript';

@@ -1,8 +1,8 @@
 /*
  * @Author: zdd
  * @Date: 2023-05-30 17:42:04
- * @LastEditors: zdd
- * @LastEditTime: 2023-07-06 14:53:46
+ * @LastEditors: jimmyZhao
+ * @LastEditTime: 2023-10-08 17:25:31
  * @FilePath: /vg-vscode-extension/src/extension.ts
  * @Description:
  */
@@ -14,7 +14,7 @@ import { newGetxGetBuilderPage } from './commands/new-getx-getbuilder-page';
 import { newGetxFullPage } from './commands/new-getx-full-page';
 import { newGetxStatefulWidgetGetBuilderPage } from './commands/new-getx-stateful-getbuilder-page';
 import { routersGenerate } from './commands/routers-generate';
-import { genWebapiForDart, genWebapiForTypescript } from './swagger-generator';
+import { genRestapi } from './swagger-generator';
 import { commonCommands } from './commands/common';
 import { registerCompletion } from './commands/registerCompletion';
 import { genVgcodeConfig } from './utils';
@@ -41,8 +41,7 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand('extension.new-getx-getbuilder-page', newGetxGetBuilderPage),
     vscode.commands.registerCommand('extension.new-getx-stateful-getbuilder-page', newGetxStatefulWidgetGetBuilderPage),
     vscode.commands.registerCommand('extension.vgcode-config-init', genVgcodeConfig),
-    vscode.commands.registerCommand('extension.swagger-2-dart', genWebapiForDart),
-    vscode.commands.registerCommand('extension.swagger-2-ts', genWebapiForTypescript)
+    vscode.commands.registerCommand('extension.swagger-gen', genRestapi)
   );
   const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, -1);
   statusBarItem.command = 'extension.generateCodeByWebview';

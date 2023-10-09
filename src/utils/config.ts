@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-06-27 22:01:26
  * @LastEditors: jimmyZhao
- * @LastEditTime: 2023-09-15 18:06:17
+ * @LastEditTime: 2023-10-08 19:20:34
  * @FilePath: /vg-vscode-extension/src/utils/config.ts
  * @Description:
  */
@@ -10,13 +10,13 @@ import * as path from 'path';
 import * as fs from 'fs-extra';
 import { Uri, WorkspaceConfiguration, commands, window, workspace } from 'vscode';
 
-import { existsSync, getRootPath, readFileSync } from '@root/utils';
+import { existsSync, getRootPath, rootPath, readFileSync } from '@root/utils';
 import { parse, stringify } from 'yaml';
-import { rootPath } from './vscodeEnv';
+import { getRegExp } from '@root/swagger-generator/utils';
 
 const defaultScaffoldJson = 'https://raw.githubusercontent.com/JimmyZDD/vg-materials/main/scaffold/index.json';
 
-const defaultConfig: Config = {
+const defaultConfig = {
   type: 'dart',
   swagger: {
     jsonUrl: 'http://127.0.0.1:4523/export/openapi?projectId=xxx&version=3.0',
@@ -30,13 +30,16 @@ export type Config = {
   swagger: {
     jsonUrl: string;
     outputDir: string;
+    rootPath: string;
     ignoreResponse?: string;
-    pageResponse?: { name: string; props: string };
+    pageResponse: { name: string; props: string[] };
     urlPrefix?: string;
     overwrite: boolean;
-    folderFilter?: string[];
+    folderFilter?: (string | RegExp)[];
+    pathHidden: string[];
     folderMap?: Record<string, string>;
-    customPathFolder?: Record<string, string>;
+    customPathFolder?: Map<string | RegExp, string>;
+    translationObj?: Record<string, string>;
     customModelFolder?: Record<string, string>;
   };
   mock?: {
@@ -55,6 +58,7 @@ export type Config = {
   commonlyUsedBlock?: string[];
 };
 
+/** 获取插件 vgcode.yaml 配置 */
 export const getConfig: () => Config = () => {
   if (fs.existsSync(rootPath.concat(`/vgcode.yaml`))) {
     const file = readFileSync(rootPath.concat(`/vgcode.yaml`), 'utf8');
@@ -122,7 +126,7 @@ export const genVgcodeConfig = async (uri: Uri) => {
     if (!rootPath) throw Error('no root path');
 
     if (!existsSync(rootPath.concat(`/vgcode.yaml`))) {
-      saveConfig(defaultConfig);
+      saveConfig(defaultConfig as Config);
       window.showInformationMessage(`Successfully Generated api yaml`);
     } else {
       window.showWarningMessage('已存在vgcode.yaml');
@@ -135,6 +139,7 @@ export const genVgcodeConfig = async (uri: Uri) => {
   }
 };
 
+/** 插件扩展设置 */
 export function getScaffoldJsonUrl(fsPath?: string): string {
   if (!fsPath) return workspace.getConfiguration().get('vgcode.scaffoldJson') || defaultScaffoldJson;
   return getSetting(fsPath, 'scaffoldJson') || defaultScaffoldJson;
@@ -144,4 +149,83 @@ function getSetting(fsPath: string, configKey: string): any {
   const uri = Uri.file(fsPath);
   const workspaceConfiguration: WorkspaceConfiguration = workspace.getConfiguration('vgcode', uri);
   if (workspaceConfiguration.has(configKey)) return workspaceConfiguration.get(configKey);
+}
+
+export class VGConfig {
+  private static _instance: VGConfig;
+  private _config?: Config;
+  /*
+    单例模式，仅允许通过 RemoteOption.instance 获取全局唯一实例
+  */
+  private constructor() {}
+
+  static get instance() {
+    if (!VGConfig._instance) VGConfig._instance = new VGConfig();
+    return VGConfig._instance;
+  }
+
+  static get config() {
+    if (!VGConfig.instance._config) throw Error('config not init');
+    return VGConfig.instance._config;
+  }
+  static get swaggerConfig() {
+    if (!VGConfig.instance._config) throw Error('config not init');
+    return VGConfig.instance._config.swagger;
+  }
+  static get type() {
+    if (!VGConfig.instance._config) throw Error('config not init');
+    return VGConfig.instance._config.type;
+  }
+
+  async initConfig(rootPath: string) {
+    if (!existsSync(rootPath.concat(`/vgcode.yaml`))) throw Error('config your vgcode.yaml then  try again');
+
+    const config = getConfig();
+    const { swagger } = getConfig();
+    let folderFilter: (string | RegExp)[] = [];
+    if (swagger.folderFilter) {
+      if (!Array.isArray(swagger.folderFilter)) throw Error('folderFilter must be array');
+      folderFilter = (swagger.folderFilter as string[]).map(getRegExp);
+    }
+    let pathHidden: string[] = [];
+    if (swagger.pathHidden) {
+      if (!Array.isArray(swagger.pathHidden)) throw Error('pathHidden must be array');
+      pathHidden = swagger.pathHidden ?? [];
+    }
+    let customPathFolder = new Map();
+    if (swagger.customPathFolder)
+      for (const key in swagger.customPathFolder) {
+        const element = (swagger.customPathFolder as unknown as Record<string, string>)[key];
+        let _key = getRegExp(key);
+        customPathFolder.set(_key, element);
+      }
+    if (swagger.urlPrefix && !swagger.urlPrefix.startsWith('/')) swagger.urlPrefix = '/' + swagger.urlPrefix;
+
+    const ignoreResponse = (swagger.ignoreResponse ?? '$1.data').trim();
+    const props = ((swagger.pageResponse?.props as unknown as string) ?? 'page,size,total,items').split(',').map((e) => e.trim());
+    swagger.pageResponse = { name: swagger.pageResponse?.name ?? 'PageResp.data', props: props };
+    this._config = {
+      ...config,
+      swagger: {
+        ...swagger,
+        outputDir: swagger.outputDir ?? 'api',
+        folderFilter,
+        pathHidden,
+        customPathFolder,
+        ignoreResponse,
+      },
+    };
+  }
+
+  static addSwaggerConfig(config: Partial<Config['swagger']>) {
+    if (!this.config) throw Error('config not init');
+    const instance = VGConfig.instance;
+    instance._config = {
+      ...this.config,
+      swagger: {
+        ...this.config.swagger,
+        ...config,
+      },
+    };
+  }
 }

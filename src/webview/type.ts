@@ -3,3 +3,5 @@ export interface IMessage<T = any> {
   cbid: string;
   data: T;
 }
+
+export type MaterialType = 'swagger2api' | 'schema2code' | 'blocks' | 'snippets';

@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-06-01 16:34:25
  * @LastEditors: jimmyZhao
- * @LastEditTime: 2023-09-10 09:43:52
+ * @LastEditTime: 2023-10-08 22:20:24
  * @FilePath: /vg-vscode-extension/src/swagger-generator/index.d.ts
  * @Description:
  */
@@ -77,7 +77,7 @@ export interface SwaggerHttpEndpoint {
   tags: string[];
   summary?: string;
   description?: string;
-  operationId: string;
+  operationId?: string;
   produces: Producers[];
   parameters: SwaggerParameter[];
   successResponse?: JSONSchema;
@@ -116,3 +116,25 @@ export interface Swagger {
     version: string;
   };
 }
+
+export interface IParameter {
+  name: string;
+  orgKey: string;
+  type: string;
+  description: string | undefined;
+  require: boolean;
+}
+export interface IDescriptionOption {
+  summary?: string;
+  description?: string;
+  operationId?: string;
+  returnType: string;
+  paths: IParameter[];
+  querys: IParameter[];
+  formData?: IParameter;
+  body?: IParameter;
+}
+
+export type FilesMap = Record<string, [api: string, model: [name: string, content: string][], deeps: number]>;
+
+export type FilesMapModel = FilesMap[1][1];

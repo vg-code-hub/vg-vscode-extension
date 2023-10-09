@@ -1,8 +1,8 @@
 /*
  * @Author: zdd
  * @Date: 2023-06-17 18:09:03
- * @LastEditors: zdd
- * @LastEditTime: 2023-07-05 14:12:13
+ * @LastEditors: jimmyZhao
+ * @LastEditTime: 2023-09-29 21:14:57
  * @FilePath: /vg-vscode-extension/src/utils/scaffold.ts
  * @Description:
  */
@@ -12,8 +12,7 @@ import * as execa from 'execa';
 import { parse } from 'yaml';
 
 import { renderEjsTemplates } from './ejs';
-import { tempGlobalDir } from './env';
-import { rootPath } from './vscodeEnv';
+import { tempGlobalDir, rootPath } from './env';
 import { camelCase, snakeCase } from './tools';
 
 export const downloadScaffoldFromGit = async (remote: string, tag?: string) => {

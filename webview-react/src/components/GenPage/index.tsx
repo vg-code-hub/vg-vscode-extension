@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-07-20 15:14:05
  * @LastEditors: jimmyZhao
- * @LastEditTime: 2023-09-11 10:39:25
+ * @LastEditTime: 2023-10-09 10:26:25
  * @FilePath: /vg-vscode-extension/webview-react/src/components/GenPage/index.tsx
  * @Description: 
  */
@@ -31,6 +31,7 @@ const GenPage: React.FC<IProps> = ({ visible, modelList, config, pageName: _page
   const [menuWidth, setMenuWidth] = useState(100);
   const [checkAllDisable, setCheckAllDisable] = useState(false);
   const [checkedList, setCheckedList] = useState<any[]>([]);
+  const [modelName, setModelName] = useState<string>('');
   const [plainOptions, setPlainOptions] = useState<any[]>([]);
   const [selectPages, setSelectPages] = useImmer<string[]>(['list', 'detail', 'create']);
   const { initialState } = useModel('@@initialState', ({ initialState }) => ({ initialState }));
@@ -78,16 +79,18 @@ const GenPage: React.FC<IProps> = ({ visible, modelList, config, pageName: _page
       } else {
         setSelectPages(['detail'])
       }
+      setModelName(config.returnType.type)
     } else if (config.methodName.startsWith('create')) {
       model = find(modelList, { name: config.body.type });
       setSelectPages(['create'])
+      setModelName(config.body.type)
     }
     if (!model) return;
 
     let { required = [], properties } = model.schema;
     const _checkedList: string[] = [];
     const _options = Object.keys(properties).map((key) => {
-      if (required.includes(key)) _checkedList.push(key);
+      _checkedList.push(key);
       return { label: key, value: key, disabled: required.includes(key) };
     });
     setPlainOptions(_options);
@@ -307,7 +310,7 @@ const GenPage: React.FC<IProps> = ({ visible, modelList, config, pageName: _page
             </Form.Item> */}
           </Form>
           <Space direction="horizontal" align="start" style={{ width: '100%', marginTop: '20px', height: 'calc(100% - 130px)' }} classNames={{ item: styles['space-item'] }} size={16}>
-            <Card size='small' title={`表名:${config.key}`}>
+            <Card size='small' title={`表名:${modelName}`}>
               <Checkbox disabled={checkAllDisable} indeterminate={indeterminate} onChange={(e) => {
                 setCheckedList(e.target.checked ? plainOptions.map((item) => item.label) : []);
               }} checked={checkAll}>

@@ -10,5 +10,5 @@ export * from './common';
 export * from './helper';
 export * from './schema';
 
-import SwaggerGenTool from './config';
+import SwaggerGenTool from './gen_tool';
 export { SwaggerGenTool };

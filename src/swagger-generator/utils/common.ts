@@ -2,19 +2,20 @@
  * @Author: zdd
  * @Date: 2023-06-01 16:59:31
  * @LastEditors: jimmyZhao
- * @LastEditTime: 2023-09-21 10:13:06
+ * @LastEditTime: 2023-10-08 21:21:36
  * @FilePath: /vg-vscode-extension/src/swagger-generator/utils/common.ts
  * @Description:
  */
 import { JSONSchema, SwaggerHttpEndpoint, SwaggerParameter } from '../index.d';
+import SwaggerGenTool from './gen_tool';
 import { exchangeZhToEn } from './helper';
-import { first, join, snakeCase, pascalCase, camelCase } from '@root/utils';
+import { first, join, snakeCase, pascalCase, camelCase, rootPath } from '@root/utils';
 
 /** tab 空格数 */
 export const INDENT = '  ';
 export const LIST_KEY = 'items';
 
-export const DART_TYPE = ['String', 'int', 'double', 'bool', 'num', 'DateTime', 'dynamic', 'null', 'Map<String, dynamic>', 'List'];
+export const DART_TYPE = ['String', 'int', 'double', 'bool', 'num', 'DateTime', 'dynamic', 'null', 'FormData', 'Map<String, dynamic>', 'List'];
 export const TS_TYPE = ['string', 'number', 'boolean', 'null', 'undefined', 'File', 'Record<string, any>', 'any', 'any[]'];
 
 export const METHOD_MAP = {
@@ -23,7 +24,7 @@ export const METHOD_MAP = {
   put: 'update',
   delete: 'delete',
 };
-interface TypeParam {
+export interface TypeParam {
   key?: string;
   property?: JSONSchema;
   param?: SwaggerParameter;
@@ -148,14 +149,16 @@ export function getDartType({ key, property, param }: TypeParam): string {
   return 'dynamic';
 }
 
-export const getDirPath = (folder: string | undefined, { translationObj, rootPath }: any) => {
+export const getDirPath = (folder: string | undefined) => {
   let dirPath: string,
     deeps = 1,
     className: string;
+  const translationObj = SwaggerGenTool.translationObj;
+  const targetDir = SwaggerGenTool.targetDirectory;
   if (folder) {
     const { str: path } = exchangeZhToEn(folder, translationObj);
     dirPath = join(
-      rootPath,
+      targetDir,
       path
         .split('/')
         .map((e) => snakeCase(e))
@@ -169,7 +172,7 @@ export const getDirPath = (folder: string | undefined, { translationObj, rootPat
         .join('_') + '_request'
     );
   } else {
-    dirPath = join(rootPath);
+    dirPath = join(targetDir);
     className = pascalCase('request');
   }
 
@@ -178,22 +181,6 @@ export const getDirPath = (folder: string | undefined, { translationObj, rootPat
     dirPath,
     deeps,
   };
-};
-
-export const isStandardResponse = (response?: JSONSchema) => {
-  if (typeof response !== 'object') return undefined;
-  if (response.allOf && response.allOf.length > 1 && response.allOf[0].$ref?.endsWith('utils.Result')) return response.allOf[1].properties!['data'];
-  if (typeof response === 'object' && response.type === 'object' && response.properties && Object.keys(response.properties).includes('data'))
-    return response.properties!['data'];
-  return undefined;
-};
-
-export const isPaginationResponse = (standardResponse: JSONSchema) => {
-  if (standardResponse.properties && Object.keys(standardResponse.properties).includes('list') && standardResponse.properties['list'].type === 'array')
-    return standardResponse!['properties']!['list'];
-  if (standardResponse.allOf && standardResponse.allOf.length > 1 && standardResponse.allOf[0].$ref?.endsWith('utils.PageData'))
-    return standardResponse.allOf[1].properties![LIST_KEY];
-  return undefined;
 };
 
 export function getParamObj(parameters: SwaggerHttpEndpoint['parameters']) {

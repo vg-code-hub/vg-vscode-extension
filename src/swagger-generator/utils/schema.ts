@@ -2,28 +2,13 @@
  * @Author: zdd
  * @Date: 2023-07-20 11:44:45
  * @LastEditors: jimmyZhao
- * @LastEditTime: 2023-09-10 13:47:23
+ * @LastEditTime: 2023-10-09 10:11:55
  * @FilePath: /vg-vscode-extension/src/swagger-generator/utils/schema.ts
  * @Description:
  */
-import * as path from 'path';
-import * as fs from 'fs';
-import { getFileContent, camelCase, find, first, isRegExp, getRootPath, join } from '../../utils';
-import {
-  SwaggerGenTool,
-  getDirPath,
-  METHOD_MAP,
-  filterPathName,
-  getClassName,
-  getDartType,
-  isPaginationResponse,
-  isStandardResponse,
-  getParamObj,
-  DART_TYPE,
-  getResSchema,
-} from '@root/swagger-generator/utils';
-import type { JSONSchema, Method, ProjectType, Swagger, SwaggerHttpEndpoint, SwaggerPath } from '@root/swagger-generator/index.d';
-import { arrayClass } from '@root/swagger-generator/dart/generate/model_tool';
+import { camelCase, find, first, isRegExp, rootPath } from '@root/utils';
+import { SwaggerGenTool, getDirPath, METHOD_MAP, filterPathName, getClassName, getDartType, getParamObj, DART_TYPE, getResSchema } from '../utils';
+import type { JSONSchema, Method, ProjectType, SwaggerHttpEndpoint, SwaggerPath } from '@root/swagger-generator/index.d';
 
 export class SwaggerSchema {
   data: Record<string, JSONSchema>;
@@ -35,19 +20,14 @@ export class SwaggerSchema {
     this.paths = paths;
   }
 
-  static fromTargetDirectory() {
-    const { outputDir, type, rootPath } = SwaggerGenTool.config;
-    const targetDirectory = outputDir.startsWith('/') ? join(rootPath, outputDir) : join(rootPath, type === 'dart' ? 'lib' : 'src', outputDir);
-    var schemaFullPath = path.join(targetDirectory, 'swagger.json');
-    if (!fs.existsSync(schemaFullPath)) throw new Error('schema不存在');
-    const { data, paths } = JSON.parse(getFileContent(schemaFullPath, true) || '{data:{}}') as Swagger;
-
+  static async fromTargetDirectory() {
+    const { data, paths } = await SwaggerGenTool.reqSwaggerData(true);
     return new SwaggerSchema(data, paths);
   }
 
   getLocalSchemas() {
     const filesMap: Record<string, [api: Request[], model: Model[]]> = {};
-    const { customPathFolder, outputDir } = SwaggerGenTool.config;
+    const { customPathFolder } = SwaggerGenTool.config;
 
     for (let key in this.paths)
       for (let method in this.paths[key]) {
@@ -69,8 +49,8 @@ export class SwaggerSchema {
           if (!SwaggerGenTool.testFolder(folder ?? '')) return;
           folder = SwaggerGenTool.exchangeConfigMap(folder);
         }
-        const translationObj = SwaggerGenTool.translationObj;
-        let { dirPath } = getDirPath(folder, { translationObj, rootPath: outputDir });
+        let { dirPath } = getDirPath(folder);
+        dirPath = dirPath.replace(SwaggerGenTool.targetDirectory, '');
         const _temp = key
           .split('/')
           .map((e) => camelCase(e))
@@ -93,6 +73,8 @@ export class SwaggerSchema {
         delete body?.schema;
         filesMap[dirPath][0].push({ path: key, methodName, pathParams, queryParams, body, formData, returnType, summary, description });
       }
+
+    console.log(filesMap);
 
     return filesMap;
   }
@@ -134,9 +116,9 @@ export class SwaggerSchema {
     let resClass: string | undefined,
       isPagination = false,
       schema = responses;
-    let standardRes: JSONSchema | undefined = isStandardResponse(responses);
+    let standardRes: JSONSchema | undefined = SwaggerGenTool.getStandardResponse(responses);
     if (standardRes) {
-      const pageData = isPaginationResponse(standardRes);
+      const pageData = SwaggerGenTool.getPageResponse(standardRes);
       if (pageData) {
         standardRes = pageData;
         isPagination = true;
@@ -148,7 +130,7 @@ export class SwaggerSchema {
     }
 
     if (!resClass) return undefined;
-    return { type: arrayClass(resClass), isPagination, isList: resClass.startsWith('List<'), schema: getResSchema(schema) };
+    return { type: SwaggerGenTool.implementor.arraySubClass(resClass), isPagination, isList: resClass.startsWith('List<'), schema: getResSchema(schema) };
   }
 
   private getParams(parameters: SwaggerHttpEndpoint['parameters'], reqClassName: string) {
