@@ -54,15 +54,13 @@ import { http } from '${join(...Array(deeps - 1).fill('..'), 'base_http')}';\n`;
     if (apiContent.includes(`${pageName}<`)) apiContent = apiContent.replace('import { http } from ', `import { http, ${pageName} } from `);
     if (!existsSync(join(dirPath, 'request.g.ts')) || overwrite) writeFile(join(dirPath, 'request.g.ts'), apiContent, 'utf-8');
 
-    sharedModelNames = filter(sharedModelNames, (value) => modelContent.includes(`: ${value};`) || modelContent.includes(`: ${value}[]`));
+    const filterModelNames = filter(sharedModelNames, (value) => modelContent.includes(`: ${value};`) || modelContent.includes(`: ${value}[]`));
+    let shared = '\n';
+    if (filterModelNames.length > 0) shared += `import { ${filterModelNames.join(', ')} } from '${join(...Array(deeps - 1).fill('..'), 'shared_model.g')}';`;
+    if (sharedModelNames.length > 0)
+      shared += `${shared !== '\n\n' ? '\n' : ''}export { ${sharedModelNames.join(', ')} } from '${join(...Array(deeps - 1).fill('..'), 'shared_model.g')}';`;
+    shared += shared !== '\n' ? '\n\n' : '\n';
 
-    const shared =
-      sharedModelNames.length !== 0
-        ? `\nimport { ${sharedModelNames.join(', ')} } from '${join(...Array(deeps - 1).fill('..'), 'shared_model.g')}';\nexport * from '${join(
-            ...Array(deeps - 1).fill('..'),
-            'shared_model.g'
-          )}';\n\n`
-        : `\n\n`;
     modelContent = SwaggerGenTool.modelHeader + shared + modelContent;
 
     if ((!existsSync(join(dirPath, 'model.g.ts')) || overwrite) && !modelEmpty) writeFile(join(dirPath, 'model.g.ts'), modelContent, 'utf-8');

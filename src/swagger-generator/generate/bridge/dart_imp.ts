@@ -2,6 +2,7 @@ import { Material, camelCase, existsSync, find, join, writeFile } from '@root/ut
 import { DART_TYPE, INDENT, SwaggerGenTool, getDartType } from '../../utils';
 import { IDescriptionOption, JSONSchema, Method, SwaggerParameter } from '../../index.d';
 import { PlatformImplementor } from '.';
+import { filter } from 'lodash';
 
 const rootName = 'requests';
 // 具体实现角色
@@ -59,13 +60,13 @@ class ${className} {\n`;
     }
     if (modelEmpty) apiContent = apiContent.replace(`import 'model.g.dart';\n`, '');
     if (!existsSync(join(dirPath, 'request.g.dart')) || overwrite) writeFile(join(dirPath, 'request.g.dart'), apiContent + '}', 'utf-8');
-    const shared =
-      sharedModelNames.length !== 0
-        ? `\n\nimport '${join(...Array(deeps - 1).fill('..'), 'shared_model.g.dart')}';\nexport '${join(
-            ...Array(deeps - 1).fill('..'),
-            'shared_model.g.dart'
-          )}';\n\n`
-        : `\n\n`;
+
+    const filterModelNames = filter(sharedModelNames, (value) => modelContent.includes(`${value} `) || modelContent.includes(`<${value}>`));
+    let shared = '\n\n';
+    if (filterModelNames.length > 0) shared += `import '${join(...Array(deeps - 1).fill('..'), 'shared_model.g.dart')}';`;
+    if (sharedModelNames.length > 0) shared += `${shared !== '\n\n' ? '\n' : ''}export '${join(...Array(deeps - 1).fill('..'), 'shared_model.g.dart')}';`;
+    if (shared !== '\n\n') shared += '\n\n';
+
     modelContent = SwaggerGenTool.modelHeader + shared + modelContent;
 
     if ((!existsSync(join(dirPath, 'model.g.dart')) || overwrite) && !modelEmpty) writeFile(join(dirPath, 'model.g.dart'), modelContent, 'utf-8');
