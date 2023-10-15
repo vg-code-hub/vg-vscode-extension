@@ -76,27 +76,8 @@ class RequestGenerate {
   }
 
   generateRequest(key: string, method: Method, value: SwaggerHttpEndpoint) {
-    const { customPathFolder } = SwaggerGenTool.config;
-    let folder: string | undefined;
-    if (customPathFolder)
-      for (const customKey of customPathFolder.keys())
-        if (isRegExp(customKey) && (customKey as RegExp).test(key)) {
-          folder = customPathFolder.get(customKey);
-          break;
-        } else if (!isRegExp(customKey) && key.startsWith(customKey as string)) {
-          folder = customPathFolder.get(customKey);
-          break;
-        }
-
-    if (!folder) {
-      folder = value['x-apifox-folder'];
-      if (!folder && value.tags && value.tags.length > 0) folder = value.tags[0];
-      folder = SwaggerGenTool.exchangeConfigMap(folder);
-    }
-
-    if (!SwaggerGenTool.testFolder(folder ?? '')) return;
-    if (!SwaggerGenTool.testPath(`${method.toLowerCase()}&&${key}`)) return;
-
+    let folder = SwaggerGenTool.getFolder(key, method, value);
+    if (!folder) return;
     let { dirPath, deeps, className } = getDirPath(folder);
 
     if (!existsSync(dirPath)) mkdirpSync(dirPath);

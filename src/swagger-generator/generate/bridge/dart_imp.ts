@@ -1,4 +1,4 @@
-import { Material, camelCase, existsSync, find, join, writeFile } from '@root/utils';
+import { Material, camelCase, compile as compileEjs, existsSync, find, join, writeFile } from '@root/utils';
 import { DART_TYPE, INDENT, SwaggerGenTool, getDartType } from '../../utils';
 import { IDescriptionOption, JSONSchema, Method, SwaggerParameter } from '../../index.d';
 import { PlatformImplementor } from '.';
@@ -14,14 +14,6 @@ export class DartPlatformImplementor implements PlatformImplementor {
   getSchameType = getDartType;
   isArrPropType = (propType: string) => propType.startsWith('List');
 
-  /**
-   * Generates the request header for a specific file.
-   *
-   * @param {string} fileHeader - The file header string.
-   * @param {number} deeps - The number of deeps.
-   * @param {string} className - The name of the class.
-   * @return {string} The generated request header.
-   */
   public getReqHeader(fileHeader: string, deeps: number, className: string) {
     return `${fileHeader}
 import 'model.g.dart';
@@ -78,23 +70,57 @@ class ${className} {\n`;
     const description = p.description;
     const require = p.required;
 
-    return { name, orgKey: p.name, type, description, require };
+    return { name, orgKey: p.name, type, description, require, schema: p.schema };
   }
 
-  /**
-   * A description of the entire function.
-   *
-   * @param {IDescriptionOption} options - The options object containing the function parameters.
-   * @param {string} options.summary - The summary of the function.
-   * @param {string} options.description - The description of the function.
-   * @param {string} options.operationId - The operation id of the function.
-   * @param {string} options.returnType - The return type of the function.
-   * @param {Array<{type: string, require: boolean, name: string, description: string}>} options.paths - The array of path parameters.
-   * @param {Array<{type: string, require: boolean, name: string, description: string}>} options.querys - The array of query parameters.
-   * @param {{type: string, name: string, description: string}} options.formData - The form data parameter.
-   * @param {{type: string, name: string, description: string}} options.body - The body parameter.
-   * @returns {string} The function description.
-   */
+  public getEnumModelContent(className: string, value: JSONSchema) {
+    const type = SwaggerGenTool.implementor.getSchameType({ property: value });
+    const enumVals = value.enum;
+    const commentNames = value['x-enum-varnames']!.map((key) => value!['x-enum-comments']![key]);
+    const varnames = value['x-enum-varnames']!.map((e) => camelCase(e.replace(className, '')));
+    let propsContent = '';
+    let constructorContent = 'switch (val) {\n';
+
+    enumVals?.forEach((e, index) => {
+      const comment = commentNames[index];
+      const varname = varnames[index];
+      propsContent += `${INDENT}/// ${comment}\n${INDENT}${varname}(${e}),\n`;
+      constructorContent += `${INDENT}${INDENT}${INDENT}case ${
+        value!.type === 'integer' ? e : `'${e}'`
+      }:\n${INDENT}${INDENT}${INDENT}${INDENT}return ${className}.${varname};\n`;
+    });
+    if (propsContent.length > 0) propsContent = propsContent.substring(2, propsContent.length - 2) + ';';
+    if (constructorContent.length > 0) constructorContent += `${INDENT}${INDENT}}`;
+
+    const template = SwaggerGenTool.getMaterialTemplateWithName('enum_model');
+
+    const modelContent = compileEjs(template, {
+      type,
+      className,
+      propsContent,
+      constructorContent,
+      commentNames: `[${commentNames.map((e) => `"${e}"`).join(', ')}];`,
+    } as any);
+    return modelContent;
+  }
+
+  getModelContent(className: string, value: JSONSchema) {
+    const constructorContent = this.getConstructorContent(value.properties, value.required);
+    const properties = this.getPropertiesContent(value.properties, value.required);
+    const fromJsonContent = this.getFromJsonContent(value.properties, value.required);
+    const toJsonContent = this.getToJsonContent(value.properties, value.required);
+    const template = SwaggerGenTool.getMaterialTemplateWithName('model');
+
+    const modelContent = compileEjs(template, {
+      className,
+      properties,
+      constructorContent,
+      fromJsonContent,
+      toJsonContent,
+    } as any);
+    return modelContent;
+  }
+
   public getDescription(options: IDescriptionOption) {
     const { summary, description, operationId } = options;
     let desc = summary ? `\n${INDENT}/// ${summary}` : '';
@@ -202,8 +228,10 @@ class ${className} {\n`;
 
     if (body && ['put', 'post', 'delete'].includes(method)) {
       const { type } = body;
+      const value = SwaggerGenTool.dataModels[type] ?? body.schema;
       var suffix = '';
-      if (type && !DART_TYPE.includes(this.arraySubClass(type))) suffix = `.toJson()`;
+      if (type && !DART_TYPE.includes(this.arraySubClass(type)) && SwaggerGenTool.isEnumObject(value)) suffix = `.value`;
+      else if (type && !DART_TYPE.includes(this.arraySubClass(type))) suffix = `.toJson()`;
       else if (type && ['int', 'double'].includes(type)) suffix = `.toString()`;
       str += `, body${suffix}`;
     }
@@ -211,9 +239,11 @@ class ${className} {\n`;
 
     if (querys.length > 0) {
       queryStr += '{';
-      querys.forEach(({ type, name, orgKey, require }) => {
+      querys.forEach(({ type, name, orgKey, require, schema }) => {
         var suffix = '';
-        if (type && !DART_TYPE.includes(this.arraySubClass(type))) suffix = `.toJson()`;
+        const value = SwaggerGenTool.dataModels[type] ?? schema;
+        if (type && !DART_TYPE.includes(this.arraySubClass(type)) && SwaggerGenTool.isEnumObject(value)) suffix = `.value`;
+        else if (type && !DART_TYPE.includes(this.arraySubClass(type))) suffix = `.toJson()`;
         else if (type && ['int', 'double'].includes(type)) suffix = `.toString()`;
         queryStr += `\'${orgKey}\': ${name}${require || !suffix ? '' : '?'}${suffix}, `;
       });
@@ -230,31 +260,38 @@ class ${className} {\n`;
     const resName = SwaggerGenTool.resName;
     const [pageName, keyName] = SwaggerGenTool.pageResName;
     const pageDataKey = SwaggerGenTool.pageResDataKey;
-    if (!SwaggerGenTool.getStandardResponse(responses)) return `\n${INDENT}${INDENT}return ${resName};`;
+    const standardRes: JSONSchema | undefined = SwaggerGenTool.getStandardResponse(responses);
+    if (!standardRes) return `\n${INDENT}${INDENT}return ${resName};`;
 
     let type = returnType;
     if (DART_TYPE.includes(type) || type === 'List<Map<String, dynamic>>') {
       return `\n${INDENT}${INDENT}return ${resName};`;
     } else if (type.startsWith('List<')) {
       const subType = type.substring(5, type.length - 1);
-      return `\n${INDENT}${INDENT}return ${resName} == null ? [] : ${type}.from(${resName}.map((e) => ${subType}.fromJson(e)));`;
+      const value = SwaggerGenTool.dataModels[subType] ?? standardRes;
+      const suffix = SwaggerGenTool.isEnumObject(value) ? 'from(e)' : 'fromJson(e)';
+      return `\n${INDENT}${INDENT}return ${resName} == null ? [] : ${type}.from(${resName}.map((e) => ${subType}.${suffix}));`;
     } else if (type.startsWith(pageName)) {
       const subType = type.substring(pageName.length + 1, type.length - 1);
+      const value = SwaggerGenTool.dataModels[subType] ?? standardRes;
+      const suffix = SwaggerGenTool.isEnumObject(value) ? 'from(e)' : 'fromJson(e)';
       return `\n${INDENT}${INDENT}var pageData = ${resName};
     List<${subType}> ${keyName} = pageData['${pageDataKey}'] == null
         ? []
         : List<${subType}>.from(
-            pageData['${pageDataKey}'].map((e) => ${subType}.fromJson(e)));
+            pageData['${pageDataKey}'].map((e) => ${subType}.${suffix}));
     return ${pageName}(
       ${keyName},${SwaggerGenTool.pageResProps.map((key: string) => `\n${INDENT}${INDENT}${INDENT}${key}: pageData['${key}']`).join(',')},
     );`;
     } else {
-      return `\n${INDENT}${INDENT}return ${type}.fromJson(${resName});`;
+      const value = SwaggerGenTool.dataModels[type] ?? standardRes;
+      const suffix = SwaggerGenTool.isEnumObject(value) ? `from(${resName})` : `fromJson(${resName})`;
+      return `\n${INDENT}${INDENT}return ${type}.${suffix};`;
     }
   }
 
   /// model
-  getConstructorContent(properties: JSONSchema['properties'], required: (string | number)[] | undefined) {
+  private getConstructorContent(properties: JSONSchema['properties'], required: (string | number)[] | undefined) {
     let str = '{\n';
     for (const propertyName in properties) {
       const property = properties[propertyName];
@@ -273,7 +310,7 @@ class ${className} {\n`;
     return str;
   }
 
-  getPropertiesContent(properties: JSONSchema['properties'], required: (string | number)[] | undefined) {
+  private getPropertiesContent(properties: JSONSchema['properties'], required: (string | number)[] | undefined) {
     let str = '';
     for (const propertyName in properties) {
       const property = properties[propertyName];
@@ -292,12 +329,13 @@ class ${className} {\n`;
     return str;
   }
 
-  getFromJsonContent(properties: JSONSchema['properties'], required: (string | number)[] | undefined) {
+  private getFromJsonContent(properties: JSONSchema['properties'], required: (string | number)[] | undefined) {
     let str = '';
     for (const propertyName in properties) {
       const property = properties[propertyName];
-      const dartType = getDartType({ key: propertyName, property });
+      let dartType = getDartType({ key: propertyName, property });
       const camelPropertyName = camelCase(propertyName);
+      const isEnumObject = SwaggerGenTool.isEnumObject(property);
 
       let require = required?.includes(propertyName) ?? false;
       // nullable swagger 3+
@@ -311,9 +349,8 @@ class ${className} {\n`;
           DART_TYPE.includes(subType) ? 'e' : `${subType}.fromJson(e)`
         })) : [],\n`;
       } else if (!DART_TYPE.includes(dartType)) {
-        str += require
-          ? `${dartType}.fromJson(json["${propertyName}"]),\n`
-          : `json["${propertyName}"] != null ? ${dartType}.fromJson(json["${propertyName}"]) : null,\n`;
+        const suffix = isEnumObject ? `from(json["${propertyName}"])` : `fromJson(json["${propertyName}"])`;
+        str += require ? `${dartType}.${suffix},\n` : `json["${propertyName}"] != null ? ${dartType}.${suffix} : null,\n`;
       } else if (dartType === 'int') {
         str += require
           ? `int.parse(json["${propertyName}"].toString()),\n`
@@ -330,12 +367,14 @@ class ${className} {\n`;
     return str;
   }
 
-  getToJsonContent(properties: JSONSchema['properties'], required: (string | number)[] | undefined) {
+  private getToJsonContent(properties: JSONSchema['properties'], required: (string | number)[] | undefined) {
     let str = '';
     for (const propertyName in properties) {
       const camelPropertyName = camelCase(propertyName);
       const property = properties[propertyName];
       const dartType = getDartType({ key: propertyName, property });
+      const isEnumObject = SwaggerGenTool.isEnumObject(property);
+      const suffix = isEnumObject ? 'value' : 'toJson()';
       let require = required?.includes(propertyName) ?? false;
       // nullable swagger 3+
       const nullable = Array.isArray(property.type) && find(property.type, (e) => e.toString().includes('null'));
@@ -345,11 +384,11 @@ class ${className} {\n`;
 
       if (dartType.startsWith('List')) {
         var subType = dartType.substring(5, dartType.length - 1);
-        if (require) str += `${camelPropertyName}.map((e) => ${DART_TYPE.includes(subType) ? 'e' : 'e.toJson()'}).toList(),\n`;
-        else str += `${camelPropertyName} != null ? ${camelPropertyName}!.map((e) => ${DART_TYPE.includes(subType) ? 'e' : 'e.toJson()'}).toList() : null,\n`;
+        if (require) str += `${camelPropertyName}.map((e) => ${DART_TYPE.includes(subType) ? 'e' : `e.${suffix}`}).toList(),\n`;
+        else str += `${camelPropertyName} != null ? ${camelPropertyName}!.map((e) => ${DART_TYPE.includes(subType) ? 'e' : `e.${suffix}`}).toList() : null,\n`;
       } else if (!DART_TYPE.includes(dartType)) {
-        if (require) str += `${camelPropertyName}.toJson(),\n`;
-        else str += `${camelPropertyName} != null ? ${camelPropertyName}!.toJson() : null,\n`;
+        if (require) str += `${camelPropertyName}.${suffix},\n`;
+        else str += `${camelPropertyName} != null ? ${camelPropertyName}!.${suffix} : null,\n`;
       } else {
         str += `${camelPropertyName},\n`;
       }

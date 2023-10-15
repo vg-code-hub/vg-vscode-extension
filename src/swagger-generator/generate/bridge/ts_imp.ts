@@ -1,4 +1,4 @@
-import { Material, camelCase, existsSync, find, join, writeFile } from '@root/utils';
+import { Material, camelCase, compile as compileEjs, existsSync, find, join, writeFile } from '@root/utils';
 import { INDENT, LIST_KEY, SwaggerGenTool, TS_TYPE, getTsType } from '../../utils';
 import { IDescriptionOption, JSONSchema, Method, SwaggerParameter } from '../../index.d';
 import { PlatformImplementor } from '.';
@@ -78,7 +78,49 @@ import { http } from '${join(...Array(deeps - 1).fill('..'), 'base_http')}';\n`;
     const description = p.description;
     const require = p.required;
 
-    return { name, orgKey: p.name, type, description, require };
+    return { name, orgKey: p.name, type, description, require, schema: p.schema };
+  }
+
+  public getEnumModelContent(className: string, value: JSONSchema) {
+    const enumVals = value.enum;
+    const commentNames = value['x-enum-varnames']!.map((key) => value!['x-enum-comments']![key]);
+    const varnames = value['x-enum-varnames']!.map((e) => camelCase(e.replace(className, '')));
+    let propsContent = '';
+    let optionsContent = '';
+
+    enumVals?.forEach((e, index) => {
+      const comment = commentNames[index];
+      const varname = varnames[index];
+      propsContent += `${INDENT}/** ${comment} */\n${INDENT}${varname} = ${e},\n`;
+      optionsContent += `${INDENT}${INDENT}{ label: "${comment}", value: ${e} },\n`;
+    });
+    if (propsContent.length > 0) propsContent = propsContent.substring(0, propsContent.length - 1);
+
+    const template = SwaggerGenTool.getMaterialTemplateWithName('enum_model');
+
+    const modelContent = compileEjs(template, {
+      className,
+      propsContent,
+      optionsContent,
+    } as any);
+    return modelContent;
+  }
+
+  public getModelContent(className: string, value: JSONSchema) {
+    const constructorContent = this.getConstructorContent(value.properties, value.required);
+    const properties = this.getPropertiesContent(value.properties, value.required);
+    const fromJsonContent = this.getFromJsonContent(value.properties, value.required);
+    const toJsonContent = this.getToJsonContent(value.properties, value.required);
+    const template = SwaggerGenTool.getMaterialTemplateWithName('model');
+
+    const modelContent = compileEjs(template, {
+      className,
+      properties,
+      constructorContent,
+      fromJsonContent,
+      toJsonContent,
+    } as any);
+    return modelContent;
   }
 
   public getDescription(options: IDescriptionOption) {
@@ -140,7 +182,7 @@ import { http } from '${join(...Array(deeps - 1).fill('..'), 'base_http')}';\n`;
     return str;
   }
 
-  getSimpleReturnType(responses: JSONSchema | undefined, name: string) {
+  public getSimpleReturnType(responses: JSONSchema | undefined, name: string) {
     if (!responses) return 'void';
 
     let resClass: string;
@@ -157,7 +199,7 @@ import { http } from '${join(...Array(deeps - 1).fill('..'), 'base_http')}';\n`;
     return this.arraySubClass(resClass);
   }
 
-  getReturnType(responses: JSONSchema | undefined, resClassName: string) {
+  public getReturnType(responses: JSONSchema | undefined, resClassName: string) {
     if (!responses) return 'any';
     let resClass: string | undefined,
       isPagination = false;
@@ -177,7 +219,7 @@ import { http } from '${join(...Array(deeps - 1).fill('..'), 'base_http')}';\n`;
     return resClass !== undefined ? `${resClass}` : 'void';
   }
 
-  getReqArgs(key: string, method: Method, options: Pick<IDescriptionOption, 'formData' | 'body' | 'paths' | 'querys'>) {
+  public getReqArgs(key: string, method: Method, options: Pick<IDescriptionOption, 'formData' | 'body' | 'paths' | 'querys'>) {
     const { paths, querys, formData, body } = options;
     const { urlPrefix } = SwaggerGenTool.config;
     const path = (urlPrefix ?? '') + key;
@@ -194,11 +236,13 @@ import { http } from '${join(...Array(deeps - 1).fill('..'), 'base_http')}';\n`;
 
     if (body && ['put', 'post', 'delete'].includes(method)) {
       const { type } = body;
+      const value = SwaggerGenTool.dataModels[type] ?? body.schema;
+      const isEnum = SwaggerGenTool.isEnumObject(value);
       if (type?.endsWith('[]')) {
         const subType = type.substring(0, type.length - 2);
-        str += TS_TYPE.includes(subType) ? ', body' : `, body.map((e) => (new models.${subType}(e)).toJson())`;
+        str += TS_TYPE.includes(subType) || isEnum ? ', body' : `, body.map((e) => (new models.${subType}(e)).toJson())`;
       } else {
-        str += TS_TYPE.includes(type!) ? ', body' : `, body.toJson()`;
+        str += TS_TYPE.includes(type!) || isEnum ? ', body' : `, body.toJson()`;
       }
     }
     if (formData && !str.includes(', body') && ['put', 'post'].includes(method)) str += ', body';
@@ -213,32 +257,39 @@ import { http } from '${join(...Array(deeps - 1).fill('..'), 'base_http')}';\n`;
    * @param {string} resClassName - The result class name.
    * @return {string} The content to be returned.
    */
-  getReturnContent(responses: JSONSchema | undefined, resClassName: string) {
+  public getReturnContent(responses: JSONSchema | undefined, resClassName: string) {
     const returnType = this.getReturnType(responses, resClassName);
     if (returnType === 'void') return '';
-    if (!SwaggerGenTool.getStandardResponse(responses)) return `\n${INDENT}return res;`;
+    const standardRes: JSONSchema | undefined = SwaggerGenTool.getStandardResponse(responses);
+    if (!standardRes) return `\n${INDENT}return res;`;
 
     if (returnType.startsWith('PageResp<')) {
       var subType = returnType.substring(9, returnType.length - 1);
+      const value = SwaggerGenTool.dataModels[subType] ?? standardRes;
+      const isEnum = SwaggerGenTool.isEnumObject(value);
       return `\n${INDENT}const data = res.data?.${LIST_KEY} ? ${
-        TS_TYPE.includes(subType) ? `res.data.${LIST_KEY}` : `(res.data.${LIST_KEY} as any[]).map<${subType}>((v: any) => ${subType}.fromJson(v))`
+        TS_TYPE.includes(subType) || isEnum ? `res.data.${LIST_KEY}` : `(res.data.${LIST_KEY} as any[]).map<${subType}>((v: any) => ${subType}.fromJson(v))`
       } : [];
   return { ...res.data, data };`;
     }
     if (returnType.endsWith('[]')) {
       var subType = returnType.substring(0, returnType.length - 2);
+      const value = SwaggerGenTool.dataModels[subType] ?? standardRes;
+      const isEnum = SwaggerGenTool.isEnumObject(value);
       return `\n${INDENT}return res.data ? ${
-        TS_TYPE.includes(subType) ? 'res.data' : `(res.data as any[]).map<${subType}>((v: any) => ${subType}.fromJson(v))`
+        TS_TYPE.includes(subType) || isEnum ? 'res.data' : `(res.data as any[]).map<${subType}>((v: any) => ${subType}.fromJson(v))`
       } : [];`;
     }
-    if (!TS_TYPE.includes(returnType)) return `\n${INDENT}return ${returnType}.fromJson(res.data);`;
+    const value = SwaggerGenTool.dataModels[returnType] ?? standardRes;
+    const isEnum = SwaggerGenTool.isEnumObject(value);
+    if (!TS_TYPE.includes(returnType) && !isEnum) return `\n${INDENT}return ${returnType}.fromJson(res.data);`;
 
     return `\n${INDENT}return res.data;`;
   }
 
   /// model
   ///
-  getConstructorContent(properties: JSONSchema['properties'], required: (string | number)[] | undefined) {
+  private getConstructorContent(properties: JSONSchema['properties'], required: (string | number)[] | undefined) {
     let str = '';
     for (const propertyName in properties) {
       const camelPropertyName = camelCase(propertyName);
@@ -248,7 +299,7 @@ import { http } from '${join(...Array(deeps - 1).fill('..'), 'base_http')}';\n`;
     return str;
   }
 
-  getPropertiesContent(properties: JSONSchema['properties'], required: (string | number)[] | undefined) {
+  private getPropertiesContent(properties: JSONSchema['properties'], required: (string | number)[] | undefined) {
     let str = '';
     for (const propertyName in properties) {
       const property = properties[propertyName];
@@ -267,12 +318,13 @@ import { http } from '${join(...Array(deeps - 1).fill('..'), 'base_http')}';\n`;
     return str;
   }
 
-  getFromJsonContent(properties: JSONSchema['properties'], required: (string | number)[] | undefined) {
+  private getFromJsonContent(properties: JSONSchema['properties'], required: (string | number)[] | undefined) {
     let str = ``;
     for (const propertyName in properties) {
       const property = properties[propertyName];
       const propType = getTsType({ key: propertyName, property });
       const camelPropertyName = camelCase(propertyName);
+      const isEnumObject = SwaggerGenTool.isEnumObject(property);
 
       let require = required?.includes(propertyName) ?? false;
       // nullable swagger 3+
@@ -283,9 +335,11 @@ import { http } from '${join(...Array(deeps - 1).fill('..'), 'base_http')}';\n`;
       if (propType.endsWith('[]')) {
         const subType = propType.substring(0, propType.length - 2);
         str += `json["${propertyName}"] != null ? ${
-          TS_TYPE.includes(subType) ? `json["${propertyName}"]` : `(json["${propertyName}"] as any[]).map<${subType}>((v: any) => ${subType}.fromJson(v))`
+          TS_TYPE.includes(subType) || isEnumObject
+            ? `json["${propertyName}"]`
+            : `(json["${propertyName}"] as any[]).map<${subType}>((v: any) => ${subType}.fromJson(v))`
         } : [],\n`;
-      } else if (!TS_TYPE.includes(propType)) {
+      } else if (!TS_TYPE.includes(propType) && !isEnumObject) {
         str += require
           ? `${propType}.fromJson(json["${propertyName}"]),\n`
           : `json["${propertyName}"] != null ? ${propType}.fromJson(json["${propertyName}"]) : undefined,\n`;
@@ -297,12 +351,13 @@ import { http } from '${join(...Array(deeps - 1).fill('..'), 'base_http')}';\n`;
     return str;
   }
 
-  getToJsonContent(properties: JSONSchema['properties'], required: (string | number)[] | undefined) {
+  private getToJsonContent(properties: JSONSchema['properties'], required: (string | number)[] | undefined) {
     let str = '{\n';
     for (const propertyName in properties) {
       const camelPropertyName = camelCase(propertyName);
       const property = properties[propertyName];
       const propType = getTsType({ key: propertyName, property });
+      const isEnumObject = SwaggerGenTool.isEnumObject(property);
 
       let require = required?.includes(propertyName) ?? false;
       // nullable swagger 3+
@@ -313,12 +368,13 @@ import { http } from '${join(...Array(deeps - 1).fill('..'), 'base_http')}';\n`;
 
       if (propType.endsWith('[]')) {
         const subType = propType.substring(0, propType.length - 2);
-        if (require) str += `this.${TS_TYPE.includes(subType) ? camelPropertyName : `${camelPropertyName}.map((e: ${subType}) => e.toJson())`},\n`;
+        if (require)
+          str += `this.${TS_TYPE.includes(subType) || isEnumObject ? camelPropertyName : `${camelPropertyName}.map((e: ${subType}) => e.toJson())`},\n`;
         else
           str += `this.${camelPropertyName} != null ? ${
-            TS_TYPE.includes(subType) ? `this.${camelPropertyName}` : `this.${camelPropertyName}.map((e: ${subType}) => e.toJson())`
+            TS_TYPE.includes(subType) || isEnumObject ? `this.${camelPropertyName}` : `this.${camelPropertyName}.map((e: ${subType}) => e.toJson())`
           } : undefined,\n`;
-      } else if (!TS_TYPE.includes(propType)) {
+      } else if (!TS_TYPE.includes(propType) && !isEnumObject) {
         if (require) str += `this.${camelPropertyName}.toJson(),\n`;
         else str += `this.${camelPropertyName} != null ? this.${camelPropertyName}!.toJson() : undefined,\n`;
       } else {

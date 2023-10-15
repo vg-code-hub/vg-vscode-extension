@@ -2,11 +2,10 @@
  * @Author: zdd
  * @Date: 2023-05-31 22:05:06
  * @LastEditors: jimmyZhao
- * @LastEditTime: 2023-10-08 22:34:22
+ * @LastEditTime: 2023-10-15 15:59:43
  * @FilePath: /vg-vscode-extension/src/swagger-generator/generate/model.ts
  * @Description:
  */
-import { compile as compileEjs } from '@root/utils';
 import type { FilesMapModel, JSONSchema } from '../index.d';
 import { SwaggerGenTool } from '../utils';
 
@@ -38,45 +37,35 @@ class ModelGenerate {
     if (!this.data[className] && _value) SwaggerGenTool.addException(`info: auto create [class ${className}] in some object propertys`);
     if (this.hasSameClassname(className)) return this.content;
 
-    const { getConstructorContent, getPropertiesContent, getFromJsonContent, getToJsonContent } = SwaggerGenTool.implementor;
+    if (SwaggerGenTool.isEnumObject(value)) {
+      const { getEnumModelContent } = SwaggerGenTool.implementor;
+      const modelContent = getEnumModelContent(className, value);
 
-    const constructorContent = getConstructorContent(value.properties, value.required);
-    const properties = getPropertiesContent(value.properties, value.required);
-    const fromJsonContent = getFromJsonContent(value.properties, value.required);
-    const toJsonContent = getToJsonContent(value.properties, value.required);
-    const template = SwaggerGenTool.getMaterialTemplateWithName('model');
-    const modelContent = compileEjs(template, {
-      className,
-      properties,
-      constructorContent,
-      fromJsonContent,
-      toJsonContent,
-    } as any);
+      this.content.push([className, modelContent]);
+      this.checkSubGen(value.properties);
+      return this.content;
+    }
+    const modelContent = SwaggerGenTool.implementor.getModelContent(className, value);
+
     this.content.push([className, modelContent]);
-
     this.checkSubGen(value.properties);
     return this.content;
   }
 
-  generateOtherModel(className: string, value: any) {
-    if (this.hasSameClassname(className)) return;
+  generateOtherModel(className: string, value: JSONSchema | undefined) {
+    if (this.hasSameClassname(className) || !value) return;
 
     if (!value.properties) value = this.data[className];
-    const { getConstructorContent, getPropertiesContent, getFromJsonContent, getToJsonContent } = SwaggerGenTool.implementor;
 
-    const constructorContent = getConstructorContent(value.properties, value.required);
-    const properties = getPropertiesContent(value.properties, value.required);
-    const fromJsonContent = getFromJsonContent(value.properties, value.required);
-    const toJsonContent = getToJsonContent(value.properties, value.required);
-    const template = SwaggerGenTool.getMaterialTemplateWithName('model');
+    if (SwaggerGenTool.isEnumObject(value)) {
+      const { getEnumModelContent } = SwaggerGenTool.implementor;
+      const modelContent = getEnumModelContent(className, value);
 
-    const modelContent = compileEjs(template, {
-      className,
-      properties,
-      constructorContent,
-      fromJsonContent,
-      toJsonContent,
-    } as any);
+      this.content.push([className, modelContent]);
+      this.checkSubGen(value.properties);
+      return;
+    }
+    const modelContent = SwaggerGenTool.implementor.getModelContent(className, value);
 
     this.content.push([className, modelContent]);
     this.checkSubGen(value.properties);

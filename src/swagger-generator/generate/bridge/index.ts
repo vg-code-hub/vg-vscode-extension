@@ -62,6 +62,24 @@ export interface PlatformImplementor {
   pathParam(p: SwaggerParameter): IParameter;
 
   /**
+   * Generates the content for an enum model based on the given class name and JSON schema value.
+   *
+   * @param {string} className - The class name.
+   * @param {JSONSchema} value - The JSON schema value.
+   * @return {string} The generated enum model content.
+   */
+  getEnumModelContent(className: string, value: JSONSchema): string;
+
+  /**
+   * Generates the content for an model based on the given class name and JSON schema value.
+   *
+   * @param {string} className - The class name.
+   * @param {JSONSchema} value - The JSON schema value.
+   * @return {string} The generated enum model content.
+   */
+  getModelContent(className: string, value: JSONSchema): string;
+
+  /**
    * A description of the entire function.
    *
    * @param {IDescriptionOption} options - The options object containing the function parameters.
@@ -121,40 +139,4 @@ export interface PlatformImplementor {
    * @return {string} The content to be returned.
    */
   getReturnContent(responses: JSONSchema | undefined, resClassName: string): string;
-
-  /**
-   * Generates the constructor content for a given set of properties and required fields.
-   *
-   * @param {JSONSchema['properties']} properties - The properties of the JSON schema.
-   * @param {(string | number)[] | undefined} required - The required fields of the JSON schema.
-   * @return {string} The constructor content generated.
-   */
-  getConstructorContent(properties: JSONSchema['properties'], required: (string | number)[] | undefined): string;
-
-  /**
-   * Generate the content for the properties of a JSON schema.
-   *
-   * @param {JSONSchema['properties']} properties - The properties of the JSON schema.
-   * @param {(string | number)[] | undefined} required - The list of required properties.
-   * @return {string} The content for the properties.
-   */
-  getPropertiesContent(properties: JSONSchema['properties'], required: (string | number)[] | undefined): string;
-
-  /**
-   * Generates the function comment for the given function body.
-   *
-   * @param {JSONSchema['properties']} properties - The properties object from JSONSchema.
-   * @param {(string | number)[] | undefined} required - The required properties array from JSONSchema.
-   * @return {string} The generated function comment.
-   */
-  getFromJsonContent(properties: JSONSchema['properties'], required: (string | number)[] | undefined): string;
-
-  /**
-   * Generates the content of a JSON object based on the provided properties and required fields.
-   *
-   * @param {JSONSchema['properties']} properties - The properties of the JSON object.
-   * @param {(string | number)[] | undefined} required - The required fields of the JSON object.
-   * @return {string} The generated JSON content.
-   */
-  getToJsonContent(properties: JSONSchema['properties'], required: (string | number)[] | undefined): string;
 }

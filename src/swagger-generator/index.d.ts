@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-06-01 16:34:25
  * @LastEditors: jimmyZhao
- * @LastEditTime: 2023-10-08 22:20:24
+ * @LastEditTime: 2023-10-15 15:39:42
  * @FilePath: /vg-vscode-extension/src/swagger-generator/index.d.ts
  * @Description:
  */
@@ -15,6 +15,8 @@ interface JSONSchema {
   $ref?: string;
   // Apifox Swagger 扩展: 接口所属目录
   'x-apifox-folder'?: string;
+  'x-enum-comments'?: Record<string, string>;
+  'x-enum-varnames'?: string[];
   title?: string;
   description?: string;
   format?: string;
@@ -123,6 +125,7 @@ export interface IParameter {
   type: string;
   description: string | undefined;
   require: boolean;
+  schema?: JSONSchema;
 }
 export interface IDescriptionOption {
   summary?: string;

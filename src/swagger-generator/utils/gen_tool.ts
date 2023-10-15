@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-06-05 11:28:07
  * @LastEditors: jimmyZhao
- * @LastEditTime: 2023-10-09 10:02:35
+ * @LastEditTime: 2023-10-15 17:55:10
  * @FilePath: /vg-vscode-extension/src/swagger-generator/utils/gen_tool.ts
  * @Description:
  */
@@ -24,7 +24,7 @@ import {
 import { baiduTranslationHandle, zhiyiTranslationHandle } from '../translation';
 import { cloneDeep, find, last } from 'lodash';
 import { getModelName } from './common';
-import { JSONSchema, Swagger } from '../index.d';
+import { JSONSchema, Method, Swagger, SwaggerHttpEndpoint } from '../index.d';
 import { DartPlatformImplementor, PlatformImplementor, TsPlatformImplementor } from '../generate';
 import { getSimpleData } from '../http';
 import { collectChinese } from './helper';
@@ -34,6 +34,7 @@ type CommonScript = {
     name: string;
     props: string[];
   };
+  isEnumObject?: (response?: JSONSchema) => boolean;
   getPageResponse?: (response?: JSONSchema) => JSONSchema | undefined;
   getStandardResponse?: (response: JSONSchema | undefined, realRes: JSONSchema | undefined) => JSONSchema | undefined;
 };
@@ -76,6 +77,30 @@ class SwaggerGenTool {
   static get translationObj() {
     if (!this._translationObj) return {};
     return this._translationObj;
+  }
+
+  static getFolder(key: string, method: Method, value: SwaggerHttpEndpoint) {
+    const { customPathFolder } = SwaggerGenTool.config;
+    let folder: string | undefined;
+    if (customPathFolder)
+      for (const customKey of customPathFolder.keys())
+        if (isRegExp(customKey) && (customKey as RegExp).test(key)) {
+          folder = customPathFolder.get(customKey);
+          break;
+        } else if (!isRegExp(customKey) && key.startsWith(customKey as string)) {
+          folder = customPathFolder.get(customKey);
+          break;
+        }
+
+    if (!folder) {
+      folder = value['x-apifox-folder'];
+      if (!folder && value.tags && value.tags.length > 0) folder = value.tags[0];
+      folder = SwaggerGenTool.exchangeConfigMap(folder);
+    }
+
+    if (!SwaggerGenTool.testFolder(folder ?? '')) return;
+    if (!SwaggerGenTool.testPath(`${method.toLowerCase()}&&${key}`)) return;
+    return folder;
   }
 
   static async reqSwaggerData(fromLocal?: boolean) {
@@ -183,6 +208,17 @@ class SwaggerGenTool {
     if (!obj) return undefined;
     for (const key in obj.properties) if (!props.includes(key)) return undefined;
     return obj.properties ? obj.properties[SwaggerGenTool.pageResDataKey] : undefined;
+  }
+
+  static isEnumObject(obj: JSONSchema) {
+    if (this.commonScript && this.commonScript.isEnumObject) return this.commonScript.isEnumObject(obj);
+    if (obj.allOf) obj = SwaggerGenTool.getRealObject(obj)!;
+    if (obj.type === 'array') {
+      const items = obj.items;
+      if (!Array.isArray(items) || items.length === 0) return false;
+      obj = items[0];
+    }
+    return obj.enum && (obj.type === 'integer' || obj.type === 'string') && obj['x-enum-comments'] && obj['x-enum-varnames'];
   }
 
   static setSwagger2apiScript() {
