@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-06-27 22:07:27
  * @LastEditors: jimmyZhao
- * @LastEditTime: 2023-10-07 14:21:31
+ * @LastEditTime: 2023-10-16 11:35:02
  * @FilePath: /vg-vscode-extension/webview-react/src/pages/materials/index.tsx
  * @Description: 
  */
@@ -164,7 +164,7 @@ const MaterialsPage: React.FC = () => {
               },
               {
                 key: 'swagger2api',
-                label: <span>swagger2api{renderBadge(4, activeKey === 'swagger2api')}</span>,
+                label: <span>swagger2api{renderBadge(count.swagger2api, activeKey === 'swagger2api')}</span>,
               },
             ],
             onChange: (key: "snippets" | "blocks" | "schema2code") => {
