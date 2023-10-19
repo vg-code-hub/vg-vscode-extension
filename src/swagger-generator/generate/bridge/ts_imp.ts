@@ -44,15 +44,6 @@ import { http } from '${join(...Array(deeps - 1).fill('..'), 'base_http')}';\n`;
   public wirtFile(overwrite: boolean, dirPath: string, options: { sharedModelNames: string[]; apiContent: string; modelContent: string; deeps: number }) {
     const [pageName] = SwaggerGenTool.pageResName;
     let { apiContent, modelContent, sharedModelNames, deeps } = options;
-    const modelEmpty = modelContent.length === 0;
-
-    if (!overwrite) {
-      writeFile(join(dirPath, 'request.g.vg'), apiContent, 'utf-8');
-      if (!modelEmpty) writeFile(join(dirPath, 'model.g.vg'), modelContent, 'utf-8');
-    }
-    if (modelEmpty) apiContent = apiContent.replace(`import * as models 'model.g';\n`, '');
-    if (apiContent.includes(`${pageName}<`)) apiContent = apiContent.replace('import { http } from ', `import { http, ${pageName} } from `);
-    if (!existsSync(join(dirPath, 'request.g.ts')) || overwrite) writeFile(join(dirPath, 'request.g.ts'), apiContent, 'utf-8');
 
     const filterModelNames = filter(sharedModelNames, (value) => modelContent.includes(`: ${value};`) || modelContent.includes(`: ${value}[]`));
     let shared = '\n';
@@ -62,6 +53,17 @@ import { http } from '${join(...Array(deeps - 1).fill('..'), 'base_http')}';\n`;
     shared += shared !== '\n' ? '\n\n' : '\n';
 
     modelContent = SwaggerGenTool.modelHeader + shared + modelContent;
+
+    const modelEmpty = modelContent === SwaggerGenTool.modelHeader;
+
+    if (!overwrite) {
+      writeFile(join(dirPath, 'request.g.vg'), apiContent, 'utf-8');
+      if (!modelEmpty) writeFile(join(dirPath, 'model.g.vg'), modelContent, 'utf-8');
+    }
+
+    if (modelEmpty) apiContent = apiContent.replace(`import * as models 'model.g';\n`, '');
+    if (apiContent.includes(`${pageName}<`)) apiContent = apiContent.replace('import { http } from ', `import { http, ${pageName} } from `);
+    if (!existsSync(join(dirPath, 'request.g.ts')) || overwrite) writeFile(join(dirPath, 'request.g.ts'), apiContent, 'utf-8');
 
     if ((!existsSync(join(dirPath, 'model.g.ts')) || overwrite) && !modelEmpty) writeFile(join(dirPath, 'model.g.ts'), modelContent, 'utf-8');
   }
@@ -90,9 +92,11 @@ import { http } from '${join(...Array(deeps - 1).fill('..'), 'base_http')}';\n`;
 
     enumVals?.forEach((e, index) => {
       const comment = commentNames[index];
-      const varname = varnames[index];
-      propsContent += `${INDENT}/** ${comment} */\n${INDENT}${varname} = ${e},\n`;
-      optionsContent += `${INDENT}${INDENT}{ label: "${comment}", value: ${e} },\n`;
+      const varname = value!.type === 'integer' ? varnames[index] : camelCase(e);
+      const eValue = value!.type === 'integer' ? e : `'${e}'`;
+
+      propsContent += `${INDENT}/** ${comment} */\n${INDENT}${varname} = ${eValue},\n`;
+      optionsContent += `${INDENT}${INDENT}{ label: "${comment}", value: ${eValue} },\n`;
     });
     if (propsContent.length > 0) propsContent = propsContent.substring(0, propsContent.length - 1);
 

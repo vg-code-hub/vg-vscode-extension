@@ -45,13 +45,6 @@ class ${className} {\n`;
 
   public wirtFile(overwrite: boolean, dirPath: string, options: { sharedModelNames: string[]; apiContent: string; modelContent: string; deeps: number }) {
     let { apiContent, modelContent, sharedModelNames, deeps } = options;
-    const modelEmpty = modelContent.length === 0;
-    if (!overwrite) {
-      writeFile(join(dirPath, 'request.g.vg'), apiContent + '}', 'utf-8');
-      if (!modelEmpty) writeFile(join(dirPath, 'model.g.vg'), modelContent, 'utf-8');
-    }
-    if (modelEmpty) apiContent = apiContent.replace(`import 'model.g.dart';\n`, '');
-    if (!existsSync(join(dirPath, 'request.g.dart')) || overwrite) writeFile(join(dirPath, 'request.g.dart'), apiContent + '}', 'utf-8');
 
     const filterModelNames = filter(sharedModelNames, (value) => modelContent.includes(`${value} `) || modelContent.includes(`<${value}>`));
     let shared = '\n\n';
@@ -61,7 +54,18 @@ class ${className} {\n`;
 
     modelContent = SwaggerGenTool.modelHeader + shared + modelContent;
 
-    if ((!existsSync(join(dirPath, 'model.g.dart')) || overwrite) && !modelEmpty) writeFile(join(dirPath, 'model.g.dart'), modelContent, 'utf-8');
+    const modelEmpty = modelContent === SwaggerGenTool.modelHeader;
+
+    if (!overwrite) {
+      writeFile(join(dirPath, 'request.g.vg'), apiContent + '}', 'utf-8');
+      if (!modelEmpty) writeFile(join(dirPath, 'model.g.vg'), modelContent, 'utf-8');
+    }
+
+    if (modelEmpty) apiContent = apiContent.replace(`import 'model.g.dart';\n`, '');
+    if (!existsSync(join(dirPath, 'request.g.dart')) || overwrite) writeFile(join(dirPath, 'request.g.dart'), apiContent + '}', 'utf-8');
+
+    if ((!existsSync(join(dirPath, 'model.g.dart')) || overwrite) && modelContent !== SwaggerGenTool.modelHeader)
+      writeFile(join(dirPath, 'model.g.dart'), modelContent, 'utf-8');
   }
 
   public pathParam(p: SwaggerParameter) {
@@ -78,16 +82,19 @@ class ${className} {\n`;
     const enumVals = value.enum;
     const commentNames = value['x-enum-varnames']!.map((key) => value!['x-enum-comments']![key]);
     const varnames = value['x-enum-varnames']!.map((e) => camelCase(e.replace(className, '')));
-    let propsContent = '';
+
+    const unknowName = 'errorOrUnknow';
+    const unknowVal = value!.type === 'integer' ? '-100' : `'error_or_unknow'`;
+
+    let propsContent = enumVals ? `${INDENT}${unknowName}(${unknowVal}),\n` : '';
     let constructorContent = 'switch (val) {\n';
 
     enumVals?.forEach((e, index) => {
       const comment = commentNames[index];
-      const varname = varnames[index];
-      propsContent += `${INDENT}/// ${comment}\n${INDENT}${varname}(${e}),\n`;
-      constructorContent += `${INDENT}${INDENT}${INDENT}case ${
-        value!.type === 'integer' ? e : `'${e}'`
-      }:\n${INDENT}${INDENT}${INDENT}${INDENT}return ${className}.${varname};\n`;
+      const varname = value!.type === 'integer' ? varnames[index] : camelCase(e);
+      const eValue = value!.type === 'integer' ? e : `'${e}'`;
+      propsContent += `${INDENT}/// ${comment}\n${INDENT}${varname}(${eValue}),\n`;
+      constructorContent += `${INDENT}${INDENT}${INDENT}case ${eValue}:\n${INDENT}${INDENT}${INDENT}${INDENT}return ${className}.${varname};\n`;
     });
     if (propsContent.length > 0) propsContent = propsContent.substring(2, propsContent.length - 2) + ';';
     if (constructorContent.length > 0) constructorContent += `${INDENT}${INDENT}}`;
