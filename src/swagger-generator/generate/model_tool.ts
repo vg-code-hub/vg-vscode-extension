@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-05-31 22:05:06
  * @LastEditors: jimmyZhao
- * @LastEditTime: 2023-10-08 21:39:59
+ * @LastEditTime: 2023-10-26 11:49:04
  * @FilePath: /vg-vscode-extension/src/swagger-generator/generate/model_tool.ts
  * @Description:
  */
@@ -34,7 +34,8 @@ function getParamContent(parameters: SwaggerHttpEndpoint['parameters'], content:
 
     if (typeof schema === 'object') {
       resClass = SwaggerGenTool.implementor.getSchameType({ param: p, key: name });
-      if (!SwaggerGenTool.implementor.baseTypes.includes(resClass)) content = MM.gen.generateModel(pascalCase(resClass), content, p.schema);
+      if (!SwaggerGenTool.implementor.baseTypes.includes(SwaggerGenTool.implementor.arraySubClass(resClass)))
+        content = MM.gen.generateModel(pascalCase(resClass), content, p.schema);
     }
   }
   return content;

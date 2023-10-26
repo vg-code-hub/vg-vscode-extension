@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-05-31 22:05:06
  * @LastEditors: jimmyZhao
- * @LastEditTime: 2023-10-15 15:59:43
+ * @LastEditTime: 2023-10-23 16:56:10
  * @FilePath: /vg-vscode-extension/src/swagger-generator/generate/model.ts
  * @Description:
  */
@@ -10,6 +10,7 @@ import type { FilesMapModel, JSONSchema } from '../index.d';
 import { SwaggerGenTool } from '../utils';
 
 class ModelGenerate {
+  className?: string;
   get data(): Record<string, JSONSchema> {
     return SwaggerGenTool.dataModels;
   }
@@ -32,6 +33,7 @@ class ModelGenerate {
 
   generateModel(className: string, content: FilesMapModel, _value?: JSONSchema) {
     const value = this.data[className] ?? _value;
+    this.className = className;
     this.content = content;
     if (!value) return content;
     if (!this.data[className] && _value) SwaggerGenTool.addException(`info: auto create [class ${className}] in some object propertys`);
@@ -53,7 +55,7 @@ class ModelGenerate {
   }
 
   generateOtherModel(className: string, value: JSONSchema | undefined) {
-    if (this.hasSameClassname(className) || !value) return;
+    if (this.hasSameClassname(className) || !value || className === this.className) return;
 
     if (!value.properties) value = this.data[className];
 

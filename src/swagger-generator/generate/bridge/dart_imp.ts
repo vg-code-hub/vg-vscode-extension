@@ -46,7 +46,10 @@ class ${className} {\n`;
   public wirtFile(overwrite: boolean, dirPath: string, options: { sharedModelNames: string[]; apiContent: string; modelContent: string; deeps: number }) {
     let { apiContent, modelContent, sharedModelNames, deeps } = options;
 
-    const filterModelNames = filter(sharedModelNames, (value) => modelContent.includes(`${value} `) || modelContent.includes(`<${value}>`));
+    const filterModelNames = filter(
+      sharedModelNames,
+      (value) => modelContent.includes(`${value} `) || modelContent.includes(`${value}?`) || modelContent.includes(`<${value}>`)
+    );
     let shared = '\n\n';
     if (filterModelNames.length > 0) shared += `import '${join(...Array(deeps - 1).fill('..'), 'shared_model.g.dart')}';`;
     if (sharedModelNames.length > 0) shared += `${shared !== '\n\n' ? '\n' : ''}export '${join(...Array(deeps - 1).fill('..'), 'shared_model.g.dart')}';`;

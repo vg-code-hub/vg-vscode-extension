@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-06-05 11:28:07
  * @LastEditors: jimmyZhao
- * @LastEditTime: 2023-10-15 17:55:10
+ * @LastEditTime: 2023-10-26 11:43:01
  * @FilePath: /vg-vscode-extension/src/swagger-generator/utils/gen_tool.ts
  * @Description:
  */
@@ -236,8 +236,13 @@ class SwaggerGenTool {
     try {
       await zhiyiTranslationHandle(values, translationObj);
     } catch (error) {
-      // 百度翻译处理
-      await baiduTranslationHandle(values, translationObj);
+      console.error(error);
+      try {
+        // 百度翻译处理
+        await baiduTranslationHandle(values, translationObj);
+      } catch (e) {
+        console.error(e);
+      }
     }
     this._translationObj = translationObj;
 
