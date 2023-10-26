@@ -2,12 +2,17 @@
  * @Author: zdd
  * @Date: 2023-05-30 17:42:04
  * @LastEditors: jimmyZhao
- * @LastEditTime: 2023-09-08 22:10:34
+ * @LastEditTime: 2023-10-26 11:59:40
  * @FilePath: /vg-vscode-extension/CHANGELOG.md
  * @Description:
 -->
 
 # Release Notes
+
+### 2.7.0
+
+- feat: gen model add enum
+- fix: gen model recursion
 
 ### 2.5.3
 
