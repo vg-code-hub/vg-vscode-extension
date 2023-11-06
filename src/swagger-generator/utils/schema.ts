@@ -1,8 +1,8 @@
 /*
  * @Author: zdd
  * @Date: 2023-07-20 11:44:45
- * @LastEditors: jimmyZhao
- * @LastEditTime: 2023-10-09 10:11:55
+ * @LastEditors: zdd
+ * @LastEditTime: 2023-11-06 14:44:48
  * @FilePath: /vg-vscode-extension/src/swagger-generator/utils/schema.ts
  * @Description:
  */
@@ -114,15 +114,9 @@ export class SwaggerSchema {
   private getReturnType(responses: JSONSchema | undefined, resClassName: string) {
     if (!responses) return undefined;
     let resClass: string | undefined,
-      isPagination = false,
       schema = responses;
-    let standardRes: JSONSchema | undefined = SwaggerGenTool.getStandardResponse(responses);
+    let [standardRes, isPagination] = SwaggerGenTool.getStandardResponse(responses);
     if (standardRes) {
-      const pageData = SwaggerGenTool.getPageResponse(standardRes);
-      if (pageData) {
-        standardRes = pageData;
-        isPagination = true;
-      }
       if (standardRes['anyOf']) standardRes = find(standardRes['anyOf'], (item) => item.type !== 'null');
       resClass = standardRes ? getDartType({ property: standardRes, key: resClassName }) : undefined;
     } else {

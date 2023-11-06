@@ -1,8 +1,8 @@
 /*
  * @Author: zdd
  * @Date: 2023-06-05 11:28:07
- * @LastEditors: jimmyZhao
- * @LastEditTime: 2023-10-26 11:43:01
+ * @LastEditors: zdd
+ * @LastEditTime: 2023-11-06 18:39:17
  * @FilePath: /vg-vscode-extension/src/swagger-generator/utils/gen_tool.ts
  * @Description:
  */
@@ -30,19 +30,29 @@ import { getSimpleData } from '../http';
 import { collectChinese } from './helper';
 
 type CommonScript = {
-  pageResponse?: {
-    name: string;
-    props: string[];
+  // 响应结构配置
+  response?: {
+    dataName: string;
+    // 分页类名
+    // 例：PageData.data (PageData 表示公共分页类，data 表示数据字段)
+    pagingName: string;
+    // 分页props
+    // 参数最后一项会映射为类名数据字段[data]。
+    pagingProps: string[];
   };
   isEnumObject?: (response?: JSONSchema) => boolean;
-  getPageResponse?: (response?: JSONSchema) => JSONSchema | undefined;
-  getStandardResponse?: (response: JSONSchema | undefined, realRes: JSONSchema | undefined) => JSONSchema | undefined;
+  getStandardResponse?: (response: JSONSchema | undefined, realRes: JSONSchema | undefined) => [JSONSchema | undefined, boolean];
+};
+
+type RequestScript = {
+  getPagingReturnContent?: (subType: string, suffix: string | boolean) => string;
 };
 
 class SwaggerGenTool {
   private static _instance: SwaggerGenTool;
   private static _translationObj?: Record<string, string>;
   private static commonScript: CommonScript | undefined;
+  static requestScript: RequestScript | undefined;
   private static _dataModels?: Record<string, JSONSchema>;
 
   static get instance() {
@@ -158,56 +168,66 @@ class SwaggerGenTool {
     return undefined;
   };
 
-  static get pageResponse() {
-    if (this.commonScript && this.commonScript.pageResponse) return this.commonScript.pageResponse;
-    return SwaggerGenTool.config.pageResponse;
+  private static get responseConfig() {
+    if (this.commonScript && this.commonScript.response) return this.commonScript.response;
+    return {
+      pagingName: 'PageResp.data',
+      dataName: `res.body['data']`,
+      pagingProps: ['page', 'size', 'total', 'data'],
+    };
   }
 
   static get pageResName() {
-    const name = SwaggerGenTool.pageResponse.name;
+    const name = SwaggerGenTool.responseConfig.pagingName;
     return name.split('.');
   }
 
   static get pageResDataKey() {
-    return last(SwaggerGenTool.pageResponse.props)!;
+    return last(SwaggerGenTool.responseConfig.pagingProps)!;
   }
 
   static get pageResProps() {
-    const props = cloneDeep(SwaggerGenTool.pageResponse.props);
+    const props = cloneDeep(SwaggerGenTool.responseConfig.pagingProps);
     return props.slice(0, props.length - 1);
   }
 
   static get resName() {
-    if (!SwaggerGenTool.config.ignoreResponse || !SwaggerGenTool.config.ignoreResponse.includes('.')) return `res.body`;
-    const [_, key] = SwaggerGenTool.config.ignoreResponse.split('.');
-    return `res.body['${key}']`;
+    return SwaggerGenTool.responseConfig.dataName;
   }
 
-  static getStandardResponse(response?: JSONSchema) {
+  static getStandardResponse(response?: JSONSchema): [JSONSchema | undefined, boolean] {
     if (this.commonScript && this.commonScript.getStandardResponse) {
       const obj = response?.allOf ? SwaggerGenTool.getRealObject(response) : undefined;
       return this.commonScript.getStandardResponse(response, obj);
     }
-    if (typeof response !== 'object') return undefined;
-    if (!SwaggerGenTool.config.ignoreResponse || !SwaggerGenTool.config.ignoreResponse.includes('.')) return response;
-    const [_, key] = SwaggerGenTool.config.ignoreResponse.split('.');
+    if (typeof response !== 'object') return [undefined, false];
+    const dataKey = 'data';
+    const pageProps = ['page', 'size', 'total', 'data'];
 
     if (response.allOf) {
       const obj = SwaggerGenTool.getRealObject(response);
-      if (obj && obj.properties) return obj.properties[key];
-    } else if (typeof response === 'object' && response.type === 'object' && response.properties) {
-      return response.properties[key];
-    }
-    return undefined;
-  }
+      if (obj && obj.properties && obj.properties[dataKey]) {
+        let isPaging = true;
+        for (let index = 0; index < pageProps.length; index++) {
+          const key = pageProps[index];
+          if (!Object.keys(obj.properties).includes(key)) {
+            isPaging = false;
+            break;
+          }
+        }
 
-  static getPageResponse(standardResponse: JSONSchema) {
-    const obj = SwaggerGenTool.getRealObject(standardResponse);
-    if (this.commonScript && this.commonScript.getPageResponse) return this.commonScript.getPageResponse(obj);
-    const props = SwaggerGenTool.pageResponse.props;
-    if (!obj) return undefined;
-    for (const key in obj.properties) if (!props.includes(key)) return undefined;
-    return obj.properties ? obj.properties[SwaggerGenTool.pageResDataKey] : undefined;
+        return [obj.properties[dataKey], isPaging];
+      }
+    } else if (typeof response === 'object' && response.type === 'object' && response.properties && response.properties[dataKey]) {
+      let isPaging = true;
+      for (const key in pageProps)
+        if (!Object.keys(response.properties).includes(key)) {
+          isPaging = false;
+          break;
+        }
+      return [response.properties[dataKey], isPaging];
+    }
+    return [undefined, false];
   }
 
   static isEnumObject(obj: JSONSchema) {
@@ -223,9 +243,18 @@ class SwaggerGenTool {
 
   static setSwagger2apiScript() {
     const commonScriptFile = join(Material.getDirPath('swagger2api'), 'common', 'script', 'index.js');
+    const type = {
+      dart: 'dart',
+      typescript: 'ts',
+    }[VGConfig.type];
+    const requestScriptFile = join(Material.getDirPath('swagger2api'), type, 'request', 'script', 'index.js');
     if (existsSync(commonScriptFile)) {
       delete eval('require').cache[eval('require').resolve(commonScriptFile)];
       this.commonScript = eval('require')(commonScriptFile);
+    }
+    if (existsSync(requestScriptFile)) {
+      delete eval('require').cache[eval('require').resolve(requestScriptFile)];
+      this.requestScript = eval('require')(requestScriptFile);
     }
   }
 

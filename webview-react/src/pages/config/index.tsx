@@ -1,8 +1,8 @@
 /*
  * @Author: zdd
  * @Date: 2023-06-27 22:01:26
- * @LastEditors: jimmyZhao
- * @LastEditTime: 2023-10-06 23:45:33
+ * @LastEditors: zdd
+ * @LastEditTime: 2023-11-06 18:30:46
  * @FilePath: /vg-vscode-extension/webview-react/src/pages/config/index.tsx
  * @Description: 
  */
@@ -79,33 +79,6 @@ const schame: any = {
           "type": "boolean",
           "labelWidth": 100,
           "widget": "switch"
-        },
-        "ignoreResponse": {
-          "title": "忽略响应类",
-          "tooltip": "例：$1.data (表示取第一层data字段)，$1从第一层开始取值。",
-          "type": "string",
-          "labelWidth": 140,
-          "props": {}
-        },
-        "pageResponse": {
-          "type": "object",
-          "title": "分页响应类",
-          "widget": "card",
-          "column": 2,
-          "properties": {
-            "name": {
-              "title": "类名",
-              "tooltip": "例：PageData.data (PageData 表示公共分页类，data 表示数据字段)",
-              "type": "string",
-              "props": {}
-            },
-            "props": {
-              "title": "参数",
-              "tooltip": "参数最后一项会映射为类名数据字段[data]。",
-              "type": "string",
-              "props": {}
-            }
-          }
         },
         "folderFilter": {
           "title": "显示路径",

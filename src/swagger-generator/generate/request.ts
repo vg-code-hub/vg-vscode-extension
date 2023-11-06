@@ -96,10 +96,10 @@ class RequestGenerate {
 
     var _name = filterPathName(_temp);
 
-    // if (key === '/schedule/enter/provided-devices') {
-    //   console.log(key);
-    //   console.log(key);
-    // }
+    if (key === '/v2/device/device-infos/' && method === 'get') {
+      console.log(key);
+      console.log(key);
+    }
     this.filesMap[dirPath][1] = getModelClassContent(_name, value, this.filesMap[dirPath][1]);
     const reqClassName = getClassName(_name);
 

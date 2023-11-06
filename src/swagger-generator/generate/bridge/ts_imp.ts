@@ -190,11 +190,8 @@ import { http } from '${join(...Array(deeps - 1).fill('..'), 'base_http')}';\n`;
     if (!responses) return 'void';
 
     let resClass: string;
-    let standardRes: JSONSchema | undefined = SwaggerGenTool.getStandardResponse(responses);
+    let [standardRes] = SwaggerGenTool.getStandardResponse(responses);
     if (standardRes) {
-      const pageData = SwaggerGenTool.getPageResponse(standardRes);
-      if (pageData) standardRes = pageData;
-
       if (standardRes['anyOf']) standardRes = find(standardRes['anyOf'], (item) => item.type !== 'null');
       resClass = standardRes ? getTsType({ property: standardRes, key: name }) : 'void';
     } else {
@@ -205,15 +202,9 @@ import { http } from '${join(...Array(deeps - 1).fill('..'), 'base_http')}';\n`;
 
   public getReturnType(responses: JSONSchema | undefined, resClassName: string) {
     if (!responses) return 'any';
-    let resClass: string | undefined,
-      isPagination = false;
-    let standardRes: JSONSchema | undefined = SwaggerGenTool.getStandardResponse(responses);
+    let resClass: string | undefined;
+    let [standardRes, isPagination] = SwaggerGenTool.getStandardResponse(responses);
     if (standardRes) {
-      const pageData = SwaggerGenTool.getPageResponse(standardRes);
-      if (pageData) {
-        standardRes = pageData;
-        isPagination = true;
-      }
       if (standardRes['anyOf']) standardRes = find(standardRes['anyOf'], (item) => item.type !== 'null');
       resClass = standardRes ? getTsType({ property: standardRes, key: resClassName }) : undefined;
     } else {
@@ -264,17 +255,22 @@ import { http } from '${join(...Array(deeps - 1).fill('..'), 'base_http')}';\n`;
   public getReturnContent(responses: JSONSchema | undefined, resClassName: string) {
     const returnType = this.getReturnType(responses, resClassName);
     if (returnType === 'void') return '';
-    const standardRes: JSONSchema | undefined = SwaggerGenTool.getStandardResponse(responses);
+    const [pageName, keyName] = SwaggerGenTool.pageResName;
+    const [standardRes] = SwaggerGenTool.getStandardResponse(responses);
     if (!standardRes) return `\n${INDENT}return res;`;
 
-    if (returnType.startsWith('PageResp<')) {
+    if (returnType.startsWith(`${pageName}<`)) {
       var subType = returnType.substring(9, returnType.length - 1);
       const value = SwaggerGenTool.dataModels[subType] ?? standardRes;
       const isEnum = SwaggerGenTool.isEnumObject(value);
-      return `\n${INDENT}const data = res.data?.${LIST_KEY} ? ${
-        TS_TYPE.includes(subType) || isEnum ? `res.data.${LIST_KEY}` : `(res.data.${LIST_KEY} as any[]).map<${subType}>((v: any) => ${subType}.fromJson(v))`
+      if (SwaggerGenTool.requestScript?.getPagingReturnContent) {
+        const isSample = TS_TYPE.includes(subType) || isEnum;
+        return SwaggerGenTool.requestScript?.getPagingReturnContent(subType, !!isSample);
+      }
+      return `\n${INDENT}const ${keyName} = res.data ? ${
+        TS_TYPE.includes(subType) || isEnum ? `res.data` : `(res.data as any[]).map<${subType}>((v: any) => ${subType}.fromJson(v))`
       } : [];
-  return { ...res.data, data };`;
+  return { ...res.data, ${keyName} };`;
     }
     if (returnType.endsWith('[]')) {
       var subType = returnType.substring(0, returnType.length - 2);

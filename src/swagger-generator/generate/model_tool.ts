@@ -1,8 +1,8 @@
 /*
  * @Author: zdd
  * @Date: 2023-05-31 22:05:06
- * @LastEditors: jimmyZhao
- * @LastEditTime: 2023-10-26 11:49:04
+ * @LastEditors: zdd
+ * @LastEditTime: 2023-11-06 14:38:13
  * @FilePath: /vg-vscode-extension/src/swagger-generator/generate/model_tool.ts
  * @Description:
  */
@@ -46,7 +46,7 @@ function getReturnTypeContent(responses: JSONSchema | undefined, content: FilesM
   let resClass = SwaggerGenTool.implementor.getSimpleReturnType(responses, name);
   if (baseTypes.includes(resClass as string)) return content;
 
-  let standardRes: JSONSchema | undefined = SwaggerGenTool.getStandardResponse(responses);
+  let [standardRes] = SwaggerGenTool.getStandardResponse(responses);
   content = MM.gen.generateModel(pascalCase(resClass), content, standardRes) ?? '';
   return content;
 }

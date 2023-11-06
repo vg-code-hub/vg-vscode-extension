@@ -187,10 +187,8 @@ class ${className} {\n`;
     if (!responses) return 'dynamic';
 
     let resClass: string;
-    let standardRes: JSONSchema | undefined = SwaggerGenTool.getStandardResponse(responses);
+    let [standardRes] = SwaggerGenTool.getStandardResponse(responses);
     if (standardRes) {
-      const pageData = SwaggerGenTool.getPageResponse(standardRes);
-      if (pageData) standardRes = pageData;
       if (standardRes['anyOf']) standardRes = find(standardRes['anyOf'], (item) => item.type !== 'null');
       resClass = standardRes ? getDartType({ property: standardRes, key: name }) : 'dynamic';
     } else {
@@ -201,15 +199,9 @@ class ${className} {\n`;
 
   getReturnType(responses: JSONSchema | undefined, resClassName: string) {
     if (!responses) return 'dynamic';
-    let resClass: string | undefined,
-      isPagination = false;
-    let standardRes: JSONSchema | undefined = SwaggerGenTool.getStandardResponse(responses);
+    let resClass: string | undefined;
+    let [standardRes, isPagination] = SwaggerGenTool.getStandardResponse(responses);
     if (standardRes) {
-      const pageData = SwaggerGenTool.getPageResponse(standardRes);
-      if (pageData) {
-        standardRes = pageData;
-        isPagination = true;
-      }
       if (standardRes['anyOf']) standardRes = find(standardRes['anyOf'], (item: JSONSchema) => item.type !== 'null');
       resClass = standardRes ? getDartType({ property: standardRes, key: resClassName }) : undefined;
     } else {
@@ -269,8 +261,7 @@ class ${className} {\n`;
     if (returnType === 'void') return '';
     const resName = SwaggerGenTool.resName;
     const [pageName, keyName] = SwaggerGenTool.pageResName;
-    const pageDataKey = SwaggerGenTool.pageResDataKey;
-    const standardRes: JSONSchema | undefined = SwaggerGenTool.getStandardResponse(responses);
+    const [standardRes] = SwaggerGenTool.getStandardResponse(responses);
     if (!standardRes) return `\n${INDENT}${INDENT}return ${resName};`;
 
     let type = returnType;
@@ -285,13 +276,15 @@ class ${className} {\n`;
       const subType = type.substring(pageName.length + 1, type.length - 1);
       const value = SwaggerGenTool.dataModels[subType] ?? standardRes;
       const suffix = SwaggerGenTool.isEnumObject(value) ? 'from(e)' : 'fromJson(e)';
+      if (SwaggerGenTool.requestScript?.getPagingReturnContent) return SwaggerGenTool.requestScript?.getPagingReturnContent(subType, suffix);
+
       return `\n${INDENT}${INDENT}var pageData = ${resName};
-    List<${subType}> ${keyName} = pageData['${pageDataKey}'] == null
+    List<${subType}> ${keyName} = pageData == null
         ? []
         : List<${subType}>.from(
-            pageData['${pageDataKey}'].map((e) => ${subType}.${suffix}));
+            pageData.map((e) => ${subType}.${suffix}));
     return ${pageName}(
-      ${keyName},${SwaggerGenTool.pageResProps.map((key: string) => `\n${INDENT}${INDENT}${INDENT}${key}: pageData['${key}']`).join(',')},
+      ${keyName},${SwaggerGenTool.pageResProps.map((key: string) => `\n${INDENT}${INDENT}${INDENT}${key}: res.body['${key}']`).join(',')},
     );`;
     } else {
       const value = SwaggerGenTool.dataModels[type] ?? standardRes;

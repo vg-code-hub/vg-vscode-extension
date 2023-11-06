@@ -1,8 +1,8 @@
 /*
  * @Author: zdd
  * @Date: 2023-06-27 22:01:26
- * @LastEditors: jimmyZhao
- * @LastEditTime: 2023-10-08 19:20:34
+ * @LastEditors: zdd
+ * @LastEditTime: 2023-11-06 18:31:18
  * @FilePath: /vg-vscode-extension/src/utils/config.ts
  * @Description:
  */
@@ -31,8 +31,6 @@ export type Config = {
     jsonUrl: string;
     outputDir: string;
     rootPath: string;
-    ignoreResponse?: string;
-    pageResponse: { name: string; props: string[] };
     urlPrefix?: string;
     overwrite: boolean;
     folderFilter?: (string | RegExp)[];
@@ -201,9 +199,6 @@ export class VGConfig {
       }
     if (swagger.urlPrefix && !swagger.urlPrefix.startsWith('/')) swagger.urlPrefix = '/' + swagger.urlPrefix;
 
-    const ignoreResponse = (swagger.ignoreResponse ?? '$1.data').trim();
-    const props = ((swagger.pageResponse?.props as unknown as string) ?? 'page,size,total,items').split(',').map((e) => e.trim());
-    swagger.pageResponse = { name: swagger.pageResponse?.name ?? 'PageResp.data', props: props };
     this._config = {
       ...config,
       swagger: {
@@ -212,7 +207,6 @@ export class VGConfig {
         folderFilter,
         pathHidden,
         customPathFolder,
-        ignoreResponse,
       },
     };
   }
