@@ -111,6 +111,12 @@ import { http } from '${join(...Array(deeps - 1).fill('..'), 'base_http')}';\n`;
   }
 
   public getModelContent(className: string, value: JSONSchema) {
+    console.log(className);
+
+    if (className === 'RefuelStats') {
+      console.log(className);
+      console.log(className);
+    }
     const constructorContent = this.getConstructorContent(value.properties, value.required);
     const properties = this.getPropertiesContent(value.properties, value.required);
     const fromJsonContent = this.getFromJsonContent(value.properties, value.required);
@@ -332,9 +338,10 @@ import { http } from '${join(...Array(deeps - 1).fill('..'), 'base_http')}';\n`;
       if (nullable && require && !propType.endsWith('[]')) require = false;
 
       str += `${INDENT}${INDENT}${INDENT}${camelPropertyName}: `;
+      ('Array.isArray()');
       if (propType.endsWith('[]')) {
         const subType = propType.substring(0, propType.length - 2);
-        str += `json["${propertyName}"] != null ? ${
+        str += `Array.isArray(json["${propertyName}"]) ? ${
           TS_TYPE.includes(subType) || isEnumObject
             ? `json["${propertyName}"]`
             : `(json["${propertyName}"] as any[]).map<${subType}>((v: any) => ${subType}.fromJson(v))`
@@ -342,7 +349,7 @@ import { http } from '${join(...Array(deeps - 1).fill('..'), 'base_http')}';\n`;
       } else if (!TS_TYPE.includes(propType) && !isEnumObject) {
         str += require
           ? `${propType}.fromJson(json["${propertyName}"]),\n`
-          : `json["${propertyName}"] != null ? ${propType}.fromJson(json["${propertyName}"]) : undefined,\n`;
+          : `json["${propertyName}"] ? ${propType}.fromJson(json["${propertyName}"]) : undefined,\n`;
       } else {
         str += `json["${propertyName}"],\n`;
       }
@@ -370,13 +377,11 @@ import { http } from '${join(...Array(deeps - 1).fill('..'), 'base_http')}';\n`;
         const subType = propType.substring(0, propType.length - 2);
         if (require)
           str += `this.${TS_TYPE.includes(subType) || isEnumObject ? camelPropertyName : `${camelPropertyName}.map((e: ${subType}) => e.toJson())`},\n`;
-        else
-          str += `this.${camelPropertyName} != null ? ${
-            TS_TYPE.includes(subType) || isEnumObject ? `this.${camelPropertyName}` : `this.${camelPropertyName}.map((e: ${subType}) => e.toJson())`
-          } : undefined,\n`;
+        else if (TS_TYPE.includes(subType) || isEnumObject) str += `this.${camelPropertyName},\n`;
+        else str += `this.${camelPropertyName} ? ${`this.${camelPropertyName}.map((e: ${subType}) => e.toJson())`} : undefined,\n`;
       } else if (!TS_TYPE.includes(propType) && !isEnumObject) {
         if (require) str += `this.${camelPropertyName}.toJson(),\n`;
-        else str += `this.${camelPropertyName} != null ? this.${camelPropertyName}!.toJson() : undefined,\n`;
+        else str += `this.${camelPropertyName} ? this.${camelPropertyName}!.toJson() : undefined,\n`;
       } else {
         str += `this.${camelPropertyName},\n`;
       }

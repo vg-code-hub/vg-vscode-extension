@@ -1,9 +1,9 @@
 /*
  * @Author: zdd
  * @Date: 2023-06-05 11:28:07
- * @LastEditors: zdd
- * @LastEditTime: 2023-11-06 18:39:17
- * @FilePath: /vg-vscode-extension/src/swagger-generator/utils/gen_tool.ts
+ * @LastEditors: zdd dongdong@grizzlychina.com
+ * @LastEditTime: 2024-01-24 09:47:55
+ * @FilePath: gen_tool.ts
  * @Description:
  */
 import {
@@ -162,6 +162,10 @@ class SwaggerGenTool {
         }
       }
       return rootObj;
+    } else if (response.$ref) {
+      const parts = response.$ref.split('/');
+      const typeName = getModelName(parts[parts.length - 1]);
+      return dataModels[typeName];
     } else if (typeof response === 'object' && response.type === 'object') {
       return response;
     }
@@ -232,7 +236,7 @@ class SwaggerGenTool {
 
   static isEnumObject(obj: JSONSchema) {
     if (this.commonScript && this.commonScript.isEnumObject) return this.commonScript.isEnumObject(obj);
-    if (obj.allOf) obj = SwaggerGenTool.getRealObject(obj)!;
+    if (obj.allOf || obj.$ref) obj = SwaggerGenTool.getRealObject(obj)!;
     if (obj.type === 'array') {
       const items = obj.items;
       if (!Array.isArray(items) || items.length === 0) return false;

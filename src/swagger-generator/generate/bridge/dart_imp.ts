@@ -115,6 +115,11 @@ class ${className} {\n`;
   }
 
   getModelContent(className: string, value: JSONSchema) {
+    if (className === 'RefuelStats') {
+      console.log(className);
+      console.log(className);
+    }
+
     const constructorContent = this.getConstructorContent(value.properties, value.required);
     const properties = this.getPropertiesContent(value.properties, value.required);
     const fromJsonContent = this.getFromJsonContent(value.properties, value.required);
@@ -347,9 +352,9 @@ class ${className} {\n`;
 
       str += `${INDENT}${INDENT}${camelPropertyName}: `;
       if (dartType.startsWith('List')) {
-        var subType = dartType.substring(5, dartType.length - 1);
-        str += `json["${propertyName}"] != null ? List<${subType}>.from(json["${propertyName}"].map((e) => ${
-          DART_TYPE.includes(subType) ? 'e' : `${subType}.fromJson(e)`
+        var subType = dartType === 'List' ? '' : dartType.substring(5, dartType.length - 1);
+        str += `json["${propertyName}"] != null ? List${subType ? `<${subType}>` : ''}.from(json["${propertyName}"].map((e) => ${
+          DART_TYPE.includes(subType) || !subType ? 'e' : `${subType}.fromJson(e)`
         })) : [],\n`;
       } else if (!DART_TYPE.includes(dartType)) {
         const suffix = isEnumObject ? `from(json["${propertyName}"])` : `fromJson(json["${propertyName}"])`;
@@ -386,9 +391,10 @@ class ${className} {\n`;
       str += `${INDENT}${INDENT}"${propertyName}": `;
 
       if (dartType.startsWith('List')) {
-        var subType = dartType.substring(5, dartType.length - 1);
-        if (require) str += `${camelPropertyName}.map((e) => ${DART_TYPE.includes(subType) ? 'e' : `e.${suffix}`}).toList(),\n`;
-        else str += `${camelPropertyName} != null ? ${camelPropertyName}!.map((e) => ${DART_TYPE.includes(subType) ? 'e' : `e.${suffix}`}).toList() : null,\n`;
+        var subType = dartType === 'List' ? '' : dartType.substring(5, dartType.length - 1);
+        var simple = DART_TYPE.includes(subType) || !subType;
+        if (require) str += `${camelPropertyName}.map((e) => ${simple ? 'e' : `e.${suffix}`}).toList(),\n`;
+        else str += `${camelPropertyName} != null ? ${camelPropertyName}!.map((e) => ${simple ? 'e' : `e.${suffix}`}).toList() : null,\n`;
       } else if (!DART_TYPE.includes(dartType)) {
         if (require) str += `${camelPropertyName}.${suffix},\n`;
         else str += `${camelPropertyName} != null ? ${camelPropertyName}!.${suffix} : null,\n`;

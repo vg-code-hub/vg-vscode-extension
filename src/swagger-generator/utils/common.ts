@@ -1,9 +1,9 @@
 /*
  * @Author: zdd
  * @Date: 2023-06-01 16:59:31
- * @LastEditors: jimmyZhao
- * @LastEditTime: 2023-10-08 21:21:36
- * @FilePath: /vg-vscode-extension/src/swagger-generator/utils/common.ts
+ * @LastEditors: zdd dongdong@grizzlychina.com
+ * @LastEditTime: 2024-01-24 10:16:09
+ * @FilePath: common.ts
  * @Description:
  */
 import { JSONSchema, SwaggerHttpEndpoint, SwaggerParameter } from '../index.d';
@@ -99,7 +99,7 @@ export function getTsType({ key, property, param }: TypeParam): string {
       if (!property) return 'any[]';
 
       const items = property!['items'];
-      if (!items) return 'any[]';
+      if (!items || items.type === 'array') return 'any[]';
       let item = items;
       //TODO: 目前仅支持单一类型
       if (Array.isArray(items) && items.length > 0) item = items[0];
@@ -135,7 +135,7 @@ export function getDartType({ key, property, param }: TypeParam): string {
       return subClass;
     case 'array':
       const items = property!['items'];
-      if (!items) return 'List';
+      if (!items || items.type === 'array') return 'List';
       let item = items;
       /// 目前仅支持单一类型
       if (Array.isArray(items) && items.length > 0) item = items[0];
