@@ -1,9 +1,9 @@
 /*
  * @Author: zdd
  * @Date: 2023-05-30 17:42:04
- * @LastEditors: jimmyZhao
- * @LastEditTime: 2023-10-08 17:25:31
- * @FilePath: /vg-vscode-extension/src/extension.ts
+ * @LastEditors: zdd dongdong@grizzlychina.com
+ * @LastEditTime: 2024-01-25 21:25:23
+ * @FilePath: extension.ts
  * @Description:
  */
 import * as vscode from 'vscode';
@@ -18,6 +18,8 @@ import { genRestapi } from './swagger-generator';
 import { commonCommands } from './commands/common';
 import { registerCompletion } from './commands/registerCompletion';
 import { genVgcodeConfig } from './utils';
+import npmProvider from './package-link/npm';
+import pubProvider from './package-link/pub';
 
 export function activate(context: vscode.ExtensionContext) {
   console.log('恭喜，您的扩展“vg-vscode-extension”已被激活！');
@@ -34,6 +36,8 @@ export function activate(context: vscode.ExtensionContext) {
   init({ extensionContext: context, extensionPath: context.extensionPath });
 
   context.subscriptions.push(
+    vscode.languages.registerDocumentLinkProvider(['javascript', { pattern: '**/package.json' }], npmProvider),
+    vscode.languages.registerDocumentLinkProvider(['yaml', { pattern: '**/pubspec.yaml' }], pubProvider),
     vscode.commands.registerCommand('extension.new-getx-routers-generate', routersGenerate),
     vscode.commands.registerCommand('extension.assets-generate', imageGenerate),
     vscode.commands.registerCommand('extension.new-getx-create-directory', newGetxCommonDirectory),

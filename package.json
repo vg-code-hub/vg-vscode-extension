@@ -2,7 +2,7 @@
   "name": "vg-vscode-extension",
   "displayName": "Frontend Code Generator - VG",
   "description": "It supports effective creation of business modules for frontend applications.",
-  "version": "2.7.2",
+  "version": "2.8.0",
   "engines": {
     "vscode": "^1.69.0"
   },
@@ -167,6 +167,16 @@
             "default": "",
             "description": "本地 scaffold json路径",
             "scope": "resource"
+          },
+          "npmDependencyLinks.registryUrl": {
+            "type": "string",
+            "default": "https://www.npmjs.com/package/",
+            "description": "Registry URL to be used for package link."
+          },
+          "pubDependencyLinks.registryUrl": {
+            "type": "string",
+            "default": "https://pub-web.flutter-io.cn/packages/",
+            "description": "Registry URL to be used for Dart and Flutter apps package link."
           }
         }
       }
