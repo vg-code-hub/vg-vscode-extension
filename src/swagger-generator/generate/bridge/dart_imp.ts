@@ -115,11 +115,6 @@ class ${className} {\n`;
   }
 
   getModelContent(className: string, value: JSONSchema) {
-    if (className === 'RefuelStats') {
-      console.log(className);
-      console.log(className);
-    }
-
     const constructorContent = this.getConstructorContent(value.properties, value.required);
     const properties = this.getPropertiesContent(value.properties, value.required);
     const fromJsonContent = this.getFromJsonContent(value.properties, value.required);

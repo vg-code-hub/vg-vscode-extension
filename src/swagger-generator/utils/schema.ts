@@ -1,12 +1,12 @@
 /*
  * @Author: zdd
  * @Date: 2023-07-20 11:44:45
- * @LastEditors: zdd
- * @LastEditTime: 2023-11-06 14:44:48
- * @FilePath: /vg-vscode-extension/src/swagger-generator/utils/schema.ts
+ * @LastEditors: zdd dongdong@grizzlychina.com
+ * @LastEditTime: 2024-01-25 18:12:48
+ * @FilePath: schema.ts
  * @Description:
  */
-import { camelCase, find, first, isRegExp, rootPath } from '@root/utils';
+import { camelCase, find, first, isRegExp, kebabCase, rootPath, snakeCase } from '@root/utils';
 import { SwaggerGenTool, getDirPath, METHOD_MAP, filterPathName, getClassName, getDartType, getParamObj, DART_TYPE, getResSchema } from '../utils';
 import type { JSONSchema, Method, ProjectType, SwaggerHttpEndpoint, SwaggerPath } from '@root/swagger-generator/index.d';
 
@@ -51,16 +51,12 @@ export class SwaggerSchema {
         }
         let { dirPath } = getDirPath(folder);
         dirPath = dirPath.replace(SwaggerGenTool.targetDirectory, '');
-        const _temp = key
-          .split('/')
-          .map((e) => camelCase(e))
-          .filter((e) => !['create', 'delete', 'update', 'v1', ''].includes(e));
-        const keyLast = _temp.join('_');
+        const keyLast = SwaggerGenTool.methodNameExchange(key);
         if (!keyLast) return;
 
         const methodName = camelCase(METHOD_MAP[method as Method] + '_' + keyLast);
         if (!filesMap[dirPath]) filesMap[dirPath] = [[], []];
-        var _name = filterPathName(_temp);
+        var _name = filterPathName(keyLast.split('_'));
         const reqClassName = getClassName(_name);
         const returnType = this.getReturnType(value.successResponse, getClassName(_name, false));
         const { pathParams, body, formData, queryParams } = this.getParams(value.parameters, reqClassName);
@@ -74,13 +70,12 @@ export class SwaggerSchema {
         filesMap[dirPath][0].push({ path: key, methodName, pathParams, queryParams, body, formData, returnType, summary, description });
       }
 
-    console.log(filesMap);
-
     return filesMap;
   }
 
   private calcModelArr(arr: Model[], modelName?: string, schema?: JSONSchema) {
     if (!modelName || DART_TYPE.includes(modelName)) return;
+    if (modelName.startsWith('List')) modelName = modelName.substring(5, modelName.length - 1);
     if (find(arr, { name: modelName })) return;
     if (this.data[modelName]) {
       arr.push({
@@ -113,6 +108,7 @@ export class SwaggerSchema {
 
   private getReturnType(responses: JSONSchema | undefined, resClassName: string) {
     if (!responses) return undefined;
+
     let resClass: string | undefined,
       schema = responses;
     let [standardRes, isPagination] = SwaggerGenTool.getStandardResponse(responses);
@@ -124,6 +120,7 @@ export class SwaggerSchema {
     }
 
     if (!resClass) return undefined;
+    if (isPagination && !resClass?.startsWith('List')) isPagination = false;
     return { type: SwaggerGenTool.implementor.arraySubClass(resClass), isPagination, isList: resClass.startsWith('List<'), schema: getResSchema(schema) };
   }
 

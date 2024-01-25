@@ -111,12 +111,6 @@ import { http } from '${join(...Array(deeps - 1).fill('..'), 'base_http')}';\n`;
   }
 
   public getModelContent(className: string, value: JSONSchema) {
-    console.log(className);
-
-    if (className === 'RefuelStats') {
-      console.log(className);
-      console.log(className);
-    }
     const constructorContent = this.getConstructorContent(value.properties, value.required);
     const properties = this.getPropertiesContent(value.properties, value.required);
     const fromJsonContent = this.getFromJsonContent(value.properties, value.required);

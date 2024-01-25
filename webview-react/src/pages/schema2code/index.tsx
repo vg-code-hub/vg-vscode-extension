@@ -1,22 +1,21 @@
 /*
  * @Author: zdd
  * @Date: 2023-06-27 22:07:27
- * @LastEditors: jimmyZhao
- * @LastEditTime: 2023-10-09 10:27:10
- * @FilePath: /vg-vscode-extension/webview-react/src/pages/schema2code/index.tsx
- * @Description: 
+ * @LastEditors: zdd dongdong@grizzlychina.com
+ * @LastEditTime: 2024-01-24 16:14:43
+ * @FilePath: index.tsx
+ * @Description:
  */
 
+import { getLocalSchemas } from '@/common';
+import CodeMirror from '@/components/CodeMirror';
+import GenPage from '@/components/GenPage';
 import type { ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
 import { useMount } from 'ahooks';
 import { Menu } from 'antd';
-import { useImmer } from 'use-immer';
 import { useEffect, useState } from 'react';
-import { getLocalSchemas } from '@/common';
-import CodeMirror from '@/components/CodeMirror';
-import GenPage from '@/components/GenPage';
-
+import { useImmer } from 'use-immer';
 
 export type TableListItem = {
   key: number;
@@ -56,13 +55,13 @@ const Schema2codePage: React.FC = () => {
     const _schemas = await getLocalSchemas();
 
     setSchemas(_schemas);
-    const _menuItems: any[] = []
+    const _menuItems: any[] = [];
     for (let keyT in _schemas) {
       if (keyT.startsWith('/')) keyT = keyT.substring(1);
       if (selectedKey == '') setSelectedKey(keyT);
       const paths = keyT.split('/');
       for (let j = 0; j < paths.length; j++) {
-        var distArr = (new Array(j + 1)).fill(0).map((_, i) => paths[i]);
+        var distArr = new Array(j + 1).fill(0).map((_, i) => paths[i]);
         const label = paths[j];
         let current: any = {};
         let children: any[] = [];
@@ -73,71 +72,79 @@ const Schema2codePage: React.FC = () => {
             if (!current.children) {
               current.children = [];
             }
-            children = current.children
+            children = current.children;
           }
           if (!children.find((item) => item.label == val)) {
             const key = distArr.slice(0, i + 1).join('/');
             current = {
               key,
               label,
-            }
-            children.push(current)
+            };
+            children.push(current);
           } else {
-            current = children.find((item) => item.label == val)
+            current = children.find((item) => item.label == val);
           }
-        })
+        });
       }
     }
     setMenuItems(_menuItems);
-  })
+  });
 
   useEffect(() => {
     const keys = selectedKey.split('/');
-    const _openKeys: string[] = []
+    const _openKeys: string[] = [];
     keys.forEach((_, i) => {
       _openKeys.push(keys.slice(0, i + 1).join('/'));
-    })
+    });
     setOpenKeys(_openKeys);
-  }, [selectedKey])
+  }, [selectedKey]);
 
   return (
     <>
-      <GenPage visible={formModal.visible}
+      <GenPage
+        visible={formModal.visible}
         config={formModal.config}
         pageName={formModal.pageName}
         modelList={modelList}
         onClose={(ok) => {
           setFormModal((s: any) => {
-            s.visible = false
+            s.visible = false;
           });
-        }} />
+        }}
+      />
       <ProTable<TableListItem>
         search={false}
-        columns={[...columns, {
-          title: '操作',
-          valueType: 'option',
-          key: 'option',
-          width: 120,
-          render: (_: string, record: any) => {
-            if (record.methodName.startsWith('update') || record.methodName.startsWith('delete')) {
-              return []
-            }
-            return [
-              <a
-                key="editable"
-                onClick={() => {
-                  setFormModal({
-                    visible: true,
-                    config: record,
-                    pageName: selectedKey,
-                  })
-                }}
-              >
-                生成page
-              </a>
-            ];
+        columns={[
+          ...columns,
+          {
+            title: '操作',
+            valueType: 'option',
+            key: 'option',
+            width: 120,
+            render: (_: string, record: any) => {
+              if (
+                record.methodName.startsWith('update') ||
+                record.methodName.startsWith('delete')
+              ) {
+                return [];
+              }
+              return [
+                <a
+                  key="editable"
+                  onClick={() => {
+                    setFormModal({
+                      visible: true,
+                      config: record,
+                      pageName: selectedKey,
+                    });
+                  }}
+                >
+                  生成page
+                </a>,
+              ];
+            },
           },
-        },]}
+        ]}
         rowKey="methodName"
         pagination={false}
         tableRender={(_: any, dom: any) => (
@@ -149,7 +156,7 @@ const Schema2codePage: React.FC = () => {
           >
             <Menu
               onSelect={(e) => {
-                setSelectedKey(e.key as string)
+                setSelectedKey(e.key as string);
               }}
               style={{ width: 256 }}
               openKeys={openKeys}
@@ -171,16 +178,25 @@ const Schema2codePage: React.FC = () => {
           selectedKey,
         }}
         expandable={{
-          expandedRowRender: (record: any) => <CodeMirror domId={"templateCodeMirror_" + record.methodName} readonly={true} value={record.code} />,
+          expandedRowRender: (record: any) => (
+            <CodeMirror
+              domId={'templateCodeMirror_' + record.methodName}
+              readonly={true}
+              value={record.code}
+            />
+          ),
         }}
         request={async () => {
           var tableListDataSource: any[] = [];
           const findKey = Object.keys(schemas).find((key) =>
-            key.startsWith('/') ? key.substring(1) == selectedKey : key == selectedKey);
+            key.startsWith('/')
+              ? key.substring(1) == selectedKey
+              : key == selectedKey,
+          );
           if (selectedKey != '' && findKey) {
             const [apis, models] = schemas[findKey];
             tableListDataSource = apis;
-            setModelList(models)
+            setModelList(models);
           }
 
           return {

@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-06-01 16:59:31
  * @LastEditors: zdd dongdong@grizzlychina.com
- * @LastEditTime: 2024-01-24 10:16:09
+ * @LastEditTime: 2024-01-25 18:33:20
  * @FilePath: common.ts
  * @Description:
  */
@@ -31,7 +31,7 @@ export interface TypeParam {
 }
 
 export function getClassName(name: string, isReq = true) {
-  return pascalCase(name + (isReq ? '_req' : '_res'));
+  return pascalCase(name.replace(/^(v1|v2|\d+)/, '') + (isReq ? '_req' : '_res'));
 }
 
 export function filterPathName(strs: string[]) {

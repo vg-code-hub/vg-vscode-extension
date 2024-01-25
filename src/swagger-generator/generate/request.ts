@@ -81,21 +81,15 @@ class RequestGenerate {
     let { dirPath, deeps, className } = getDirPath(folder);
 
     if (!existsSync(dirPath)) mkdirpSync(dirPath);
-    const _temp = key
-      .split('/')
-      .map((e) => camelCase(e))
-      .filter((e) => !['create', 'delete', 'update', 'v1', ''].includes(e));
-    const keyLast = _temp.join('_');
+    const keyLast = SwaggerGenTool.methodNameExchange(key);
     if (!keyLast) return;
-
     // 写入 class 头
     if (!this.filesMap[dirPath]) {
       const apiHeader = SwaggerGenTool.implementor.getReqHeader(SwaggerGenTool.modelHeader, deeps, className);
       this.filesMap[dirPath] = [apiHeader, [], deeps];
     }
 
-    var _name = filterPathName(_temp);
-    console.log(key, method);
+    var _name = filterPathName(keyLast.split('_'));
 
     this.filesMap[dirPath][1] = getModelClassContent(_name, value, this.filesMap[dirPath][1]);
     const reqClassName = getClassName(_name);

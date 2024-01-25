@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-06-05 11:28:07
  * @LastEditors: zdd dongdong@grizzlychina.com
- * @LastEditTime: 2024-01-24 09:47:55
+ * @LastEditTime: 2024-01-25 18:10:33
  * @FilePath: gen_tool.ts
  * @Description:
  */
@@ -22,7 +22,7 @@ import {
   writeFileSync,
 } from '@root/utils';
 import { baiduTranslationHandle, zhiyiTranslationHandle } from '../translation';
-import { cloneDeep, find, last } from 'lodash';
+import { cloneDeep, find, last, snakeCase } from 'lodash';
 import { getModelName } from './common';
 import { JSONSchema, Method, Swagger, SwaggerHttpEndpoint } from '../index.d';
 import { DartPlatformImplementor, PlatformImplementor, TsPlatformImplementor } from '../generate';
@@ -350,6 +350,16 @@ class SwaggerGenTool {
     if (this.exceptionString) writeFileSync(path, this.exceptionString, 'utf-8');
     else if (existsSync(path)) rmSync(path);
     this.exceptionString = '';
+  }
+
+  static methodNameExchange(name: string) {
+    const _temp = name
+      .split('/')
+      .map((e) => (e === '{id}' ? 'by_id' : snakeCase(e).split('_')))
+      .flat()
+      .filter((e) => !['create', 'delete', 'update', 'v1', ''].includes(e));
+    const keyLast = [...new Set(_temp)].join('_');
+    return keyLast;
   }
 }
 

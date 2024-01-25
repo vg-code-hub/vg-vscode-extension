@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-05-31 22:05:06
  * @LastEditors: zdd dongdong@grizzlychina.com
- * @LastEditTime: 2024-01-23 18:58:51
+ * @LastEditTime: 2024-01-24 10:42:56
  * @FilePath: model.ts
  * @Description:
  */
@@ -82,14 +82,6 @@ class ModelGenerate {
       if (isArrPropType(propType)) {
         var subType = arraySubClass(propType);
         if (!baseTypes.includes(subType)) this.generateOtherModel(subType, property.items);
-
-        // let endType = propType,
-        //   endProperty = property;
-        // while (isArrPropType(endType)) {
-        //   endType = arraySubClass(propType);
-        //   endProperty = property.items!;
-        // }
-        // if (!baseTypes.includes(endType)) this.generateOtherModel(endType, endProperty);
       } else if (!baseTypes.includes(propType)) {
         this.generateOtherModel(propType, property);
       }

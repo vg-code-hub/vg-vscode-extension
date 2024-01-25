@@ -1,20 +1,31 @@
 /*
  * @Author: zdd
  * @Date: 2023-07-20 15:14:05
- * @LastEditors: jimmyZhao
- * @LastEditTime: 2023-10-09 10:26:25
- * @FilePath: /vg-vscode-extension/webview-react/src/components/GenPage/index.tsx
- * @Description: 
+ * @LastEditors: zdd dongdong@grizzlychina.com
+ * @LastEditTime: 2024-01-25 18:18:13
+ * @FilePath: index.tsx
+ * @Description:
  */
-import React, { useEffect, useState } from 'react';
-import { camelCase, find, snakeCase, upperFirst } from 'lodash';
-import { render as ejsRender } from 'ejs';
-import { useModel } from '@umijs/max';
-import { useImmer } from 'use-immer';
-import { Modal, Form, Input, Checkbox, Card, Space, Divider, Menu, Radio, message } from 'antd';
 import { genPagesCode } from '@/common';
+import { useModel } from '@umijs/max';
+import {
+  Card,
+  Checkbox,
+  Divider,
+  Form,
+  Input,
+  Menu,
+  Modal,
+  Radio,
+  Space,
+  message,
+} from 'antd';
+import { render as ejsRender } from 'ejs';
+import { camelCase, find, snakeCase, upperFirst } from 'lodash';
+import React, { useEffect, useState } from 'react';
+import { useImmer } from 'use-immer';
 import CodeMirror from '../CodeMirror';
-import styles from "./index.less";
+import styles from './index.less';
 
 interface IProps {
   visible: boolean;
@@ -24,8 +35,13 @@ interface IProps {
   onClose: (ok?: boolean) => void;
 }
 
-
-const GenPage: React.FC<IProps> = ({ visible, modelList, config, pageName: _pageName, onClose }) => {
+const GenPage: React.FC<IProps> = ({
+  visible,
+  modelList,
+  config,
+  pageName: _pageName,
+  onClose,
+}) => {
   const [indeterminate, setIndeterminate] = useState(true);
   const [checkAll, setCheckAll] = useState(false);
   const [menuWidth, setMenuWidth] = useState(100);
@@ -33,8 +49,11 @@ const GenPage: React.FC<IProps> = ({ visible, modelList, config, pageName: _page
   const [checkedList, setCheckedList] = useState<any[]>([]);
   const [modelName, setModelName] = useState<string>('');
   const [plainOptions, setPlainOptions] = useState<any[]>([]);
-  const [selectPages, setSelectPages] = useImmer<string[]>(['list', 'detail', 'create']);
-  const { initialState } = useModel('@@initialState', ({ initialState }) => ({ initialState }));
+  // 'list' ｜ 'detail' ｜ 'create'
+  const [selectPageType, setSelectPageType] = useImmer<string>('');
+  const { initialState } = useModel('@@initialState', ({ initialState }) => ({
+    initialState,
+  }));
 
   const [fileItems, setFileItems] = useImmer<any[]>([
     {
@@ -48,9 +67,9 @@ const GenPage: React.FC<IProps> = ({ visible, modelList, config, pageName: _page
         {
           key: 'index.dart',
           label: 'index.dart',
-        }
+        },
       ],
-    }
+    },
   ]);
   const [pageNameFull, setPageNameFull] = useState('');
   const [openKeys, setOpenKeys] = useImmer<string[]>([]);
@@ -62,28 +81,35 @@ const GenPage: React.FC<IProps> = ({ visible, modelList, config, pageName: _page
     if (initialState?.localMaterials) {
       setSchema2codeMaterial(initialState?.localMaterials.schema2code);
     }
-  }, [initialState?.localMaterials])
+  }, [initialState?.localMaterials]);
 
   useEffect(() => {
-    setIndeterminate(!!checkedList.length && checkedList.length < plainOptions.length);
+    setIndeterminate(
+      !!checkedList.length && checkedList.length < plainOptions.length,
+    );
     setCheckAll(checkedList.length === plainOptions.length);
-  }, [checkedList])
+  }, [checkedList]);
 
   useEffect(() => {
     if (!config) return;
     let model;
     if (config.methodName.startsWith('get')) {
-      model = find(modelList, { name: config.returnType.type });
+      let returnType = config.returnType.type;
+      if (returnType.startsWith('List'))
+        returnType = returnType.substring(5, returnType.length - 1);
+
+      model = find(modelList, { name: returnType });
+
       if (config.returnType.isPagination || config.returnType.isList) {
-        setSelectPages(['list'])
+        setSelectPageType('list');
       } else {
-        setSelectPages(['detail'])
+        setSelectPageType('detail');
       }
-      setModelName(config.returnType.type)
+      setModelName(returnType);
     } else if (config.methodName.startsWith('create')) {
       model = find(modelList, { name: config.body.type });
-      setSelectPages(['create'])
-      setModelName(config.body.type)
+      setSelectPageType('create');
+      setModelName(config.body.type);
     }
     if (!model) return;
 
@@ -94,27 +120,30 @@ const GenPage: React.FC<IProps> = ({ visible, modelList, config, pageName: _page
       return { label: key, value: key, disabled: required.includes(key) };
     });
     setPlainOptions(_options);
-    setCheckedList(_checkedList)
+    setCheckedList(_checkedList);
     if (required.length != 0 && required.length === _checkedList.length) {
       setCheckAllDisable(true);
     }
-  }, [config])
+  }, [config]);
 
   useEffect(() => {
     if (!config || !_pageName) return;
-    const paths = _pageName.split('/')
-    const names = snakeCase(config.methodName).split('_')
+    const paths = _pageName.split('/');
+    let names = snakeCase(config.methodName)
+      .split('_')
+      .filter((v) => !['2', 'v'].includes(v));
+    names = [...new Set(names)];
+
     names.shift();
     if (paths[paths.length - 1] == names[0]) {
       names.shift();
     }
-    setPageNameFull(_pageName + '/' + names.join('_'))
-  }, [_pageName, config, selectPages])
+    setPageNameFull(_pageName + '/' + names.join('_'));
+  }, [_pageName, config, selectPageType]);
 
   useEffect(() => {
     const pages = pageNameFull.split('/');
-    const snakeCaseName = snakeCase(pages[pages.length - 1]);
-    let menuItem = {}
+    let menuItem = {};
     let current: any = {};
     let _codeMap: any = {};
     let children: any[] = [];
@@ -127,94 +156,142 @@ const GenPage: React.FC<IProps> = ({ visible, modelList, config, pageName: _page
         current = {
           key,
           label,
-        }
+        };
         menuItem = current;
         continue;
       }
       if (!current.children) current.children = [];
-      children = current.children
+      children = current.children;
 
       if (current && i !== pages.length - 1) {
         current = {
           key,
           label,
-        }
-        children.push(current)
+        };
+        children.push(current);
       } else {
+        let snakeCaseName = snakeCase(pages[pages.length - 1]);
+
         const _key = pages.slice(0, i).join('/');
-        if (selectPages.length === 0) {
+        if (selectPageType.length === 0) {
           delete current.children;
           continue;
+        }
+        if (snakeCaseName.endsWith('by_id')) {
+          snakeCaseName = snakeCaseName.replace('by_id', selectPageType);
+        } else if (!snakeCaseName.includes(selectPageType)) {
+          snakeCaseName += '_' + selectPageType;
         }
         current.children = [
           {
             key: `${_key}/controllers`,
             label: 'controllers',
-            children: selectPages.map(p => ({
-              key: `${_key}/controllers/${snakeCaseName}_${p}.dart`,
-              label: `${snakeCaseName}_${p}.dart`,
-            }))
+            children: [
+              {
+                key: `${_key}/controllers/${snakeCaseName}.dart`,
+                label: `${snakeCaseName}.dart`,
+              },
+            ],
           },
-          ...selectPages.includes('list') ? [
-            {
-              key: `${_key}/widgets`,
-              label: 'widgets',
-              children: [
+          ...(selectPageType === 'list'
+            ? [
                 {
-                  key: `${_key}/widgets/${snakeCaseName}_item.dart`,
-                  label: `${snakeCaseName}_item.dart`,
+                  key: `${_key}/widgets`,
+                  label: 'widgets',
+                  children: [
+                    {
+                      key: `${_key}/widgets/${snakeCaseName}_item.dart`,
+                      label: `${snakeCaseName}_item.dart`,
+                    },
+                  ],
                 },
               ]
-            },
-          ] : [],
-          ...selectPages.map(p => ({
-            key: `${_key}/${snakeCaseName}_${p}_page.dart`,
-            label: `${snakeCaseName}_${p}_page.dart`,
-          })),
-        ]
+            : []),
+          {
+            key: `${_key}/${snakeCaseName}_page.dart`,
+            label: `${snakeCaseName}_page.dart`,
+          },
+          ,
+        ];
 
         function findCodeTemplate(arr: string[]) {
-
           let model;
           if (config.methodName.startsWith('get')) {
-            model = find(modelList, { name: config.returnType.type });
+            let returnType = config.returnType.type;
+            if (returnType.startsWith('List'))
+              returnType = returnType.substring(5, returnType.length - 1);
+
+            model = find(modelList, { name: returnType });
           } else if (config.methodName.startsWith('create')) {
             model = find(modelList, { name: config.body.type });
           }
           if (!model) return '';
           let { required = [], properties } = model.schema;
 
-          return ejsRender(find(schema2codeMaterial, { name: arr.join('-') })?.template, {
-            className: upperFirst(camelCase(snakeCaseName)),
-            camelClassName: camelCase(snakeCaseName),
-            snakeName: snakeCaseName,
-            dataClass: upperFirst(config.key),
-            properties: properties ? Object.keys(properties).map((key) => {
-              return { key: key, title: properties[key].title, required: required.includes(key) };
-            }) : []
-          });
+          const reqMethod = `${upperFirst(camelCase(_pageName))}Request.${
+            config.methodName
+          }`;
+
+          return ejsRender(
+            find(schema2codeMaterial, { name: arr.join('-') })?.template,
+            {
+              className: upperFirst(camelCase(snakeCaseName)),
+              camelClassName: camelCase(snakeCaseName),
+              snakeName: snakeCaseName,
+              dataClass: upperFirst(model.name),
+              reqMethod,
+              pageTitle: config.summary ?? upperFirst(model.name),
+              properties: properties
+                ? Object.keys(properties)
+                    .filter((key) => checkedList.includes(key))
+                    .map((key) => {
+                      return {
+                        key: key,
+                        camelKey: camelCase(key),
+                        title: properties[key].description,
+                        required: required.includes(key),
+                      };
+                    })
+                : [],
+            },
+          );
         }
 
         if (schema2codeMaterial) {
           let indexContent = '';
-          if (selectPages.includes('create')) {
-            _codeMap[`${_key}/controllers/${snakeCaseName}_create.dart`] = findCodeTemplate(['dart', 'create', 'controller'])
-            _codeMap[`${_key}/${snakeCaseName}_create_page.dart`] = findCodeTemplate(['dart', 'create', 'page'])
-            indexContent += `export '${_key}/${snakeCaseName}_create_page.dart';\n`;
-            _selectedKey = `${_key}/${snakeCaseName}_create_page.dart`;
-          }
-          if (selectPages.includes('detail')) {
-            _codeMap[`${_key}/${snakeCaseName}_detail_page.dart`] = findCodeTemplate(['dart', 'detail', 'page'])
-            _codeMap[`${_key}/controllers/${snakeCaseName}_detail.dart`] = findCodeTemplate(['dart', 'detail', 'controller'])
-            indexContent += `export '${_key}/${snakeCaseName}_detail_page.dart';\n`;
-            _selectedKey = `${_key}/${snakeCaseName}_detail_page.dart`;
-          }
-          if (selectPages.includes('list')) {
-            _codeMap[`${_key}/${snakeCaseName}_list_page.dart`] = findCodeTemplate(['dart', 'list', 'page'])
-            _codeMap[`${_key}/widgets/${snakeCaseName}_item.dart`] = findCodeTemplate(['dart', 'list', 'item'])
-            _codeMap[`${_key}/controllers/${snakeCaseName}_list.dart`] = findCodeTemplate(['dart', 'list', 'controller'])
-            indexContent += `export '${_key}/${snakeCaseName}_list_page.dart';\n`;
-            _selectedKey = `${_key}/${snakeCaseName}_list_page.dart`;
+
+          if (selectPageType === 'create') {
+            _codeMap[`${_key}/controllers/${snakeCaseName}.dart`] =
+              findCodeTemplate(['dart', 'create', 'controller']);
+            _codeMap[`${_key}/${snakeCaseName}_page.dart`] = findCodeTemplate([
+              'dart',
+              'create',
+              'page',
+            ]);
+            indexContent += `export '${_key}/${snakeCaseName}_page.dart';\n`;
+            _selectedKey = `${_key}/${snakeCaseName}_page.dart`;
+          } else if (selectPageType === 'detail') {
+            _codeMap[`${_key}/${snakeCaseName}_page.dart`] = findCodeTemplate([
+              'dart',
+              'detail',
+              'page',
+            ]);
+            _codeMap[`${_key}/controllers/${snakeCaseName}.dart`] =
+              findCodeTemplate(['dart', 'detail', 'controller']);
+            indexContent += `export '${_key}/${snakeCaseName}_page.dart';\n`;
+            _selectedKey = `${_key}/${snakeCaseName}_page.dart`;
+          } else if (selectPageType === 'list') {
+            _codeMap[`${_key}/${snakeCaseName}_page.dart`] = findCodeTemplate([
+              'dart',
+              'list',
+              'page',
+            ]);
+            _codeMap[`${_key}/widgets/${snakeCaseName}_item.dart`] =
+              findCodeTemplate(['dart', 'list', 'item']);
+            _codeMap[`${_key}/controllers/${snakeCaseName}.dart`] =
+              findCodeTemplate(['dart', 'list', 'controller']);
+            indexContent += `export '${_key}/${snakeCaseName}_page.dart';\n`;
+            _selectedKey = `${_key}/${snakeCaseName}_page.dart`;
           }
           _codeMap['index.dart'] = indexContent;
         }
@@ -223,30 +300,36 @@ const GenPage: React.FC<IProps> = ({ visible, modelList, config, pageName: _page
 
     if (pages.length > 0) {
       setSelectedKey(_selectedKey);
-      setFileItems(s => {
-        s[0].children[0] = menuItem
-      })
+      setFileItems((s) => {
+        s[0].children[0] = menuItem;
+      });
     }
-    setCodeMap(_codeMap)
-  }, [pageNameFull, selectPages])
+    setCodeMap(_codeMap);
+  }, [pageNameFull, selectPageType, checkedList]);
 
   useEffect(() => {
     const keys = selectedKey.split('/');
-    const _openKeys: string[] = []
+    const _openKeys: string[] = [];
     keys.forEach((_, i) => {
       _openKeys.push(keys.slice(0, i + 1).join('/'));
-    })
+    });
 
     setOpenKeys(['pages', ..._openKeys]);
 
     if (keys.length > 1) {
       const pages = pageNameFull.split('/');
       const snakeCaseName = snakeCase(pages[pages.length - 1]);
-      const width = (keys.length) * 8 + `${snakeCaseName}_create${keys.includes('controllers') || keys.includes('widgets') ? '' : '_page'}.dart`.length * 9;
-      setMenuWidth(width)
+      const width =
+        keys.length * 8 +
+        `${snakeCaseName}_create${
+          keys.includes('controllers') || keys.includes('widgets')
+            ? ''
+            : '_page'
+        }.dart`.length *
+          9;
+      setMenuWidth(width);
     }
-  }, [selectedKey])
-
+  }, [selectedKey]);
 
   return (
     <Modal
@@ -266,7 +349,7 @@ const GenPage: React.FC<IProps> = ({ visible, modelList, config, pageName: _page
       okText="确定"
       className={styles['gen-page-modal']}
     >
-      {config &&
+      {config && (
         <>
           <Form
             fields={[
@@ -275,7 +358,7 @@ const GenPage: React.FC<IProps> = ({ visible, modelList, config, pageName: _page
             ]}
             layout={'inline'}
           >
-            <Form.Item label="项目类别" name="type" >
+            <Form.Item label="项目类别" name="type">
               <Radio.Group value={'dart'} disabled={true} optionType="default">
                 <Radio.Button value="dart">dart</Radio.Button>
                 <Radio.Button value="typescript">typescript</Radio.Button>
@@ -293,36 +376,46 @@ const GenPage: React.FC<IProps> = ({ visible, modelList, config, pageName: _page
                 }}
               />
             </Form.Item>
-            {/* <Form.Item
-              name="pages"
-              label="要生成页面"
-              rules={[{ required: true, type: 'array' }]}
-            >
-              <Select
-                onChange={(value) => {
-                  setSelectPages(value)
-                }}
-                mode="multiple" style={{ minWidth: 160 }} placeholder="请选择">
-                <Select.Option disabled={true} value="list">list</Select.Option>
-                <Select.Option value="create">create</Select.Option>
-                <Select.Option value="detail">detail</Select.Option>
-              </Select>
-            </Form.Item> */}
           </Form>
-          <Space direction="horizontal" align="start" style={{ width: '100%', marginTop: '20px', height: 'calc(100% - 130px)' }} classNames={{ item: styles['space-item'] }} size={16}>
-            <Card size='small' title={`表名:${modelName}`}>
-              <Checkbox disabled={checkAllDisable} indeterminate={indeterminate} onChange={(e) => {
-                setCheckedList(e.target.checked ? plainOptions.map((item) => item.label) : []);
-              }} checked={checkAll}>
+          <Space
+            direction="horizontal"
+            align="start"
+            style={{
+              width: '100%',
+              marginTop: '20px',
+              height: 'calc(100% - 130px)',
+            }}
+            classNames={{ item: styles['space-item'] }}
+            size={16}
+          >
+            <Card size="small" title={`表名:${modelName}`}>
+              <Checkbox
+                disabled={checkAllDisable}
+                indeterminate={indeterminate}
+                onChange={(e) => {
+                  setCheckedList(
+                    e.target.checked
+                      ? plainOptions.map((item) => item.label)
+                      : [],
+                  );
+                }}
+                checked={checkAll}
+              >
                 全选所有字段
               </Checkbox>
               <Divider style={{ margin: '8px 0' }} />
-              <Checkbox.Group className={styles['checkbox-group']} style={{ display: 'flex', flexDirection: 'column' }} options={plainOptions} value={checkedList} onChange={setCheckedList} />
+              <Checkbox.Group
+                className={styles['checkbox-group']}
+                style={{ display: 'flex', flexDirection: 'column' }}
+                options={plainOptions}
+                value={checkedList}
+                onChange={setCheckedList}
+              />
             </Card>
-            <Card size='small' title="导出文件清单">
+            <Card size="small" title="导出文件清单">
               <Menu
                 onSelect={(e) => {
-                  setSelectedKey(e.key as string)
+                  setSelectedKey(e.key as string);
                 }}
                 style={{ width: menuWidth }}
                 openKeys={openKeys}
@@ -333,11 +426,16 @@ const GenPage: React.FC<IProps> = ({ visible, modelList, config, pageName: _page
                 mode="inline"
               />
             </Card>
-            <Card size='small' title="文件预览">
-              <CodeMirror domId='templateCodeMirror' height='100%' value={codeMap[selectedKey]} />
+            <Card size="small" title="文件预览">
+              <CodeMirror
+                domId="templateCodeMirror"
+                height="100%"
+                value={codeMap[selectedKey]}
+              />
             </Card>
           </Space>
-        </>}
+        </>
+      )}
     </Modal>
   );
 };
