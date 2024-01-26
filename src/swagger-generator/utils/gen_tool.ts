@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-06-05 11:28:07
  * @LastEditors: zdd dongdong@grizzlychina.com
- * @LastEditTime: 2024-01-25 18:10:33
+ * @LastEditTime: 2024-01-26 09:39:36
  * @FilePath: gen_tool.ts
  * @Description:
  */
@@ -358,7 +358,7 @@ class SwaggerGenTool {
       .map((e) => (e === '{id}' ? 'by_id' : snakeCase(e).split('_')))
       .flat()
       .filter((e) => !['create', 'delete', 'update', 'v1', ''].includes(e));
-    const keyLast = [...new Set(_temp)].join('_');
+    const keyLast = [...new Set(_temp.reverse())].reverse().join('_');
     return keyLast;
   }
 }
