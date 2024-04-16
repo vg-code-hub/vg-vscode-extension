@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-06-05 11:28:07
  * @LastEditors: zdd dongdong@grizzlychina.com
- * @LastEditTime: 2024-01-26 09:39:36
+ * @LastEditTime: 2024-04-07 15:19:23
  * @FilePath: gen_tool.ts
  * @Description:
  */
@@ -309,6 +309,10 @@ class SwaggerGenTool {
       folder = folder.split(key).join(element);
     }
     return folder;
+  }
+
+  static needFormKeys(classname: string) {
+    return /Req$/.test(classname);
   }
 
   static reset() {

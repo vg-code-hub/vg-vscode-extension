@@ -121,13 +121,19 @@ class ${className} {\n`;
     const toJsonContent = this.getToJsonContent(value.properties, value.required);
     const template = SwaggerGenTool.getMaterialTemplateWithName('model');
 
-    const modelContent = compileEjs(template, {
+    let modelContent = compileEjs(template, {
       className,
       properties,
       constructorContent,
       fromJsonContent,
       toJsonContent,
     } as any);
+    const needFormKeys = SwaggerGenTool.needFormKeys(className);
+    if (needFormKeys) {
+      const rowKeysContent = this.getRowKeysContent(value.properties);
+      modelContent = `class ${className}RowKeys {\n${rowKeysContent}}\n\n${modelContent}`;
+    }
+
     return modelContent;
   }
 
@@ -329,6 +335,18 @@ class ${className} {\n`;
       str += `${INDENT}${dartType}${require ? '' : '?'} ${camelPropertyName};\n\n`;
     }
     str = str.length > 0 ? str.substring(2, str.length - 1) : str;
+    return str;
+  }
+
+  private getRowKeysContent(properties: JSONSchema['properties']) {
+    let str = '';
+    for (const propertyName in properties) {
+      const property = properties[propertyName];
+      const camelPropertyName = camelCase(propertyName);
+      if (property.title || property.description) str += `${INDENT}/// ${property.title || property.description}\n`;
+      str += `${INDENT}static const ${camelPropertyName} = '${propertyName}';\n\n`;
+    }
+    str = str.length > 0 ? str.substring(0, str.length - 1) : str;
     return str;
   }
 
