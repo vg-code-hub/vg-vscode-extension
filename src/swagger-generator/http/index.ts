@@ -1,9 +1,9 @@
 /*
  * @Author: zdd
  * @Date: 2023-06-01 16:31:38
- * @LastEditors: jimmyZhao
- * @LastEditTime: 2023-10-07 18:43:44
- * @FilePath: /vg-vscode-extension/src/swagger-generator/http/index.ts
+ * @LastEditors: zdd dongdong@grizzlychina.com
+ * @LastEditTime: 2024-09-13 15:13:03
+ * @FilePath: index.ts
  * @Description:
  */
 import axios from 'axios';
@@ -82,6 +82,11 @@ export const swagger3to2 = (data: any) => {
           let keys = Object.keys(methodData.responses['200']?.content || {});
           if (keys.includes('application/json')) {
             methodData.successResponse = methodData.responses['200']?.content['application/json'].schema;
+            delete methodData.responses;
+            delete methodData.successResponse['x-apifox-orders'];
+            delete methodData.successResponse['x-apifox-ignore-properties'];
+          } else if (keys.includes('*/*')) {
+            methodData.successResponse = methodData.responses['200']?.content['*/*'].schema;
             delete methodData.responses;
             delete methodData.successResponse['x-apifox-orders'];
             delete methodData.successResponse['x-apifox-ignore-properties'];

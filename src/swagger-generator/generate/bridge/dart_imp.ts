@@ -145,21 +145,23 @@ class ${className} {\n`;
     const { returnType, paths, querys, formData, body } = options;
     if (paths.length > 0 || querys.length > 0 || formData || body) desc += `\n${INDENT}///\n${INDENT}/// parameters`;
 
+    const replaceLineBreak = (str: string) => str.replaceAll(/\n/g, `\n${INDENT}/// `);
+
     paths.forEach(({ type, require, name, description }) => {
-      desc += `\n${INDENT}/// @pathParam [${type}${require ? '' : '?'}] ${name}${description ? `: ${description}` : ''}`;
+      desc += `\n${INDENT}/// @pathParam [${type}${require ? '' : '?'}] ${name}${description ? `: ${replaceLineBreak(description)}` : ''}`;
     });
 
     querys.forEach(({ type, require, name, description }) => {
-      desc += `\n${INDENT}/// @queryParam [${type}${require ? '' : '?'}] ${name}${description ? `: ${description}` : ''}`;
+      desc += `\n${INDENT}/// @queryParam [${type}${require ? '' : '?'}] ${name}${description ? `: ${replaceLineBreak(description)}` : ''}`;
     });
 
     if (formData) {
       const { type, name, description } = formData;
-      desc += `\n${INDENT}/// @formDataParam [${type}] ${name}${description ? `: ${description}` : ''}`;
+      desc += `\n${INDENT}/// @formDataParam [${type}] ${name}${description ? `: ${replaceLineBreak(description)}` : ''}`;
     }
     if (body) {
       const { type, name, description } = body;
-      desc += `\n${INDENT}/// @bodyParam [${type}] ${name}${description ? `: ${description}` : ''}`;
+      desc += `\n${INDENT}/// @bodyParam [${type}] ${name}${description ? `: ${replaceLineBreak(description)}` : ''}`;
     }
 
     desc += `\n${INDENT}/// @return [${returnType}]`;
@@ -175,7 +177,8 @@ class ${className} {\n`;
     });
     if (querys.length > 0) str += '{\n';
     querys.forEach((p) => {
-      str += `${INDENT}${INDENT}${p.require ? 'required ' : ''}${p.type}${p.require ? '' : '?'} ${p.name},\n`;
+      const type = p.type.replace(/(int|num|double|bool)/, 'String');
+      str += `${INDENT}${INDENT}${p.require ? 'required ' : ''}${type}${p.require ? '' : '?'} ${p.name},\n`;
     });
     if (formData) {
       if (!str.includes('{')) str += '{\n';
@@ -185,7 +188,13 @@ class ${className} {\n`;
       if (!str.includes('{')) str += '{\n';
       str += `${INDENT}${INDENT}required ${body.type} ${body.name},\n`;
     }
-    if (str.includes('{')) str += `${INDENT}}`;
+
+    if (str.includes('{')) {
+      if (str.endsWith(',\n')) str = str.substring(0, str.length - 2);
+      str += `${INDENT}}`;
+    } else {
+      if (str.endsWith(', ')) str = str.substring(0, str.length - 2);
+    }
     return str;
   }
 
@@ -234,7 +243,7 @@ class ${className} {\n`;
     });
     str += `'${reqPath}'`;
 
-    if (body && ['put', 'post', 'delete'].includes(method)) {
+    if (body && ['put', 'post'].includes(method)) {
       const { type } = body;
       const value = SwaggerGenTool.dataModels[type] ?? body.schema;
       var suffix = '';
@@ -242,6 +251,8 @@ class ${className} {\n`;
       else if (type && !DART_TYPE.includes(this.arraySubClass(type))) suffix = `.toJson()`;
       else if (type && ['int', 'double'].includes(type)) suffix = `.toString()`;
       str += `, body${suffix}`;
+    } else if (!body && ['put', 'post'].includes(method) && !formData) {
+      str += `, {}`;
     }
     if (formData && !str.includes(', body') && ['put', 'post'].includes(method)) str += ', body';
 
@@ -252,9 +263,10 @@ class ${className} {\n`;
         const value = SwaggerGenTool.dataModels[type] ?? schema;
         if (type && !DART_TYPE.includes(this.arraySubClass(type)) && SwaggerGenTool.isEnumObject(value)) suffix = `.value`;
         else if (type && !DART_TYPE.includes(this.arraySubClass(type))) suffix = `.toJson()`;
-        else if (type && ['int', 'double'].includes(type)) suffix = `.toString()`;
+        // else if (type && ['int', 'double'].includes(type)) suffix = `.toString()`;
         queryStr += `\'${orgKey}\': ${name}${require || !suffix ? '' : '?'}${suffix}, `;
       });
+      queryStr = queryStr.substring(0, queryStr.length - 2);
       queryStr += '}';
     }
     if (queryStr.length !== 0) str += `, query: ${queryStr}`;

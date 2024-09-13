@@ -136,21 +136,23 @@ import { http } from '${join(...Array(deeps - 1).fill('..'), 'base_http')}';\n`;
     const { returnType, paths, querys, formData, body } = options;
     if (paths.length > 0 || querys.length > 0 || formData || body) desc += `\n *\n * parameters`;
 
+    const replaceLineBreak = (str: string) => str.replaceAll(/\n/g, `\n * `);
+
     paths.forEach(({ type, require, name, description }) => {
-      desc += `\n * @pathParam {${type}${require ? '' : '?'}} ${name}${description ? `: ${description}` : ''}`;
+      desc += `\n * @pathParam {${type}${require ? '' : '?'}} ${name}${description ? `: ${replaceLineBreak(description)}` : ''}`;
     });
 
     querys.forEach(({ type, require, name, description }) => {
-      desc += `\n * @queryParam {${type}${require ? '' : '?'}} ${name}${description ? `: ${description}` : ''}`;
+      desc += `\n * @queryParam {${type}${require ? '' : '?'}} ${name}${description ? `: ${replaceLineBreak(description)}` : ''}`;
     });
 
     if (formData) {
       const { type, name, description } = formData;
-      desc += `\n * @formDataParam {${type}} ${name}${description ? `: ${description}` : ''}`;
+      desc += `\n * @formDataParam {${type}} ${name}${description ? `: ${replaceLineBreak(description)}` : ''}`;
     }
     if (body) {
       const { type, name, description } = body;
-      desc += `\n * @bodyParam {${type}} ${name}${description ? `: ${description}` : ''}`;
+      desc += `\n * @bodyParam {${type}} ${name}${description ? `: ${replaceLineBreak(description)}` : ''}`;
     }
 
     desc += `\n * @return {${returnType}}\n */`;

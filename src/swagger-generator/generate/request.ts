@@ -79,6 +79,10 @@ class RequestGenerate {
     let folder = SwaggerGenTool.getFolder(key, method, value);
     if (!folder) return;
     let { dirPath, deeps, className } = getDirPath(folder);
+    if (key.startsWith('/v3/co/project/reimbursement-payment-applies')) {
+      console.log({ key });
+      console.log(value.successResponse);
+    }
 
     if (!existsSync(dirPath)) mkdirpSync(dirPath);
     const keyLast = SwaggerGenTool.methodNameExchange(key);
@@ -96,6 +100,8 @@ class RequestGenerate {
 
     const params = this.getParams(value.parameters, reqClassName);
     let returnType = SwaggerGenTool.implementor.getReturnType(value.successResponse, getClassName(_name, false));
+    console.log({ returnType });
+
     const description = SwaggerGenTool.implementor.getDescription({
       ...value,
       ...params,
