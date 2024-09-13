@@ -1,13 +1,18 @@
 <!--
  * @Author: zdd
  * @Date: 2023-05-30 17:42:04
- * @LastEditors: jimmyZhao
- * @LastEditTime: 2023-10-26 11:59:40
- * @FilePath: /vg-vscode-extension/CHANGELOG.md
+ * @LastEditors: zdd dongdong@grizzlychina.com
+ * @LastEditTime: 2024-09-13 16:01:04
+ * @FilePath: CHANGELOG.md
  * @Description:
 -->
 
 # Release Notes
+
+### 2.9.0
+
+- fix: new apifox swagger response bug
+- fix: dart http request bug
 
 ### 2.7.0
 
