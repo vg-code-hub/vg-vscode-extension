@@ -1,9 +1,9 @@
 const https = require('https');
 const md5 = require('md5');
-const CryptoJS = require('crypto-js');
 
 import { ParamsBaidu, ParamsZhiyi } from './index.d';
 import { handleSpecialSymbol } from '../utils';
+import { SHA256, enc } from 'crypto-js';
 
 const fanyi = {
   baidu: {
@@ -98,7 +98,7 @@ export const zhiyiTranslationHandle = async (values: Array<string>, translationO
     await new Promise((resolve, reject) => {
       let str1 = appKey + truncate(query) + salt + curtime + key;
       let vocabId = '您的用户词表ID';
-      let sign = CryptoJS.SHA256(str1).toString(CryptoJS.enc.Hex);
+      let sign = SHA256(str1).toString(enc.Hex);
 
       const content = {
         q: query,
