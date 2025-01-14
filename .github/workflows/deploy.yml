@@ -25,12 +25,12 @@ jobs:
           pnpm --dir webview-react install --frozen-lockfile
       - name: build webview
         run: pnpm webview:build
-      # - name: Publish to Open VSX Registry
-      #   uses: HaaLeo/publish-vscode-extension@v1
-      #   id: publishToOpenVSX
-      #   with:
-      #     pat: ${{ secrets.OPEN_VSX_TOKEN }}
-      #     dependencies: false
+      - name: Publish to Open VSX Registry
+        uses: HaaLeo/publish-vscode-extension@v1
+        id: publishToOpenVSX
+        with:
+          pat: ${{ secrets.OPEN_VSX_TOKEN }}
+          dependencies: false
       - name: Publish to Visual Studio Marketplace
         uses: HaaLeo/publish-vscode-extension@v1
         with:
