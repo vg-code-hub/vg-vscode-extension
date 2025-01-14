@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-06-01 16:59:31
  * @LastEditors: zdd dongdong@grizzlychina.com
- * @LastEditTime: 2024-01-25 18:33:20
+ * @LastEditTime: 2025-01-14 16:10:16
  * @FilePath: common.ts
  * @Description:
  */
@@ -58,9 +58,12 @@ function getRef({ property, param }: TypeParam) {
 }
 
 function calcTypeParam({ key, property, param }: TypeParam) {
-  const subClass = key ? pascalCase(key) : undefined;
+  const mulitType = Array.isArray(property?.type) && property?.type.length > 3;
+  const hasSubProperty = Object.keys(property?.properties ?? {}).length !== 0;
+  const subClass = key && hasSubProperty ? pascalCase(key) : undefined;
   function getCuncrrentType(type: JSONSchema['type']) {
     if (!type) return undefined;
+    if (mulitType) return 'object';
     return Array.isArray(type) ? first(type) : type;
   }
 
@@ -80,7 +83,12 @@ function calcTypeParam({ key, property, param }: TypeParam) {
 }
 
 export function getTsType({ key, property, param }: TypeParam): string {
+  if (key === 'diff_data') {
+    console.log({ key });
+    console.log({ key });
+  }
   const { type, property: _property, subClass } = calcTypeParam({ key, property, param });
+
   property = _property;
   switch (type) {
     case 'integer':
@@ -206,11 +214,14 @@ export function getResSchema(schema: JSONSchema) {
 
 export function getModelName(key: string) {
   let className;
+
+  const schemasPackageMap = SwaggerGenTool.config.schemasPackageMap ?? {};
   if (!key.includes('.')) {
     className = pascalCase(key);
   } else {
-    const [a, b] = key.split('.');
-    if (/^v\d+$/i.test(a) || ['api'].includes(a) || RegExp(`^${a}`, 'i').test(b)) className = pascalCase(b);
+    let [a, b] = key.split('.');
+    a = Object.keys(schemasPackageMap).includes(a) ? schemasPackageMap[a] : a;
+    if (!a || RegExp(`^${pascalCase(a)}`, 'i').test(b)) className = pascalCase(b);
     else className = pascalCase(a + '_' + b);
   }
   return className;

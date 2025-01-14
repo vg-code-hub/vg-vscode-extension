@@ -1,13 +1,14 @@
 const https = require('https');
 const md5 = require('md5');
+const CryptoJS = require('crypto-js');
 
 import { ParamsBaidu, ParamsZhiyi } from './index.d';
 import { handleSpecialSymbol } from '../utils';
 
 const fanyi = {
   baidu: {
-    appid: '20210301000711374',
-    secretKey: 'qyjxl2zU20BwQ8sfdyxt',
+    appid: '20210422000795232',
+    secretKey: '3Pa0eeawc3SBmUBIskBK',
     maxLimit: 2000,
   },
 };
@@ -76,19 +77,42 @@ export const zhiyiTranslationHandle = async (values: Array<string>, translationO
   const maxLimit = 2000;
   let qList = splitArray(values, maxLimit);
 
+  var appKey = '174b0a38fcc259db';
+  var key = 'kx85gxMIFMEFdq6pkBskPSpFktJ3kLvX'; //注意：暴露appSecret，有被盗用造成损失的风险
+  // 多个query可以用\n连接  如 query='apple\norange\nbanana\npear'
+  var from = 'zh-CHS';
+  var to = 'en';
+
+  function truncate(q: string) {
+    var len = q.length;
+    if (len <= 20) return q;
+    return q.substring(0, 10) + len + q.substring(len - 10, len);
+  }
+
   // 保留了百度一样处理
   async function loop(index: number) {
-    let q = qList[index];
+    let query = qList[index];
+    let salt = new Date().getTime();
+    let curtime = Math.round(new Date().getTime() / 1000);
 
     await new Promise((resolve, reject) => {
+      let str1 = appKey + truncate(query) + salt + curtime + key;
+      let vocabId = '您的用户词表ID';
+      let sign = CryptoJS.SHA256(str1).toString(CryptoJS.enc.Hex);
+
       const content = {
-        entityTag: '0',
-        field: 'common',
-        lang: 'chinese',
-        src: values,
+        q: query,
+        appKey: appKey,
+        salt: salt,
+        from: from,
+        to: to,
+        sign: sign,
+        signType: 'v3',
+        curtime: curtime,
+        vocabId: vocabId,
       };
       const req = https.request(
-        'https://www.trialos.com/api/ai-translationservice/ai/translate/translateBatch',
+        'https://openapi.youdao.com/api',
         {
           method: 'POST',
           headers: {

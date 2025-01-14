@@ -344,7 +344,7 @@ class ${className} {\n`;
       if (nullable && require && !dartType.startsWith('List')) require = false;
 
       if (property.title || property.description) str += `${INDENT}/// ${property.title || property.description}\n`;
-      str += `${INDENT}${dartType}${require ? '' : '?'} ${camelPropertyName};\n\n`;
+      str += `${INDENT}${dartType}${require || dartType === 'dynamic' ? '' : '?'} ${camelPropertyName};\n\n`;
     }
     str = str.length > 0 ? str.substring(2, str.length - 1) : str;
     return str;
@@ -378,7 +378,7 @@ class ${className} {\n`;
       str += `${INDENT}${INDENT}${camelPropertyName}: `;
       if (dartType.startsWith('List')) {
         var subType = dartType === 'List' ? '' : dartType.substring(5, dartType.length - 1);
-        str += `json["${propertyName}"] != null ? List${subType ? `<${subType}>` : ''}.from(json["${propertyName}"].map((e) => ${
+        str += `json["${propertyName}"] is List ? List${subType ? `<${subType}>` : ''}.from(json["${propertyName}"].map((e) => ${
           DART_TYPE.includes(subType) || !subType ? 'e' : `${subType}.fromJson(e)`
         })) : [],\n`;
       } else if (!DART_TYPE.includes(dartType)) {
@@ -418,11 +418,9 @@ class ${className} {\n`;
       if (dartType.startsWith('List')) {
         var subType = dartType === 'List' ? '' : dartType.substring(5, dartType.length - 1);
         var simple = DART_TYPE.includes(subType) || !subType;
-        if (require) str += `${camelPropertyName}.map((e) => ${simple ? 'e' : `e.${suffix}`}).toList(),\n`;
-        else str += `${camelPropertyName} != null ? ${camelPropertyName}!.map((e) => ${simple ? 'e' : `e.${suffix}`}).toList() : null,\n`;
+        str += `${camelPropertyName}${require ? '' : '?'}.map((e) => ${simple ? 'e' : `e.${suffix}`}).toList(),\n`;
       } else if (!DART_TYPE.includes(dartType)) {
-        if (require) str += `${camelPropertyName}.${suffix},\n`;
-        else str += `${camelPropertyName} != null ? ${camelPropertyName}!.${suffix} : null,\n`;
+        str += `${camelPropertyName}${require ? '' : '?'}.${suffix},\n`;
       } else {
         str += `${camelPropertyName},\n`;
       }

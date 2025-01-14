@@ -1,9 +1,9 @@
 /*
  * @Author: zdd
  * @Date: 2023-06-27 22:01:26
- * @LastEditors: zdd
- * @LastEditTime: 2023-11-06 18:31:18
- * @FilePath: /vg-vscode-extension/src/utils/config.ts
+ * @LastEditors: zdd dongdong@grizzlychina.com
+ * @LastEditTime: 2025-01-14 14:39:44
+ * @FilePath: config.ts
  * @Description:
  */
 import * as path from 'path';
@@ -36,6 +36,7 @@ export type Config = {
     folderFilter?: (string | RegExp)[];
     pathHidden: string[];
     folderMap?: Record<string, string>;
+    schemasPackageMap?: Record<string, string>;
     customPathFolder?: Map<string | RegExp, string>;
     translationObj?: Record<string, string>;
     customModelFolder?: Record<string, string>;
