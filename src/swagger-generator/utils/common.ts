@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-06-01 16:59:31
  * @LastEditors: zdd dongdong@grizzlychina.com
- * @LastEditTime: 2025-01-14 16:10:16
+ * @LastEditTime: 2025-01-14 17:48:54
  * @FilePath: common.ts
  * @Description:
  */
@@ -58,7 +58,7 @@ function getRef({ property, param }: TypeParam) {
 }
 
 function calcTypeParam({ key, property, param }: TypeParam) {
-  const mulitType = Array.isArray(property?.type) && property?.type.length > 3;
+  const mulitType = Array.isArray(property?.type) && property?.type?.length > 3;
   const hasSubProperty = Object.keys(property?.properties ?? {}).length !== 0;
   const subClass = key && hasSubProperty ? pascalCase(key) : undefined;
   function getCuncrrentType(type: JSONSchema['type']) {
