@@ -270,7 +270,7 @@ import { http } from '${join(...Array(deeps - 1).fill('..'), 'base_http')}';\n`;
         return SwaggerGenTool.requestScript?.getPagingReturnContent(subType, !!isSample);
       }
       return `\n${INDENT}const ${keyName} = res.data ? ${
-        TS_TYPE.includes(subType) || isEnum ? `res.data` : `(res.data as any[]).map<${subType}>((v: any) => ${subType}.fromJson(v))`
+        TS_TYPE.includes(subType) || isEnum ? `res.data` : `(res.data as any[]).map<${subType}>((v) => ${subType}.fromJson(v))`
       } : [];
   return { ...res.data, ${keyName} };`;
     }
@@ -279,7 +279,7 @@ import { http } from '${join(...Array(deeps - 1).fill('..'), 'base_http')}';\n`;
       const value = SwaggerGenTool.dataModels[subType] ?? standardRes;
       const isEnum = SwaggerGenTool.isEnumObject(value);
       return `\n${INDENT}return res.data ? ${
-        TS_TYPE.includes(subType) || isEnum ? 'res.data' : `(res.data as any[]).map<${subType}>((v: any) => ${subType}.fromJson(v))`
+        TS_TYPE.includes(subType) || isEnum ? 'res.data' : `(res.data as any[]).map<${subType}>((v) => ${subType}.fromJson(v))`
       } : [];`;
     }
     const value = SwaggerGenTool.dataModels[returnType] ?? standardRes;
@@ -334,13 +334,10 @@ import { http } from '${join(...Array(deeps - 1).fill('..'), 'base_http')}';\n`;
       if (nullable && require && !propType.endsWith('[]')) require = false;
 
       str += `${INDENT}${INDENT}${INDENT}${camelPropertyName}: `;
-      ('Array.isArray()');
       if (propType.endsWith('[]')) {
         const subType = propType.substring(0, propType.length - 2);
         str += `Array.isArray(json["${propertyName}"]) ? ${
-          TS_TYPE.includes(subType) || isEnumObject
-            ? `json["${propertyName}"]`
-            : `(json["${propertyName}"] as any[]).map<${subType}>((v: any) => ${subType}.fromJson(v))`
+          TS_TYPE.includes(subType) || isEnumObject ? `json["${propertyName}"]` : `json["${propertyName}"].map<${subType}>((v) => ${subType}.fromJson(v))`
         } : [],\n`;
       } else if (!TS_TYPE.includes(propType) && !isEnumObject) {
         str += require

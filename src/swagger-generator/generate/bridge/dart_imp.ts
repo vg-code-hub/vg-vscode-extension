@@ -73,7 +73,7 @@ class ${className} {\n`;
 
   public pathParam(p: SwaggerParameter) {
     const name = camelCase(p.name);
-    const type = getDartType({ param: p });
+    const type = getDartType({ param: p, key: name });
     const description = p.description;
     const require = p.required;
 
@@ -385,13 +385,9 @@ class ${className} {\n`;
         const suffix = isEnumObject ? `from(json["${propertyName}"])` : `fromJson(json["${propertyName}"])`;
         str += require ? `${dartType}.${suffix},\n` : `json["${propertyName}"] != null ? ${dartType}.${suffix} : null,\n`;
       } else if (dartType === 'int') {
-        str += require
-          ? `int.parse(json["${propertyName}"].toString()),\n`
-          : `json["${propertyName}"] != null ? int.parse(json["${propertyName}"].toString()) : null,\n`;
+        str += require ? `int.parse(json["${propertyName}"].toString()),\n` : `int.tryParse(json["${propertyName}"].toString()),\n`;
       } else if (dartType === 'num') {
-        str += require
-          ? `num.parse(json["${propertyName}"].toString()),\n`
-          : `json["${propertyName}"] != null ? num.parse(json["${propertyName}"].toString()) : null,\n`;
+        str += require ? `num.parse(json["${propertyName}"].toString()),\n` : `num.tryParse(json["${propertyName}"].toString()),\n`;
       } else {
         str += `json["${propertyName}"],\n`;
       }

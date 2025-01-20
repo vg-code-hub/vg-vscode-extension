@@ -79,7 +79,7 @@ class RequestGenerate {
     let folder = SwaggerGenTool.getFolder(key, method, value);
     if (!folder) return;
     let { dirPath, deeps, className } = getDirPath(folder);
-    if (key.startsWith('/v3/co/project/rec-diff/list/')) {
+    if (key.startsWith('/v3/co/project/rec-diff/')) {
       console.log({ key });
       console.log(value.successResponse);
     }
@@ -141,7 +141,7 @@ class RequestGenerate {
         description: formDataParams[0].description,
       };
 
-    if (bodyParams.length > 0) body = { ...SwaggerGenTool.implementor.pathParam(first(bodyParams)!), name: 'body', require: true };
+    if (bodyParams.length > 0) body = { ...SwaggerGenTool.implementor.pathParam({ ...first(bodyParams)!, name: reqClassName }), name: 'body', require: true };
 
     return { paths, querys, formData, body };
   }

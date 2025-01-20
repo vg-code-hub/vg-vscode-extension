@@ -2,7 +2,7 @@
  * @Author: zdd
  * @Date: 2023-06-01 16:59:31
  * @LastEditors: zdd dongdong@grizzlychina.com
- * @LastEditTime: 2025-01-14 18:28:47
+ * @LastEditTime: 2025-01-20 17:02:56
  * @FilePath: common.ts
  * @Description:
  */
@@ -58,19 +58,26 @@ function getRef({ property, param }: TypeParam) {
 }
 
 function calcTypeParam({ key, property, param }: TypeParam) {
-  const hasSubProperty = Object.keys(property?.properties ?? {}).length !== 0;
-  const subClass = key && hasSubProperty ? pascalCase(key) : undefined;
   function getCuncrrentType(type: JSONSchema['type']) {
+    if (Array.isArray(type)) {
+      console.log(type);
+      console.log({ key, property, param });
+    }
     if (!type) return undefined;
-    const mulitType = Array.isArray(type) ? type?.length > 3 : false;
-    if (mulitType) return 'object';
+    // TODO: 暂定 type 数组，类型超过 2 个为 any 类型
+    const mulitType = Array.isArray(type) ? type?.length > 2 : false;
+    if (mulitType) return 'any';
     return Array.isArray(type) ? first(type) : type;
   }
 
   let type: string | undefined;
+  let subClass: string | undefined;
+
   if (property) {
     //TODO: allOf property 获取第一项
     if (property.allOf) property = property.allOf[0];
+    const hasSubProperty = Object.keys(property?.properties ?? {}).length !== 0;
+    subClass = key && hasSubProperty ? pascalCase(key) : undefined;
     type = getCuncrrentType(property.type);
   } else if (param) {
     const schema = param.schema;
@@ -78,6 +85,8 @@ function calcTypeParam({ key, property, param }: TypeParam) {
     if (param.type) type = getCuncrrentType(param.type);
     else if (!schema) type = '';
     else type = typeof schema === 'string' ? schema : getCuncrrentType(schema.type);
+    const hasSubProperty = Object.keys(property?.properties ?? {}).length !== 0;
+    subClass = key && hasSubProperty ? pascalCase(key) : undefined;
   }
   return { type, property, subClass };
 }
@@ -101,11 +110,12 @@ export function getTsType({ key, property, param }: TypeParam): string {
     case 'file':
       return 'File';
     case 'object':
-      if (!subClass) return 'any';
+      if (!subClass) return 'Record<string, any>';
       return subClass;
+    case 'any':
+      return 'any';
     case 'array':
       if (!property) return 'any[]';
-
       const items = property!['items'];
       if (!items || items.type === 'array') return 'any[]';
       let item = items;
@@ -139,8 +149,10 @@ export function getDartType({ key, property, param }: TypeParam): string {
     case 'file':
       return 'File';
     case 'object':
-      if (!subClass) return 'dynamic';
+      if (!subClass) return 'Map<String, dynamic>';
       return subClass;
+    case 'any':
+      return 'dynamic';
     case 'array':
       const items = property!['items'];
       if (!items || items.type === 'array') return 'List';
