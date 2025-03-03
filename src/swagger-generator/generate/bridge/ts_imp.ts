@@ -54,14 +54,14 @@ import { http } from '${join(...Array(deeps - 1).fill('..'), 'base_http')}';\n`;
 
     modelContent = SwaggerGenTool.modelHeader + shared + modelContent;
 
-    const modelEmpty = modelContent === SwaggerGenTool.modelHeader;
+    const modelEmpty = modelContent === SwaggerGenTool.modelHeader + '\n\n';
+    if (modelEmpty) apiContent = apiContent.replace(`import * as models from './model.g';\n`, '');
 
     if (!overwrite) {
       writeFile(join(dirPath, 'request.g.vg'), apiContent, 'utf-8');
       if (!modelEmpty) writeFile(join(dirPath, 'model.g.vg'), modelContent, 'utf-8');
     }
 
-    if (modelEmpty) apiContent = apiContent.replace(`import * as models 'model.g';\n`, '');
     if (apiContent.includes(`${pageName}<`)) apiContent = apiContent.replace('import { http } from ', `import { http, ${pageName} } from `);
     if (!existsSync(join(dirPath, 'request.g.ts')) || overwrite) writeFile(join(dirPath, 'request.g.ts'), apiContent, 'utf-8');
 
@@ -312,8 +312,8 @@ import { http } from '${join(...Array(deeps - 1).fill('..'), 'base_http')}';\n`;
       // nullable swagger 3+
       const nullable = Array.isArray(property.type) && find(property.type, (e) => e.toString().includes('null'));
       if (nullable && require) require = false;
-
-      if (property.title || property.description) str += `${INDENT}/** ${property.title || property.description} */\n`;
+      const description = property.title || property.description;
+      if (description) str += `${INDENT}/** ${description.replaceAll('\n', `\n${INDENT} * `)} */\n`;
       str += `${INDENT}${camelPropertyName}${require ? '' : '?'}: ${propType};\n\n`;
     }
     str = str.length > 0 ? str.substring(2, str.length - 1) : str;

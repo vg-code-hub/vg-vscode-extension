@@ -1,13 +1,17 @@
 <!--
  * @Author: zdd
  * @Date: 2023-05-30 17:42:04
- * @LastEditors: zdd dongdong@grizzlychina.com
- * @LastEditTime: 2024-09-13 16:01:04
+ * @LastEditors: zdd jimmyzhao163@163.com
+ * @LastEditTime: 2025-03-03 13:52:18
  * @FilePath: CHANGELOG.md
  * @Description:
 -->
 
 # Release Notes
+
+### 2.9.3
+
+- chore: 更新版本号至 2.9.3，优化 Dart 和 TypeScript 生成逻辑
 
 ### 2.9.0
 

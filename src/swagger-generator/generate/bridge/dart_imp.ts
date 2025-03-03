@@ -57,8 +57,7 @@ class ${className} {\n`;
 
     modelContent = SwaggerGenTool.modelHeader + shared + modelContent;
 
-    const modelEmpty = modelContent === SwaggerGenTool.modelHeader;
-
+    const modelEmpty = modelContent === SwaggerGenTool.modelHeader + '\n\n';
     if (!overwrite) {
       writeFile(join(dirPath, 'request.g.vg'), apiContent + '}', 'utf-8');
       if (!modelEmpty) writeFile(join(dirPath, 'model.g.vg'), modelContent, 'utf-8');
@@ -67,8 +66,7 @@ class ${className} {\n`;
     if (modelEmpty) apiContent = apiContent.replace(`import 'model.g.dart';\n`, '');
     if (!existsSync(join(dirPath, 'request.g.dart')) || overwrite) writeFile(join(dirPath, 'request.g.dart'), apiContent + '}', 'utf-8');
 
-    if ((!existsSync(join(dirPath, 'model.g.dart')) || overwrite) && modelContent !== SwaggerGenTool.modelHeader)
-      writeFile(join(dirPath, 'model.g.dart'), modelContent, 'utf-8');
+    if ((!existsSync(join(dirPath, 'model.g.dart')) || overwrite) && !modelEmpty) writeFile(join(dirPath, 'model.g.dart'), modelContent, 'utf-8');
   }
 
   public pathParam(p: SwaggerParameter) {
@@ -343,7 +341,8 @@ class ${className} {\n`;
       const nullable = Array.isArray(property.type) && find(property.type, (e) => e.toString().includes('null'));
       if (nullable && require && !dartType.startsWith('List')) require = false;
 
-      if (property.title || property.description) str += `${INDENT}/// ${property.title || property.description}\n`;
+      const description = property.title || property.description;
+      if (description) str += `${INDENT}/// ${description.replaceAll('\n', `\n${INDENT}/// `)}\n`;
       str += `${INDENT}${dartType}${require || dartType === 'dynamic' ? '' : '?'} ${camelPropertyName};\n\n`;
     }
     str = str.length > 0 ? str.substring(2, str.length - 1) : str;
@@ -355,7 +354,8 @@ class ${className} {\n`;
     for (const propertyName in properties) {
       const property = properties[propertyName];
       const camelPropertyName = camelCase(propertyName);
-      if (property.title || property.description) str += `${INDENT}/// ${property.title || property.description}\n`;
+      const description = property.title || property.description;
+      if (description) str += `${INDENT}/// ${description.replaceAll('\n', `\n${INDENT}/// `)}\n`;
       str += `${INDENT}static const ${camelPropertyName} = '${propertyName}';\n\n`;
     }
     str = str.length > 0 ? str.substring(0, str.length - 1) : str;
