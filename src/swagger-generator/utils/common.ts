@@ -1,8 +1,8 @@
 /*
  * @Author: zdd
  * @Date: 2023-06-01 16:59:31
- * @LastEditors: zdd dongdong@grizzlychina.com
- * @LastEditTime: 2025-01-20 17:02:56
+ * @LastEditors: zdd jimmyzhao163@163.com
+ * @LastEditTime: 2025-04-08 14:59:56
  * @FilePath: common.ts
  * @Description:
  */
@@ -31,7 +31,7 @@ export interface TypeParam {
 }
 
 export function getClassName(name: string, isReq = true) {
-  return pascalCase(name.replace(/^(v1|v2|\d+)/, '') + (isReq ? '_req' : '_res'));
+  return pascalCase(name.replace(/^(v1|v2|v3|\d+)/, '') + (isReq ? '_req' : '_res'));
 }
 
 export function filterPathName(strs: string[]) {

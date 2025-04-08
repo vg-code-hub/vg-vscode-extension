@@ -1,8 +1,8 @@
 /*
  * @Author: zdd
  * @Date: 2023-06-05 11:28:07
- * @LastEditors: zdd dongdong@grizzlychina.com
- * @LastEditTime: 2024-04-07 15:19:23
+ * @LastEditors: zdd jimmyzhao163@163.com
+ * @LastEditTime: 2025-04-08 15:47:11
  * @FilePath: gen_tool.ts
  * @Description:
  */
@@ -200,31 +200,30 @@ class SwaggerGenTool {
   }
 
   static getStandardResponse(response?: JSONSchema): [JSONSchema | undefined, boolean] {
+    if (response) response = SwaggerGenTool.getRealObject(response);
     if (this.commonScript && this.commonScript.getStandardResponse) {
       const obj = response?.allOf ? SwaggerGenTool.getRealObject(response) : undefined;
       return this.commonScript.getStandardResponse(response, obj);
     }
     if (typeof response !== 'object') return [undefined, false];
     const dataKey = 'data';
-    const pageProps = ['page', 'size', 'total', 'data'];
+    const pageProps = ['total', 'data'];
 
     if (response.allOf) {
       const obj = SwaggerGenTool.getRealObject(response);
       if (obj && obj.properties && obj.properties[dataKey]) {
         let isPaging = true;
-        for (let index = 0; index < pageProps.length; index++) {
-          const key = pageProps[index];
+        for (const key of pageProps)
           if (!Object.keys(obj.properties).includes(key)) {
             isPaging = false;
             break;
           }
-        }
 
         return [obj.properties[dataKey], isPaging];
       }
     } else if (typeof response === 'object' && response.type === 'object' && response.properties && response.properties[dataKey]) {
       let isPaging = true;
-      for (const key in pageProps)
+      for (const key of pageProps)
         if (!Object.keys(response.properties).includes(key)) {
           isPaging = false;
           break;
